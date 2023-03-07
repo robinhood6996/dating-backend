@@ -48,13 +48,28 @@ exports.getAllUser = async (req, res) => {
     res.status(500).json({ message: "Something went wrong" });
   }
 };
-exports.postUser = async (req, res) => {
+
+exports.login = async (req, res) => {
   try {
-    const user = req.body;
-    const allUsers = User.find({});
-    console.log("user=>", allUsers);
-    res.send(user);
-  } catch {
+    const email = req.body.email;
+    const password = req.body.password;
+    const existingUser = await User.findOne({
+      email: email,
+    });
+    if (existingUser) {
+      // Generate a JWT token
+      const matched = await bcrypt.compare(password, existingUser.password);
+      if (matched) {
+        const secretKey = crypto.randomBytes(64).toString("hex");
+        const token = jwt.sign({ userId: existingUser._id }, secretKey);
+        res.status(200).json({ user: existingUser, token });
+      } else {
+        res.status(401).json({ message: "Invalid email or password" });
+      }
+    } else {
+      res.status(404).json({ message: "User not found" });
+    }
+  } catch (error) {
     res.status(500).json({ message: "Something went wrong" });
   }
 };
