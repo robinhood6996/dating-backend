@@ -1,9 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const settingsController = require("../controller/settingsController");
+const categoryController = require("../controller/categoryController");
 
-router.post("/category", settingsController.createCategory);
-router.patch("/category", settingsController.createCategory);
-router.get("/category", settingsController.getAllCategories);
+router.post("/category", categoryController.createCategory);
+// router.patch("/category", settingsController.createCategory);
+router.get("/category", categoryController.getAllCategories);
+router.put("/category/:id", categoryController.updateCategory);
+router.delete("/category/:id", categoryController.deleteCategory);
 
 module.exports = router;
