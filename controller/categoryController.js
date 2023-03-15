@@ -10,6 +10,7 @@ exports.createCategory = async (req, res) => {
           name: req.body.name,
           subCategories: [],
         });
+
         await category.save().then(() => {
           res
             .status(201)

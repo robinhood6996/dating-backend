@@ -9,6 +9,8 @@ app.use(cors());
 const authRoutes = require("./routes/auth.route");
 const settingsRoutes = require("./routes/settings.route");
 const escortRoutes = require("./routes/escortRoutes");
+const countryRoutes = require("./routes/country.route");
+const cityRoutes = require("./routes/cities.route");
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -26,6 +28,8 @@ mongoose
     app.use("/", settingsRoutes);
     app.use("/api/auth", authRoutes);
     app.use("/escort", escortRoutes);
+    app.use("/country", countryRoutes);
+    app.use("/city", cityRoutes);
   })
   .catch((error) => {
     console.log(error);
