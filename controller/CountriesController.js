@@ -10,6 +10,7 @@ exports.createCountry = async (req, res) => {
           cities: [],
           escortCount: 0,
           cityCount: 0,
+          escortsOnTour: 0,
         });
 
         await country.save().then(() => {

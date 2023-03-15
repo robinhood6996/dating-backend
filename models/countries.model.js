@@ -6,6 +6,7 @@ const CountriesSchema = new Schema({
   escortCount: { type: Number },
   cities: { type: Array },
   cityCount: { type: Number },
+  escortsOnTour: { type: Number },
 });
 
 module.exports = mongoose.model("Countries", CountriesSchema);

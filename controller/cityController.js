@@ -28,6 +28,7 @@ exports.addCity = async (req, res) => {
       name,
       country,
       escortCount: 0,
+      escortsOnTour: 0,
     });
 
     const savedCity = await city.save();
