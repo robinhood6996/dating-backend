@@ -11,13 +11,15 @@ const settingsRoutes = require("./routes/settings.route");
 const escortRoutes = require("./routes/escortRoutes");
 const countryRoutes = require("./routes/country.route");
 const cityRoutes = require("./routes/cities.route");
+const freeAdController = require('./routes/freeads.route');
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 // app.use(express.json());
-
+//mongodb+srv://datingadmin:D88CQRZrzRSvTGD@cluster0.oulrk.mongodb.net/?retryWrites=true&w=majority
+//mongodb://127.0.0.1:27017/dating
 mongoose
-  .connect("mongodb://127.0.0.1:27017/dating", {
+  .connect("mongodb+srv://datingadmin:D88CQRZrzRSvTGD@cluster0.oulrk.mongodb.net/dating?retryWrites=true&w=majority", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
@@ -26,10 +28,11 @@ mongoose
 
     app.listen(3000);
     app.use("/", settingsRoutes);
-    app.use("/api/auth", authRoutes);
+    app.use("/auth", authRoutes);
     app.use("/escort", escortRoutes);
     app.use("/country", countryRoutes);
     app.use("/city", cityRoutes);
+    app.use("/freead", freeAdController);
   })
   .catch((error) => {
     console.log(error);

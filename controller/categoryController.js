@@ -1,5 +1,6 @@
 const Category = require("../models/category.model");
-
+const mongoose = require('mongoose');
+const { AlreayExist } = require("../helpers/errors");
 // Category Created
 exports.createCategory = async (req, res) => {
   try {
@@ -17,10 +18,17 @@ exports.createCategory = async (req, res) => {
             .json({ category: category, message: "Category added" });
         });
       } else {
-        res.status(400).json("Bad request");
+        res.status(400).json(AlreayExist('Category'));
       }
+    }else{
+      res.status(400).json({message: 'Category name is required'})
     }
   } catch (err) {
+    if (err instanceof mongoose.Error.ValidationError) {
+      // handle validation error
+      const errors = Object.values(err.errors).map((val) => val.message);
+      res.status(400).json({ message: errors });
+    }
     res.status(500).json("Internal server error");
   }
 };
@@ -41,7 +49,7 @@ exports.updateCategory = async (req, res) => {
       })
       .catch((error) => {
         if (error) {
-          res.status(500).json({ error: "Internal server error" });
+          res.status(500).json({ error: error });
         }
       });
   } catch (err) {

@@ -59,6 +59,7 @@ exports.updateEscortBiography = async (req, res) => {
       res.status(400).json({ message: "Bad request" });
     }
   } catch (err) {
+    console.log('error->',err)
     res.status(500).json({ error: "Internal server error" });
   }
 };

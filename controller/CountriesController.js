@@ -27,15 +27,11 @@ exports.createCountry = async (req, res) => {
   }
 };
 
+
+//Get all countries
 exports.getAllCountries = async (req, res) => {
   try {
     const query = await Countries.find({});
-    // if (req.query) {
-    //   if (req?.query?.limit) {
-    //     const limit = parseInt(req.query.limit);
-    //     query = query.limit(limit);
-    //   }
-    // }
 
     const countries = query;
     res.status(200).json({ countries, counts: countries.length });
@@ -44,3 +40,15 @@ exports.getAllCountries = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+exports.deleteCountry = async (req, res) => {
+  try{
+     let countryId = req.params.id;
+     await Countries.deleteOne({_id: countryId}).then(response => {
+      res.status(200).json({message: 'Country deleted'})
+     })
+  }catch(err){
+    res.status(500).json({ message: "Internal server error" });
+      
+  }
+}

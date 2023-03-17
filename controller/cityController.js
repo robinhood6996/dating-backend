@@ -69,7 +69,6 @@ exports.editCity = async (req, res) => {
       return res.status(400).json({ message: "City does not exist" });
     }
     const existingCityWithName = await Cities.findOne({ name: newCityName });
-    console.log("existingCityWithName", existingCityWithName._id.toString());
     if (existingCityWithName) {
       if (existingCityWithName._id.toString() !== cityId) {
         return res.status(400).json({ message: "City already exist" });
@@ -126,14 +125,20 @@ exports.getAllCity = async (req, res) => {
 exports.getCityByCountry = async (req, res) => {
   try {
     const country = req.params.country;
-    const cities = await Cities.find({ country: country });
+    const existCountry = Countries.find({ name: country });
+    if (existCountry) {
+      const cities = await Cities.find({ country: country });
+      res.status(200).json({ cities, counts: cities.length });
+    }else{
+      res.status(400).json({ message: 'Bad request' });
+    }
     // if (req.query) {
     //   if (req?.query?.limit) {
-    //     const limit = parseInt(req.query.limit);
+    //     const limit = pars{eInt(req.query.limit);
     //     query = query.limit(limit);
     //   }
     // }
-    res.status(200).json({ cities, counts: cities.length });
+    
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Internal server error" });

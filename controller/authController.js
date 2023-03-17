@@ -28,6 +28,7 @@ exports.registerUser = async (req, res) => {
       type: req.body.type,
     });
     let error = user.validateSync();
+
     // Save the user document
     await user.save().then(() => {
       // Generate a JWT token
