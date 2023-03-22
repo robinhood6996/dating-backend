@@ -11,7 +11,7 @@ const settingsRoutes = require("./routes/settings.route");
 const escortRoutes = require("./routes/escortRoutes");
 const countryRoutes = require("./routes/country.route");
 const cityRoutes = require("./routes/cities.route");
-const freeAdController = require('./routes/freeads.route');
+const freeAdController = require("./routes/freeads.route");
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -19,7 +19,7 @@ app.use(bodyParser.json());
 //mongodb+srv://datingadmin:D88CQRZrzRSvTGD@cluster0.oulrk.mongodb.net/?retryWrites=true&w=majority
 //mongodb://127.0.0.1:27017/dating
 mongoose
-  .connect("mongodb+srv://datingadmin:D88CQRZrzRSvTGD@cluster0.oulrk.mongodb.net/dating?retryWrites=true&w=majority", {
+  .connect("mongodb://127.0.0.1:27017/dating", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
