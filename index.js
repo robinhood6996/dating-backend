@@ -12,6 +12,7 @@ const escortRoutes = require("./routes/escortRoutes");
 const countryRoutes = require("./routes/country.route");
 const cityRoutes = require("./routes/cities.route");
 const freeAdController = require('./routes/freeads.route');
+const bannerController = require('./routes/banner.route');
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -33,6 +34,7 @@ mongoose
     app.use("/country", countryRoutes);
     app.use("/city", cityRoutes);
     app.use("/freead", freeAdController);
+    app.use("/banner", bannerController);
   })
   .catch((error) => {
     console.log(error);
