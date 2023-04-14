@@ -1,5 +1,15 @@
 const CityTour = require('../models/tour.model');
 
+exports.getAllCityTours = async (req, res) => {
+  try {
+    const cityTours = await CityTour.find();
+    res.json({ cityTours });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 exports.createCityTour = async (req, res) => {
   try {
     const {
@@ -24,9 +34,9 @@ exports.createCityTour = async (req, res) => {
     }
 
     // Check if the user type is correct
-    if (user.type !== 'admin') {
-      return res.status(403).json({ message: 'Unauthorized access' });
-    }
+    // if (user.type !== 'admin') {
+    //   return res.status(403).json({ message: 'Unauthorized access' });
+    // }
 
     const cityTour = new CityTour({
       name,
