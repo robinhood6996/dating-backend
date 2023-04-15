@@ -11,7 +11,6 @@ const getToken = () => {
 const authenticate = (req, res, next) => {
   // Get the token from the request header
   const tokenHeader = req.header('authorization');
-  console.log('header', tokenHeader)
   if(!tokenHeader){
     return res.status(401).json({ message: 'Unauthorized' });
   }

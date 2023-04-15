@@ -4,9 +4,9 @@ const Schema = mongoose.Schema;
 //Schema
 const EscortProfileSchema = new Schema({
   //Biography
-  name: { type: String, required: true },
-  email: {type: String, required: true},
-  userId: {type: String, required: true},
+  name: { type: String,  },
+  email: {type: String, },
+  userId: {type: String,},
   slogan: { type: String},
   age: { type: Number},
   gender: { type: String},
