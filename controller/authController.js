@@ -29,12 +29,9 @@ exports.registerUser = async (req, res) => {
     let error = user.validateSync();
 
     // Save the user document
-    await user.save().then(() => {
-      // Generate a JWT token
-      const secretKey = crypto.randomBytes(64).toString("hex");
-      const token = jwt.sign({ userId: user._id }, secretKey);
+    await user.save().then((res) => {
       // Send the user details and token in the response
-      res.status(201).json({ user, token });
+      res.status(201).json({ user });
     });
   } catch (error) {
     res.status(500).json({ message: "Something went wrong" });
@@ -44,7 +41,6 @@ exports.registerUser = async (req, res) => {
 exports.getAllUser = async (req, res) => {
   try {
     const allUsers = await User.find({});
-    console.log("allUsers", allUsers);
     res.send(allUsers);
   } catch {
     res.status(500).json({ message: "Something went wrong" });
@@ -62,9 +58,14 @@ exports.login = async (req, res) => {
       // Generate a JWT token
       const matched = await bcrypt.compare(password, existingUser.password);
       if (matched) {
-        console.log('matched')
-        const token = jwt.sign({user: existingUser}, process.env.ACCESS_SECRET_TOKEN);
-        res.status(200).json({ user: existingUser, token });
+        const token = jwt.sign({user: existingUser}, process.env.ACCESS_SECRET_TOKEN, {expiresIn: '1h'});
+        let user = {
+          name: existingUser.name,
+          email: existingUser.email,
+          gender: existingUser.gender,
+          type: existingUser.type
+        }
+        res.status(200).json({ user, token });
       } else {
         res.status(401).json({ message: "Invalid email or password" });
       }
@@ -72,7 +73,6 @@ exports.login = async (req, res) => {
       res.status(404).json({ message: "User not found" });
     }
   } catch (error) {
-    console.log('err', error)
-    res.status(500).json({ message: error });
+    res.status(500).json({ message: 'Something went wrong' });
   }
 };
