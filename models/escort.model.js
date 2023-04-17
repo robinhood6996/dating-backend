@@ -1,19 +1,18 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-//Schema
+// Schema
 const EscortProfileSchema = new Schema({
-  //Biography
-  name: { type: String,  },
-  email: {type: String, },
-  userId: {type: String,},
-  slogan: { type: String},
-  age: { type: Number},
-  gender: { type: String},
-  ethnicity: { type: String},
-  nationality: { type: String},
-  userId: { type: String },
-  //Physical
+  // Biography
+  name: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  slogan: { type: String },
+  age: { type: Number },
+  gender: { type: String },
+  ethnicity: { type: String },
+  nationality: { type: String },
+
+  // Physical
   hairColor: { type: String },
   eyeColor: { type: String },
   height: { type: Number },
@@ -23,61 +22,67 @@ const EscortProfileSchema = new Schema({
   bustWaistHips: { type: String },
   brest: { type: String },
   pubicHair: { type: String },
-  //Additional
+
+  // Additional
   about: { type: String },
   smoking: { type: Boolean },
   drinking: { type: Boolean },
   tattoos: { type: Boolean },
   piercings: { type: Boolean },
 
-  //contact
+  // Contact
   phone: { type: String },
   phoneDirection: { type: String },
   apps: { type: String },
-  email: { type: String },
   website: { type: String },
 
-  //lang
+  // Languages
   languages: { type: Array, default: [] },
 
-  //availability
+  // Availability
   available24: { type: Boolean, default: true },
-  availableDate: { type: [], default: [] },
-  vacation: { type: Object, default: { from: null, to: null } },
+  availableDate: { type: Array, default: [] },
+  vacation: {
+    from: { type: Date, default: null },
+    to: { type: Date, default: null },
+  },
 
-  //Incoming
+  // Incoming
   incomingCall: { type: String, default: null },
   outgoingCall: { type: String, default: null },
 
-  //service
-  services: { type: [], default: [] },
+  // Services
+  services: { type: Array, default: [] },
 
-  //Rate:
+  // Rates
   reachHome: {
-    type: Object,
-    default: {
-      hour: null,
-      threeHour: null,
-      additionHour: null,
-      night: null,
-      dinner: null,
-      weekend: null,
-    },
+    hour: { type: Number, default: null },
+    threeHour: { type: Number, default: null },
+    additionHour: { type: Number, default: null },
+    night: { type: Number, default: null },
+    dinner: { type: Number, default: null },
+    weekend: { type: Number, default: null },
   },
   host: {
-    type: Object,
-    default: {
-      hour: null,
-      threeHour: null,
-      additionHour: null,
-      night: null,
-      dinner: null,
-      weekend: null,
-    },
+    hour: { type: Number, default: null },
+    threeHour: { type: Number, default: null },
+    additionHour: { type: Number, default: null },
+    night: { type: Number, default: null },
+    dinner: { type: Number, default: null },
+    weekend: { type: Number, default: null },
   },
 
-  //Gallery
+  // Gallery
   images: { type: Array, default: [] },
 });
 
-module.exports = mongoose.model("EscortProfile", EscortProfileSchema);
+EscortProfileSchema.statics.findByEmail = async function (email) {
+  try {
+    const profile = await this.findOne({ email }); // Find the profile using the email
+    return profile; // Return the profile object if found, or null if not found
+  } catch (error) {
+    return error;
+  }
+};
+const EscortProfile = new mongoose.model("EscortProfile", EscortProfileSchema);
+module.exports = { EscortProfile };
