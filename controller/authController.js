@@ -1,3 +1,4 @@
+require('dotenv').config();
 const User = require("../models/user.model");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
@@ -61,8 +62,8 @@ exports.login = async (req, res) => {
       // Generate a JWT token
       const matched = await bcrypt.compare(password, existingUser.password);
       if (matched) {
-        const secretKey = crypto.randomBytes(64).toString("hex");
-        const token = jwt.sign({ userId: existingUser._id }, secretKey);
+        console.log('matched')
+        const token = jwt.sign({user: existingUser}, process.env.ACCESS_SECRET_TOKEN);
         res.status(200).json({ user: existingUser, token });
       } else {
         res.status(401).json({ message: "Invalid email or password" });
@@ -71,6 +72,7 @@ exports.login = async (req, res) => {
       res.status(404).json({ message: "User not found" });
     }
   } catch (error) {
-    res.status(500).json({ message: "Something went wrong" });
+    console.log('err', error)
+    res.status(500).json({ message: error });
   }
 };
