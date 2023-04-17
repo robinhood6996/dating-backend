@@ -4,14 +4,14 @@ const Schema = mongoose.Schema;
 //Schema
 const EscortProfileSchema = new Schema({
   //Biography
-  name: { type: String, required: true },
-  email: { type: String, required: true },
-  userId: { type: String, required: true },
-  slogan: { type: String },
-  age: { type: Number },
-  gender: { type: String },
-  ethnicity: { type: String },
-  nationality: { type: String },
+  name: { type: String,  },
+  email: {type: String, },
+  userId: {type: String,},
+  slogan: { type: String},
+  age: { type: Number},
+  gender: { type: String},
+  ethnicity: { type: String},
+  nationality: { type: String},
   userId: { type: String },
   //Physical
   hairColor: { type: String },
