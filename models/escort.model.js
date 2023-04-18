@@ -35,7 +35,7 @@ const EscortProfileSchema = new Schema({
   phoneDirection: { type: String },
   apps: { type: String },
   website: { type: String },
-
+  email: {type: String},
   // Languages
   languages: { type: Array, default: [] },
 

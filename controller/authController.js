@@ -26,15 +26,13 @@ exports.registerUser = async (req, res) => {
       age: req.body.age,
       type: req.body.type,
     });
-    let error = user.validateSync();
+    
 
     // Save the user document
-    await user.save().then((res) => {
-      // Send the user details and token in the response
-      res.status(201).json({ user });
-    });
+    await user.save();
+    res.status(201).json({ message: 'Successfully registered' });
   } catch (error) {
-    res.status(500).json({ message: "Something went wrong" });
+    res.status(500).json({ message: 'Something went wrong' });
   }
 };
 

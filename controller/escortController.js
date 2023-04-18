@@ -160,12 +160,12 @@ exports.updateAdditionalData = async (req, res) => {
 };
 
 exports.updateContactData = async (req, res) => {
-  const { email } = req.user; // Extract the ID of the escort profile from the request params
-  const { phone, phoneDirection, apps, website } = req.body; // Extract the updated contact data from the request body
+  const { email:userEmail } = req.user; // Extract the ID of the escort profile from the request params
+  const { phone, phoneDirection, apps, website, email } = req.body; // Extract the updated contact data from the request body
 
   try {
     // Find the escort profile by ID
-    const profile = await EscortProfile.findOne({ email });
+    const profile = await EscortProfile.findOne({ email: userEmail });
 
     // If the profile is not found, send an error response
     if (!profile) {
@@ -194,6 +194,12 @@ exports.updateContactData = async (req, res) => {
     if (website) {
       if (typeof website !== "string") {
         throw new Error("Invalid data type for website");
+      }
+      profile.website = website;
+    }
+    if (email) {
+      if (typeof website !== "string") {
+        throw new Error("Invalid data type for email");
       }
       profile.website = website;
     }
