@@ -3,23 +3,19 @@ const User = require("../models/user.model");
 
 // Update Biography Data
 exports.updateBiographyData = async (req, res) => {
-  const { name, email, slogan, age, gender, ethnicity, nationality } = req.body;
   const user = req.user;
+  const { name, email, slogan, age, gender, ethnicity, nationality } = req.user;
   try {
     // Find the escort profile by profileId
-    const profile = await EscortProfile.findOne({ email: user.email });
-
-    // Update the physical data
-    if (hairColor) profile.hairColor = hairColor;
-    if (eyeColor) profile.eyeColor = eyeColor;
-    if (height) profile.height = height;
-    if (weight) profile.weight = weight;
-    if (dressSize) profile.dressSize = dressSize;
-    if (shoeSize) profile.shoeSize = shoeSize;
-    if (bustWaistHips) profile.bustWaistHips = bustWaistHips;
-    if (brest) profile.brest = brest;
-    if (pubicHair) profile.pubicHair = pubicHair;
-
+    const profile = await EscortProfile.find({});
+    console.log(profile);
+    if (name) profile.name = name;
+    if (email) profile.email = email;
+    if (slogan) profile.slogan = slogan;
+    if (age) profile.age = age;
+    if (gender) profile.gender = gender;
+    if (ethnicity) profile.ethnicity = ethnicity;
+    if (nationality) profile.nationality = nationality;
     // Save the updated profile
     await profile.save();
 
@@ -36,7 +32,7 @@ exports.updateBiographyData = async (req, res) => {
         error: error.message,
       });
     }
-
+    // console.log(error);
     res.status(500).json({
       success: false,
       message: "Failed to update biography data",
@@ -160,7 +156,7 @@ exports.updateAdditionalData = async (req, res) => {
 };
 
 exports.updateContactData = async (req, res) => {
-  const { email:userEmail } = req.user; // Extract the ID of the escort profile from the request params
+  const { email: userEmail } = req.user; // Extract the ID of the escort profile from the request params
   const { phone, phoneDirection, apps, website, email } = req.body; // Extract the updated contact data from the request body
 
   try {
@@ -242,5 +238,18 @@ exports.getAllEscort = async (req, res) => {
     res
       .status(500)
       .json({ message: "Something went wrong", error: error.message });
+  }
+};
+
+exports.uploadFile = async (req, res) => {
+  try {
+    if (req.files) {
+      // console.log(req.files);
+      res.send(req.file);
+    }
+    // console.log(req);
+    res.send();
+  } catch (error) {
+    console.log(error);
   }
 };
