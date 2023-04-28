@@ -38,6 +38,7 @@ app.use((req, res, next) => {
 // app.use(express.json());
 //mongodb+srv://datingadmin:D88CQRZrzRSvTGD@cluster0.oulrk.mongodb.net/?retryWrites=true&w=majority
 //mongodb://127.0.0.1:27017/dating
+//mongodb+srv://<username>:<password>@cluster0.oulrk.mongodb.net/?retryWrites=true&w=majority
 mongoose
   .connect(
     "mongodb+srv://datingadmin:D88CQRZrzRSvTGD@cluster0.oulrk.mongodb.net/?retryWrites=true&w=majority",
