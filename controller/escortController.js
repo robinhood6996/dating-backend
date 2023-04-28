@@ -4,10 +4,10 @@ const User = require("../models/user.model");
 // Update Biography Data
 exports.updateBiographyData = async (req, res) => {
   const user = req.user;
-  const { name, email, slogan, age, gender, ethnicity, nationality } = req.user;
+  const { name, email, slogan, age, gender, ethnicity, nationality } = req.body;
   try {
     // Find the escort profile by profileId
-    const profile = await EscortProfile.find({});
+    const profile = await EscortProfile.findOne({ email: user.email });
     console.log(profile);
     if (name) profile.name = name;
     if (email) profile.email = email;
