@@ -3,8 +3,8 @@ const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const app = express();
-app.use(cors());
 const multer = require("multer");
+app.use(cors());
 
 //Routes
 const authRoutes = require("./routes/auth.route");
@@ -20,7 +20,7 @@ const cityTour = require("./routes/tour.route");
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-var uploads = multer().any();
+const uploads = multer().any();
 app.use(uploads);
 
 app.use((req, res, next) => {
