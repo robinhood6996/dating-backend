@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const { EscortProfile } = require("../models/escort.model");
+const { generateRandomNumber } = require("../helpers/utils");
 
 exports.registerUser = async (req, res) => {
   try {
@@ -32,11 +33,14 @@ exports.registerUser = async (req, res) => {
     await user.save();
     console.log(user.type);
     if (user.type === "escort") {
+      let nameSplit = user.name.split(" ")[0];
+      let username = nameSplit + generateRandomNumber();
       let escort = new EscortProfile({
         name: user.name,
         email: user.email,
         age: user.age,
         gender: user.gender,
+        username,
       });
       await escort.save();
     }
@@ -111,15 +115,26 @@ exports.logout = async (req, res) => {
 //Logout Controller
 exports.deleteUser = async (req, res) => {
   try {
+    let requestedUser = req.user;
     let email = req.body.email;
     let userExist = await User.findOne({ email });
-    console.log("userExist", userExist);
+
+    // if (requestedUser.type === "admin") {
     if (userExist) {
       await User.deleteOne({ email });
+      if (userExist.type === "escort") {
+        await EscortProfile.deleteOne({ email });
+      }
       res.json({ message: "Deleted user" });
     } else {
       res.status(404).json({ message: "User not found", statusCode: 404 });
     }
+    // } else {
+    //   res.status(405).json({
+    //     message: "Sorry you're not allowed to delete user",
+    //     statusCode: 405,
+    //   });
+    // }
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Something went wrong", statusCode: 500 });

@@ -11,6 +11,7 @@ const EscortProfileSchema = new Schema({
   gender: { type: String },
   ethnicity: { type: String },
   nationality: { type: String },
+  userName: { type: String },
 
   // Physical
   hairColor: { type: String },
@@ -35,7 +36,7 @@ const EscortProfileSchema = new Schema({
   phoneDirection: { type: String },
   apps: { type: String },
   website: { type: String },
-  email: {type: String},
+  email: { type: String },
   // Languages
   languages: { type: Array, default: [] },
 
