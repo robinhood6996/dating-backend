@@ -1,8 +1,10 @@
-require('dotenv').config();
+require("dotenv").config();
 const User = require("../models/user.model");
+const BlacklistToken = require("../models/blacklistToken.model");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
+const { EscortProfile } = require("../models/escort.model");
 
 exports.registerUser = async (req, res) => {
   try {
@@ -15,7 +17,6 @@ exports.registerUser = async (req, res) => {
     }
 
     // Hash the password
-
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
     // Create a new user document
     const user = new User({
@@ -26,13 +27,23 @@ exports.registerUser = async (req, res) => {
       age: req.body.age,
       type: req.body.type,
     });
-    
 
     // Save the user document
     await user.save();
-    res.status(201).json({ message: 'Successfully registered' });
+    console.log(user.type);
+    if (user.type === "escort") {
+      let escort = new EscortProfile({
+        name: user.name,
+        email: user.email,
+        age: user.age,
+        gender: user.gender,
+      });
+      await escort.save();
+    }
+    return res.status(201).json({ message: "Successfully registered" });
   } catch (error) {
-    res.status(500).json({ message: 'Something went wrong' });
+    console.log(error);
+    return res.status(500).json({ message: "Something went wrong" });
   }
 };
 
@@ -52,25 +63,65 @@ exports.login = async (req, res) => {
     const existingUser = await User.findOne({
       email: email,
     });
+    console.log(req.body);
     if (existingUser) {
       // Generate a JWT token
       const matched = await bcrypt.compare(password, existingUser.password);
       if (matched) {
-        const token = jwt.sign({user: existingUser}, process.env.ACCESS_SECRET_TOKEN, {expiresIn: '1h'});
+        const token = jwt.sign(
+          { user: existingUser },
+          process.env.ACCESS_SECRET_TOKEN,
+          { expiresIn: "1h" }
+        );
         let user = {
           name: existingUser.name,
           email: existingUser.email,
           gender: existingUser.gender,
-          type: existingUser.type
-        }
+          type: existingUser.type,
+        };
         res.status(200).json({ user, token });
       } else {
-        res.status(401).json({ message: "Invalid email or password" });
+        res
+          .status(400)
+          .json({ message: "Invalid email or password", statusCode: 400 });
       }
     } else {
       res.status(404).json({ message: "User not found" });
     }
   } catch (error) {
-    res.status(500).json({ message: 'Something went wrong' });
+    res.status(500).json({ message: "Something went wrong" });
+  }
+};
+
+//Logout Controller
+exports.logout = async (req, res) => {
+  try {
+    // get the token from the authorization header
+    const token = req.headers.authorization.split(" ")[1];
+
+    // invalidate the token by adding it to the blacklist
+    await BlacklistToken.create({ token });
+
+    res.json({ message: "Logout successful" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Something went wrong" });
+  }
+};
+//Logout Controller
+exports.deleteUser = async (req, res) => {
+  try {
+    let email = req.body.email;
+    let userExist = await User.findOne({ email });
+    console.log("userExist", userExist);
+    if (userExist) {
+      await User.deleteOne({ email });
+      res.json({ message: "Deleted user" });
+    } else {
+      res.status(404).json({ message: "User not found", statusCode: 404 });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Something went wrong", statusCode: 500 });
   }
 };

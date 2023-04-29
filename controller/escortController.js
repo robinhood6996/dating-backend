@@ -3,23 +3,19 @@ const User = require("../models/user.model");
 
 // Update Biography Data
 exports.updateBiographyData = async (req, res) => {
-  const { name, email, slogan, age, gender, ethnicity, nationality } = req.body;
   const user = req.user;
+  const { name, email, slogan, age, gender, ethnicity, nationality } = req.body;
   try {
     // Find the escort profile by profileId
     const profile = await EscortProfile.findOne({ email: user.email });
-
-    // Update the physical data
-    if (hairColor) profile.hairColor = hairColor;
-    if (eyeColor) profile.eyeColor = eyeColor;
-    if (height) profile.height = height;
-    if (weight) profile.weight = weight;
-    if (dressSize) profile.dressSize = dressSize;
-    if (shoeSize) profile.shoeSize = shoeSize;
-    if (bustWaistHips) profile.bustWaistHips = bustWaistHips;
-    if (brest) profile.brest = brest;
-    if (pubicHair) profile.pubicHair = pubicHair;
-
+    console.log(profile);
+    if (name) profile.name = name;
+    if (email) profile.email = email;
+    if (slogan) profile.slogan = slogan;
+    if (age) profile.age = age;
+    if (gender) profile.gender = gender;
+    if (ethnicity) profile.ethnicity = ethnicity;
+    if (nationality) profile.nationality = nationality;
     // Save the updated profile
     await profile.save();
 
@@ -27,6 +23,7 @@ exports.updateBiographyData = async (req, res) => {
       success: true,
       message: "Biography data updated successfully",
       data: profile,
+      statusCode: 200,
     });
   } catch (error) {
     if (error.name === "ValidationError") {
@@ -34,13 +31,15 @@ exports.updateBiographyData = async (req, res) => {
       return res.status(400).json({
         message: "Data type validation failed",
         error: error.message,
+        statusCode: 400,
       });
     }
-
+    // console.log(error);
     res.status(500).json({
       success: false,
       message: "Failed to update biography data",
       error,
+      statusCode: 500,
     });
   }
 };
@@ -64,7 +63,9 @@ exports.updatePhysicalData = async (req, res) => {
     const profile = await EscortProfile.findOne({ email });
     // If the profile is not found, send an error response
     if (!profile) {
-      return res.status(404).json({ message: "Escort profile not found" });
+      return res
+        .status(404)
+        .json({ message: "Escort profile not found", statusCode: 404 });
     }
     // Update the physical data
     profile.hairColor = hairColor;
@@ -79,14 +80,18 @@ exports.updatePhysicalData = async (req, res) => {
     // Save the updated profile to the database
     await profile.save();
     // Send a success response
-    res
-      .status(200)
-      .json({ message: "Physical data updated successfully", data: profile });
+    res.status(200).json({
+      message: "Physical data updated successfully",
+      data: profile,
+      statusCode: 200,
+    });
   } catch (error) {
     // Send an error response if something goes wrong
-    res
-      .status(500)
-      .json({ message: "Something went wrong", error: error.message });
+    res.status(500).json({
+      message: "Something went wrong",
+      error: error.message,
+      statusCode: 500,
+    });
   }
 };
 
@@ -100,7 +105,9 @@ exports.updateAdditionalData = async (req, res) => {
 
     // If the profile is not found, send an error response
     if (!profile) {
-      return res.status(404).json({ message: "Escort profile not found" });
+      return res
+        .status(404)
+        .json({ message: "Escort profile not found", statusCode: 404 });
     }
 
     // Validate and update the additional data
@@ -139,28 +146,34 @@ exports.updateAdditionalData = async (req, res) => {
     await profile.save();
 
     // Send a success response
-    res
-      .status(200)
-      .json({ message: "Additional data updated successfully", data: profile });
+    res.status(200).json({
+      message: "Additional data updated successfully",
+      data: profile,
+      statusCode: 200,
+    });
   } catch (error) {
     // Handle known errors
     if (error.name === "ValidationError") {
       // If the error is due to data type validation, send an error response
-      return res
-        .status(400)
-        .json({ message: "Data type validation failed", error: error.message });
+      return res.status(400).json({
+        message: "Data type validation failed",
+        error: error.message,
+        statusCode: 400,
+      });
     } else if (error instanceof Error) {
       // If a custom error is thrown, send an error response
-      return res.status(400).json({ message: error.message });
+      return res.status(400).json({ message: error.message, statusCode: 400 });
     }
 
     // Handle unknown errors
-    res.status(500).json({ message: "Failed to update additional data" });
+    res
+      .status(500)
+      .json({ message: "Failed to update additional data", statusCode: 500 });
   }
 };
 
 exports.updateContactData = async (req, res) => {
-  const { email:userEmail } = req.user; // Extract the ID of the escort profile from the request params
+  const { email: userEmail } = req.user; // Extract the ID of the escort profile from the request params
   const { phone, phoneDirection, apps, website, email } = req.body; // Extract the updated contact data from the request body
 
   try {
@@ -169,7 +182,9 @@ exports.updateContactData = async (req, res) => {
 
     // If the profile is not found, send an error response
     if (!profile) {
-      return res.status(404).json({ message: "Escort profile not found" });
+      return res
+        .status(404)
+        .json({ message: "Escort profile not found", statusCode: 404 });
     }
 
     // Validate and update the contact data
@@ -208,23 +223,29 @@ exports.updateContactData = async (req, res) => {
     await profile.save();
 
     // Send a success response
-    res
-      .status(200)
-      .json({ message: "Contact data updated successfully", data: profile });
+    res.status(200).json({
+      message: "Contact data updated successfully",
+      data: profile,
+      statusCode: 200,
+    });
   } catch (error) {
     // Handle known errors
     if (error.name === "ValidationError") {
       // If the error is due to data type validation, send an error response
-      return res
-        .status(400)
-        .json({ message: "Data type validation failed", error: error.message });
+      return res.status(400).json({
+        message: "Data type validation failed",
+        error: error.message,
+        statusCode: 400,
+      });
     } else if (error instanceof Error) {
       // If a custom error is thrown, send an error response
-      return res.status(400).json({ message: error.message });
+      return res.status(400).json({ message: error.message, statusCode: 400 });
     }
 
     // Handle unknown errors
-    res.status(500).json({ message: "Failed to update contact data" });
+    res
+      .status(500)
+      .json({ message: "Failed to update contact data", statusCode: 500 });
   }
 };
 
@@ -235,12 +256,29 @@ exports.getAllEscort = async (req, res) => {
     // Send the retrieved data as a response
     res.status(200).json({
       message: "All escort profiles retrieved successfully",
+      resultCount: escorts.length,
       data: escorts,
+      statusCode: 200,
     });
   } catch (error) {
     // Send an error response if something goes wrong
-    res
-      .status(500)
-      .json({ message: "Something went wrong", error: error.message });
+    res.status(500).json({
+      message: "Something went wrong",
+      error: error.message,
+      statusCode: 500,
+    });
+  }
+};
+
+exports.uploadFile = async (req, res) => {
+  try {
+    if (req.files) {
+      // console.log(req.files);
+      res.send(req.file);
+    }
+    // console.log(req);
+    res.send();
+  } catch (error) {
+    console.log(error);
   }
 };

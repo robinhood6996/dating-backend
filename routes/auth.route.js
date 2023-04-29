@@ -7,5 +7,7 @@ const { authenticate } = require("../middleware/tokenMiddleware");
 router.post("/register", authController.registerUser);
 router.get("/user", authController.getAllUser);
 router.post("/login", authController.login);
+router.get("/logout", authController.logout);
+router.post("/delete-user", authController.deleteUser);
 
 module.exports = router;
