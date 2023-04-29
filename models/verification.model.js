@@ -7,7 +7,7 @@ const VerificationSchema = new Schema({
   photo3: { type: String, required: true },
   extraPhotos: { type: [], default: [] },
   status: { type: String, default: "pending" },
-  userId: { type: String, required: true },
+  username: { type: String, required: true },
   userEmail: { type: String, required: true },
 });
 

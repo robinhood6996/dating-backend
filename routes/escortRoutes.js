@@ -15,7 +15,12 @@ router.put(
   escortController.updateAdditionalData
 );
 router.get("/get-all", escortController.getAllEscort);
-router.post("/upload", upload.single("image"), escortController.uploadFile);
+router.post(
+  "/upload-file",
+  upload.fields([{ name: "image", maxCount: 100 }]),
+  escortController.uploadFile
+);
 router.get("/", escortController.getEscort);
+router.get("/filter", escortController.getEscorts);
 
 module.exports = router;
