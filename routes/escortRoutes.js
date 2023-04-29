@@ -16,5 +16,6 @@ router.put(
 );
 router.get("/get-all", escortController.getAllEscort);
 router.post("/upload", upload.single("image"), escortController.uploadFile);
+router.get("/", escortController.getEscort);
 
 module.exports = router;

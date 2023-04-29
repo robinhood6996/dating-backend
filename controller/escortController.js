@@ -270,6 +270,26 @@ exports.getAllEscort = async (req, res) => {
   }
 };
 
+exports.getEscort = async (req, res) => {
+  try {
+    let { username } = req.query;
+    console.log("escort", username);
+    let escort = await EscortProfile.findOne({ username });
+    if (escort) {
+      return res.status(200).json({ data: escort, statusCode: 200 });
+    } else {
+      return res
+        .status(404)
+        .json({ message: "No escort found", statusCode: 404 });
+    }
+  } catch (error) {
+    console.log("error", error);
+    return res
+      .status(500)
+      .json({ message: "Something went wrong", statusCode: 500 });
+  }
+};
+
 exports.uploadFile = async (req, res) => {
   try {
     if (req.files) {
