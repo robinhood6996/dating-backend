@@ -17,6 +17,7 @@ const freeAdController = require("./routes/freeads.route");
 const bannerController = require("./routes/banner.route");
 const cityTour = require("./routes/tour.route");
 
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 var uploads = multer().any();
@@ -35,7 +36,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// app.use(express.json());
 //mongodb+srv://datingadmin:D88CQRZrzRSvTGD@cluster0.oulrk.mongodb.net/?retryWrites=true&w=majority
 //mongodb://127.0.0.1:27017/dating
 //mongodb+srv://<username>:<password>@cluster0.oulrk.mongodb.net/?retryWrites=true&w=majority
