@@ -251,8 +251,13 @@ exports.updateContactData = async (req, res) => {
 
 exports.getAllEscort = async (req, res) => {
   try {
+    let { limit, offset } = req.query;
+
     // Fetch all escort profiles from the database
-    const escorts = await EscortProfile.find({});
+    const escorts = await EscortProfile.find({})
+      .limit(limit || 0)
+      .skip(offset || 0)
+      .exec();
     // Send the retrieved data as a response
     res.status(200).json({
       message: "All escort profiles retrieved successfully",
@@ -291,9 +296,16 @@ exports.getEscort = async (req, res) => {
 };
 exports.getEscorts = async (req, res) => {
   try {
-    let { country } = req.query;
-    console.log("escort", country);
-    let escort = await EscortProfile.find({ ...req.query });
+    let { country, limit, offset } = req.query;
+    let query = {};
+    if (country) {
+      query.country = country;
+    }
+
+    let escort = await EscortProfile.find(query)
+      .limit(limit || 0)
+      .skip(offset || 0)
+      .exec();
     if (escort) {
       return res
         .status(200)
