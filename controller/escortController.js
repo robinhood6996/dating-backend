@@ -323,3 +323,29 @@ exports.uploadFile = async (req, res) => {
     console.log(error);
   }
 };
+
+exports.getEscortByCat = async (req, res) => {
+  try {
+    let { cat } = req.params;
+    let { limit, offset } = req.query;
+
+    let escort = await EscortProfile.find({ gender: cat })
+      .limit(limit)
+      .skip(offset)
+      .exec();
+    if (escort) {
+      return res
+        .status(200)
+        .json({ escort, resultCount: escort.length, statusCode: 200 });
+    } else {
+      return res
+        .status(404)
+        .json({ message: "No escort found", statusCode: 404 });
+    }
+  } catch (error) {
+    console.log("error", error);
+    return res
+      .status(500)
+      .json({ message: "Something went wrong", statusCode: 500 });
+  }
+};

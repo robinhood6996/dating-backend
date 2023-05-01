@@ -121,9 +121,22 @@ exports.inactiveAds = async (req, res) => {
 
 exports.getAll = async (req, res) => {
   try {
-    let NewAd = new FreeAd();
-    let data = await NewAd.findAll();
-    res.status(200).json({ data, count: data.length });
+    const { category, city, limit, offset } = req.query;
+    let query = {};
+
+    if (category) {
+      query.category = category;
+    }
+
+    if (city) {
+      query.city = city;
+    }
+
+    let data = await FreeAd.find(query)
+      .limit(limit || 0)
+      .skip(offset || 0)
+      .exec();
+    return res.status(200).json({ data, count: data.length });
   } catch (error) {
     console.log("error", error);
     res.status(500).json({ message: "Internal server error" });
@@ -134,6 +147,16 @@ exports.getSingleAd = async (req, res) => {
     const { adId } = req.params;
     let NewAd = await FreeAd.findById(adId);
     res.status(200).json({ NewAd, statusCode: 200 });
+  } catch (error) {
+    console.log("error", error);
+    res.status(500).json({ message: "Internal server error", statusCode: 500 });
+  }
+};
+exports.deleteAd = async (req, res) => {
+  try {
+    const { adId } = req.params;
+    await FreeAd.deleteById(adId);
+    res.status(200).json({ message: "Deleted successfully", statusCode: 200 });
   } catch (error) {
     console.log("error", error);
     res.status(500).json({ message: "Internal server error", statusCode: 500 });

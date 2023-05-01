@@ -23,6 +23,7 @@ router.post(
   escortController.uploadFile
 );
 router.get("/", escortController.getEscort);
+router.get("/category/:cat", escortController.getEscortByCat);
 router.get("/filter", escortController.getEscorts);
 router.post("/upload", escortController.uploadFile);
 
