@@ -8,5 +8,6 @@ router.get("/active", freeAdController.activeAds);
 router.get("/inactive", freeAdController.inactiveAds);
 router.get("/", freeAdController.getAll);
 router.get("/:adId", freeAdController.getSingleAd);
+router.delete("/:adId", freeAdController.deleteAd);
 
 module.exports = router;

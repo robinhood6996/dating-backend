@@ -1,5 +1,5 @@
 const Category = require("../models/category.model");
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const { AlreayExist } = require("../helpers/errors");
 // Category Created
 exports.createCategory = async (req, res) => {
@@ -18,10 +18,10 @@ exports.createCategory = async (req, res) => {
             .json({ category: category, message: "Category added" });
         });
       } else {
-        res.status(400).json(AlreayExist('Category'));
+        res.status(400).json(AlreayExist("Category"));
       }
-    }else{
-      res.status(400).json({message: 'Category name is required'})
+    } else {
+      res.status(400).json({ message: "Category name is required" });
     }
   } catch (err) {
     if (err instanceof mongoose.Error.ValidationError) {

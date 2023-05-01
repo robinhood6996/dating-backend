@@ -85,5 +85,13 @@ EscortProfileSchema.statics.findByEmail = async function (email) {
     return error;
   }
 };
+EscortProfileSchema.static.findByCategory = function (category) {
+  try {
+    return this.findOne({ gender: category }); // Find the profile using the category
+    // Return the profile object if found, or null if not found
+  } catch (error) {
+    return error;
+  }
+};
 const EscortProfile = new mongoose.model("EscortProfile", EscortProfileSchema);
 module.exports = { EscortProfile };
