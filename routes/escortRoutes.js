@@ -3,6 +3,8 @@ const router = express.Router();
 const escortController = require("../controller/escortController");
 const { authenticate } = require("../middleware/tokenMiddleware");
 const upload = require("../middleware/upload");
+// const multer = require("multer");
+// const fUpload = multer({ dest: "../uploads/" });
 router.put("/update-bio", authenticate, escortController.updateBiographyData);
 router.put(
   "/update-physical",
@@ -17,10 +19,11 @@ router.put(
 router.get("/get-all", escortController.getAllEscort);
 router.post(
   "/upload-file",
-  upload.fields([{ name: "image", maxCount: 100 }]),
+  // upload.single("image"),
   escortController.uploadFile
 );
 router.get("/", escortController.getEscort);
 router.get("/filter", escortController.getEscorts);
+router.post("/upload", escortController.uploadFile);
 
 module.exports = router;
