@@ -121,9 +121,22 @@ exports.inactiveAds = async (req, res) => {
 
 exports.getAll = async (req, res) => {
   try {
-    const { limit, offset } = req.query;
-    let data = await FreeAd.find().limit(limit).skip(offset).exec();
-    res.status(200).json({ data, count: data.length });
+    const { category, city, limit, offset } = req.query;
+    let query = {};
+
+    if (category) {
+      query.category = category;
+    }
+
+    if (city) {
+      query.city = city;
+    }
+
+    let data = await FreeAd.find(query)
+      .limit(limit || 0)
+      .skip(offset || 0)
+      .exec();
+    return res.status(200).json({ data, count: data.length });
   } catch (error) {
     console.log("error", error);
     res.status(500).json({ message: "Internal server error" });
