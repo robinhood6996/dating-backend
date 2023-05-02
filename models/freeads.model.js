@@ -14,6 +14,7 @@ const freeAdSchema = new Schema(
     photo2: { type: String },
     photo3: { type: String },
     status: { type: String },
+    author: { type: String },
   },
   { timestamps: true }
 );

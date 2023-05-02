@@ -1,6 +1,7 @@
 const { FreeAd } = require("../models/freeads.model");
 exports.createAd = async (req, res) => {
   try {
+    const user = req.user;
     const { title, category, description, phone, email, photo1, duration } =
       req.body;
     // Check if request body exists
@@ -50,6 +51,7 @@ exports.createAd = async (req, res) => {
       photo2: req.body.photo2 || "",
       photo3: req.body.photo3 || "",
       status: req.body.status || "inactive",
+      author: user.email,
     });
 
     // Save new free ad document
