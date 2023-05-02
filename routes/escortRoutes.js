@@ -2,29 +2,43 @@ const express = require("express");
 const router = express.Router();
 const escortController = require("../controller/escortController");
 const { authenticate } = require("../middleware/tokenMiddleware");
-const upload = require("../middleware/upload");
-// const multer = require("multer");
+// const upload = require("../middleware/upload");
+const multer = require("multer");
+
+var storage = multer.diskStorage({
+  destination: function (request, file, callback) {
+    callback(null, "./uploads");
+  },
+  filename: function (request, file, callback) {
+    console.log(file);
+    callback(null, Date.now() + "-" + file.originalname);
+  },
+});
+
+var upload = multer({ storage: storage });
 // const fUpload = multer({ dest: "../uploads/" });
-router.put("/update-bio", authenticate, escortController.updateBiographyData);
+router.put(
+  "/update-bio",
+  authenticate,
+  upload.any(),
+  escortController.updateBiographyData
+);
 router.put(
   "/update-physical",
   authenticate,
+  upload.any(),
   escortController.updatePhysicalData
 );
 router.put(
   "/update-additional-data",
   authenticate,
+  upload.any(),
   escortController.updateAdditionalData
 );
 router.get("/get-all", escortController.getAllEscort);
-router.post(
-  "/upload-file",
-  // upload.single("image"),
-  escortController.uploadFile
-);
 router.get("/", escortController.getEscort);
 router.get("/category/:cat", escortController.getEscortByCat);
 router.get("/filter", escortController.getEscorts);
-router.post("/upload", escortController.uploadFile);
+router.post("/upload", upload.single("image"), escortController.uploadFile);
 
 module.exports = router;
