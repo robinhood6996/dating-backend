@@ -2,8 +2,10 @@ const express = require("express");
 const router = express.Router();
 const freeAdController = require("../controller/freeAdController");
 const { authenticate } = require("../middleware/tokenMiddleware");
-router.post("/create", authenticate, freeAdController.createAd);
-router.put("/update/:id", freeAdController.editFreeAd);
+const upload = require("multer")();
+
+router.post("/create", authenticate, upload.any(), freeAdController.createAd);
+router.put("/update/:id", upload.any(), freeAdController.editFreeAd);
 router.get("/active", freeAdController.activeAds);
 router.get("/inactive", freeAdController.inactiveAds);
 router.get("/", freeAdController.getAll);

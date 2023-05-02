@@ -3,6 +3,7 @@ const Countries = require("../models/countries.model");
 
 exports.addCity = async (req, res) => {
   try {
+    console.log("city", req.body);
     const { name } = req.body;
     const { country } = req?.params;
 
@@ -129,8 +130,8 @@ exports.getCityByCountry = async (req, res) => {
     if (existCountry) {
       const cities = await Cities.find({ country: country });
       res.status(200).json({ cities, counts: cities.length });
-    }else{
-      res.status(400).json({ message: 'Bad request' });
+    } else {
+      res.status(400).json({ message: "Bad request" });
     }
     // if (req.query) {
     //   if (req?.query?.limit) {
@@ -138,7 +139,6 @@ exports.getCityByCountry = async (req, res) => {
     //     query = query.limit(limit);
     //   }
     // }
-    
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Internal server error" });
