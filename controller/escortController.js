@@ -325,11 +325,10 @@ exports.getEscorts = async (req, res) => {
 
 exports.uploadFile = async (req, res) => {
   try {
-    console.log(req.body);
+    console.log(req.body, req.file);
     if (req.files) {
-      res.send(req.file);
+      res.send(req.files);
     }
-    // console.log(req);
     res.send();
   } catch (error) {
     console.log(error);
