@@ -39,6 +39,10 @@ router.get("/get-all", escortController.getAllEscort);
 router.get("/", escortController.getEscort);
 router.get("/category/:cat", escortController.getEscortByCat);
 router.get("/filter", escortController.getEscorts);
-router.post("/upload", upload.single("image"), escortController.uploadFile);
+router.post(
+  "/upload",
+  upload.array([{ fieldName: "images", maxCount: 20 }]),
+  escortController.uploadFile
+);
 
 module.exports = router;
