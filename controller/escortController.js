@@ -251,10 +251,10 @@ exports.updateContactData = async (req, res) => {
 
 exports.getAllEscort = async (req, res) => {
   try {
-    let { limit, offset } = req.query;
+    let { limit, offset, gender } = req.query;
 
     // Fetch all escort profiles from the database
-    const escorts = await EscortProfile.find({})
+    const escorts = await EscortProfile.find({ gender })
       .limit(limit || 0)
       .skip(offset || 0)
       .exec();
@@ -325,11 +325,10 @@ exports.getEscorts = async (req, res) => {
 
 exports.uploadFile = async (req, res) => {
   try {
-    console.log(req.body);
+    console.log(req.body, req.file);
     if (req.files) {
-      res.send(req.file);
+      res.send(req.files);
     }
-    // console.log(req);
     res.send();
   } catch (error) {
     console.log(error);
