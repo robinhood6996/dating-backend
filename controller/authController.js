@@ -72,6 +72,7 @@ exports.login = async (req, res) => {
       // Generate a JWT token
       // const matched = await bcrypt.compare(password, existingUser.password);
       const matched = password === existingUser.password;
+      console.log(matched);
       if (matched) {
         const token = jwt.sign(
           { user: existingUser },
