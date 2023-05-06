@@ -7,7 +7,7 @@ const multer = require("multer");
 
 var storage = multer.diskStorage({
   destination: function (request, file, callback) {
-    callback(null, "./uploads/");
+    callback(null, "./uploads/escort");
   },
   filename: function (request, file, callback) {
     console.log(file);
@@ -41,7 +41,8 @@ router.get("/category/:cat", escortController.getEscortByCat);
 router.get("/filter", escortController.getEscorts);
 router.post(
   "/upload",
-  upload.array([{ fieldName: "images", maxCount: 20 }]),
+  authenticate,
+  upload.array("images", 10),
   escortController.uploadFile
 );
 
