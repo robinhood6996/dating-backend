@@ -4,7 +4,7 @@
   "description": "Dating application",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js",
+    "start": "index.js",
     "start-dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "deploy": "firebase deploy --only functions:api"
@@ -25,5 +25,8 @@
     "mongoose": "^7.0.0",
     "multer": "1.4.3",
     "nodemon": "^2.0.20"
+  },
+  "engines": {
+    "node": "18"
   }
 }
