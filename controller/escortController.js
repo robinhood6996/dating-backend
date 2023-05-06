@@ -313,6 +313,7 @@ exports.getEscort = async (req, res) => {
       .json({ message: "Something went wrong", statusCode: 500 });
   }
 };
+
 exports.getEscorts = async (req, res) => {
   try {
     let { country, limit, offset } = req.query;
