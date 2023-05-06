@@ -348,9 +348,10 @@ exports.uploadFile = async (req, res) => {
     let user = req.user;
     if (req.files) {
       let files = req.files.map((file) => {
-        let image = file.path.replace("\\", "/");
-        let image2 = image.replace("\\", "/");
-        return image2;
+        console.log("file", file);
+        // let image = file.path.replace("\\", "/");
+        // let image2 = image.replace("\\", "/");
+        return file;
       });
       let escortImages = [...files];
       let escort = await EscortProfile.findOne({ email: user.email });

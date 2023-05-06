@@ -11,7 +11,7 @@ const cityRoutes = require("./routes/cities.route");
 const freeAdController = require("./routes/freeads.route");
 const bannerController = require("./routes/banner.route");
 const cityTour = require("./routes/tour.route");
-
+const functions = require("firebase-functions");
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -30,9 +30,9 @@ mongoose
   .then(() => {
     console.log("Connected");
     app.listen(3000);
-    app.get("/image/:filename", (req, res) => {
+    app.get("/escort/:filename", (req, res) => {
       const { filename } = req.params;
-      res.sendFile(`${__dirname}/uploads/${filename}`);
+      res.sendFile(`${__dirname}/uploads/escort/${filename}`);
     });
     app.use("/", settingsRoutes);
     app.use("/auth", authRoutes);
@@ -42,6 +42,7 @@ mongoose
     app.use("/freead", freeAdController);
     app.use("/banner", bannerController);
     app.use("/city-tour", cityTour);
+    exports.api = functions.https.onRequest(app);
   })
   .catch((error) => {
     console.log(error);
