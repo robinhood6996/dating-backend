@@ -30,7 +30,7 @@ mongoose
   .then(() => {
     console.log("Connected");
     app.listen(3000);
-    app.get("/escort/:filename", (req, res) => {
+    app.get("/esc/:filename", (req, res) => {
       const { filename } = req.params;
       res.sendFile(`${__dirname}/uploads/escort/${filename}`);
     });
@@ -42,7 +42,7 @@ mongoose
     app.use("/freead", freeAdController);
     app.use("/banner", bannerController);
     app.use("/city-tour", cityTour);
-    exports.api = functions.https.onRequest(app);
+    // exports.api = functions.https.onRequest(app);
   })
   .catch((error) => {
     console.log(error);
