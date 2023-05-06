@@ -97,7 +97,7 @@ exports.updatePhysicalData = async (req, res) => {
 
 exports.updateAdditionalData = async (req, res) => {
   const { email } = req.user; // Extract the ID of the escort profile from the request params
-  const { about, smoking, drinking, tattoos, piercings } = req.body; // Extract the updated additional data from the request body
+  const { about, smoking, drinking, tattoos, piercings, languages } = req.body; // Extract the updated additional data from the request body
 
   try {
     // Find the escort profile by ID
@@ -141,7 +141,26 @@ exports.updateAdditionalData = async (req, res) => {
       }
       profile.piercings = piercings;
     }
-
+    if (languages !== undefined) {
+      if (!Array.isArray(languages)) {
+        throw new Error(
+          "Invalid data type for languages, Expecting array of language object"
+        );
+      }
+      languages.forEach((lang) => {
+        if (Object.keys(lang).length > 2) {
+          throw new Error(
+            "Invalid data type for language, expecting two keys language and expertise"
+          );
+        }
+        if (lang["language"] === undefined && lang["expertise"] === undefined) {
+          throw new Error(
+            "Invalid data type for language, expecting two keys language and expertise"
+          );
+        }
+      });
+      profile.languages = languages;
+    }
     // Save the updated profile to the database
     await profile.save();
 
@@ -252,9 +271,9 @@ exports.updateContactData = async (req, res) => {
 exports.getAllEscort = async (req, res) => {
   try {
     let { limit, offset, gender } = req.query;
-
+    let genderN = gender.toLowerCase();
     // Fetch all escort profiles from the database
-    const escorts = await EscortProfile.find({ gender })
+    const escorts = await EscortProfile.find({ gender: genderN })
       .limit(limit || 0)
       .skip(offset || 0)
       .exec();
