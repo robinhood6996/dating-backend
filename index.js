@@ -30,6 +30,10 @@ mongoose
   .then(() => {
     console.log("Connected");
     app.listen(3000);
+    app.get("/image/:filename", (req, res) => {
+      const { filename } = req.params;
+      res.sendFile(`${__dirname}/uploads/${filename}`);
+    });
     app.use("/", settingsRoutes);
     app.use("/auth", authRoutes);
     app.use("/escort", escortRoutes);
