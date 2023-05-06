@@ -271,7 +271,7 @@ exports.updateContactData = async (req, res) => {
 exports.getAllEscort = async (req, res) => {
   try {
     let { limit, offset, gender } = req.query;
-    let genderN = gender.toLowerCase();
+    let genderN = gender?.toLowerCase();
     // Fetch all escort profiles from the database
     const escorts = await EscortProfile.find({ gender: genderN })
       .limit(limit || 0)
