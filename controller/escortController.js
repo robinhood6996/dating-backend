@@ -325,13 +325,29 @@ exports.getEscorts = async (req, res) => {
 
 exports.uploadFile = async (req, res) => {
   try {
-    console.log(req.body, req.file);
+    let user = req.user;
     if (req.files) {
-      res.send(req.files);
+      let files = req.files.map((file) => {
+        let image = file.path.replace("\\", "/");
+        let image2 = image.replace("\\", "/");
+        return image2;
+      });
+      let escortImages = [...files];
+      let escort = await EscortProfile.findOne({ email: user.email });
+      console.log("escort", escort);
+      let currentImages = [...escort.images];
+      files.map((file) => {
+        currentImages.push(file);
+      });
+      escort.images = currentImages;
+      await escort.save();
+      return res
+        .status(200)
+        .json({ message: "Photo Uploaded", statusCode: 200 });
     }
     res.send();
   } catch (error) {
-    console.log(error);
+    return res.status(500).json({ message: "Error", error, statusCode: 500 });
   }
 };
 
