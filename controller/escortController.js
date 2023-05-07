@@ -316,10 +316,13 @@ exports.getEscort = async (req, res) => {
 
 exports.getEscorts = async (req, res) => {
   try {
-    let { country, limit, offset } = req.query;
+    let { country, baseCity, limit, offset } = req.query;
     let query = {};
     if (country) {
       query.country = country;
+    }
+    if (baseCity) {
+      query.baseCity = baseCity.toLowerCase();
     }
 
     let escort = await EscortProfile.find(query)
