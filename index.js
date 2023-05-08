@@ -42,7 +42,7 @@ mongoose
     app.use("/freead", freeAdController);
     app.use("/banner", bannerController);
     app.use("/city-tour", cityTour);
-    // exports.api = functions.https.onRequest(app);
+    exports.api = functions.https.onRequest(app);
   })
   .catch((error) => {
     console.log(error);

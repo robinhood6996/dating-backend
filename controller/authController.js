@@ -1,7 +1,7 @@
 require("dotenv").config();
 const User = require("../models/user.model");
 const BlacklistToken = require("../models/blacklistToken.model");
-const bcrypt = require("bcrypt");
+// const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const { EscortProfile } = require("../models/escort.model");
@@ -18,12 +18,12 @@ exports.registerUser = async (req, res) => {
     }
 
     // Hash the password
-    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    // const hashedPassword = await bcrypt.hash(req.body.password, 10);
     // Create a new user document
     const user = new User({
       name: req.body.name,
       email: req.body.email,
-      password: hashedPassword,
+      password: req.body.password,
       gender: req.body.gender,
       age: req.body.age,
       type: req.body.type,
@@ -70,7 +70,9 @@ exports.login = async (req, res) => {
     console.log(req.body);
     if (existingUser) {
       // Generate a JWT token
-      const matched = await bcrypt.compare(password, existingUser.password);
+      // const matched = await bcrypt.compare(password, existingUser.password);
+      const matched = password === existingUser.password;
+      console.log(matched);
       if (matched) {
         const token = jwt.sign(
           { user: existingUser },
