@@ -4,7 +4,7 @@
     "gender": ["female", "male", "Trans", "Couples" ],
     "availability": [{"type": "in_call", "options": ["Private apartment", "Hotel Room", "Club / Studio", "Others"]}, {"type": "out_call", "options": ["Home visits only", "Hotel & home visits only", "Others"]}],
     "Orientation" : ["Heterosexual", "Bisexual", "Homosexual"],
-    "Appearance": {"hair_color": ["Blonde", "Light Brown", "Brunette", "Black", "Red"], "Eye_Color": ["Black", "Brown", "Green", "Blue", "Gray"], "cup_size": ["A", "B", "C", "D", "DD", "F", "FF", "G", "H", "J"], "Ethnicity": ["Asian", "Black", "Caucasiun", "Latin","Indian", "Arabian", "Mixed"]},
+    "Appearance": {"hair_color": ["Blonde", "Light Brown", "Brunette", "Black", "Red"], "Eye_Color": ["Black", "Brown", "Green", "Blue", "Gray"], "breast_size": ["A", "B", "C", "D", "DD", "F", "FF", "G", "H", "J"], "Ethnicity": ["Asian", "Black", "Caucasiun", "Latin","Indian", "Arabian", "Mixed"]},
     "Others" : {"height": ["135cm (4.5in)", "136cm (4.6in)", "137cm (4.6in)", "138cm (4.6in)", "139cm (4.7in)", "140cm (4.7in)", "141cm (4.8in)", "142cm (4.8in)", "143cm (4.8in)", "144cm (4.9in)", "145cm (4.9in)", "146cm (4.9in)", "147cm (4.10in)", "148cm (4.10in)", "148cm (4.10in)", "149cm (4.11in)", "150cm (4.11in)", "151cm (4.11in)", "152cm (5.00in)", "153cm (5.00in)", "154cm (5.1in)", "155cm (5.1in)", "156cm (5.1in)", "157cm (5.2in)", "158cm (5.2in)", "159cm (5.3in)", "160cm (5.2in)", "161cm (5.3in)", "162cm (5.4in)", "163cm (5.4in)", "164cm (5.5in)"]}
 
 
