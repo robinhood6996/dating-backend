@@ -1,6 +1,6 @@
 const { EscortProfile } = require("../models/escort.model");
 const User = require("../models/user.model");
-
+const searchQueries = require("../helpers/categories.json");
 // Update Biography Data
 exports.updateBiographyData = async (req, res) => {
   const user = req.user;
@@ -399,4 +399,9 @@ exports.getEscortByCat = async (req, res) => {
       .status(500)
       .json({ message: "Something went wrong", statusCode: 500 });
   }
+};
+
+exports.escortCategories = async (req, res) => {
+  let categories = searchQueries;
+  res.status(200).json({ data: categories });
 };

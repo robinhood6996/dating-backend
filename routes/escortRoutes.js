@@ -39,6 +39,7 @@ router.get("/get-all", escortController.getAllEscort);
 router.get("/", escortController.getEscort);
 router.get("/category/:cat", escortController.getEscortByCat);
 router.get("/filter", escortController.getEscorts);
+router.get("/search-query", escortController.escortCategories);
 router.post(
   "/upload",
   authenticate,
