@@ -41,6 +41,12 @@ router.put(
   upload.any(),
   escortController.workingCity
 );
+router.put(
+  "/services",
+  authenticate,
+  upload.any(),
+  escortController.updateServices
+);
 router.get("/get-all", escortController.getAllEscort);
 router.get("/", escortController.getEscort);
 router.get("/category/:cat", escortController.getEscortByCat);

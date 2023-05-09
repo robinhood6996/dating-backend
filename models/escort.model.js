@@ -58,6 +58,7 @@ const EscortProfileSchema = new Schema(
     // Services
     services: { type: Array, default: [] },
     orientation: { type: String, default: "", lowercase: true },
+    offerFor: { type: Array, default: [], lowercase: true },
     // Rates
     reachHome: {
       hour: { type: Number, default: null },

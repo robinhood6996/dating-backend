@@ -1,6 +1,7 @@
 const { EscortProfile } = require("../models/escort.model");
 const User = require("../models/user.model");
 const searchQueries = require("../helpers/categories.json");
+
 // Update Biography Data
 exports.updateBiographyData = async (req, res) => {
   const user = req.user;
@@ -56,6 +57,7 @@ exports.updateBiographyData = async (req, res) => {
   }
 };
 
+//update physical Data
 exports.updatePhysicalData = async (req, res) => {
   const { email } = req.user; // Extract the ID of the escort profile from the request params
   const {
@@ -157,6 +159,7 @@ exports.updatePhysicalData = async (req, res) => {
   }
 };
 
+//update escort about data
 exports.updateAdditionalData = async (req, res) => {
   const { email } = req.user; // Extract the ID of the escort profile from the request params
   const { about } = req.body; // Extract the updated additional data from the request body
@@ -210,6 +213,7 @@ exports.updateAdditionalData = async (req, res) => {
   }
 };
 
+//Working cities upate api
 exports.workingCity = async (req, res) => {
   const { email } = req.user;
   const { secondCity, thirdCity, fourthCity, inCall, outCall } = req.body;
@@ -278,6 +282,80 @@ exports.workingCity = async (req, res) => {
       .json({ message: "Failed to update additional data", statusCode: 500 });
   }
 };
+exports.updateServices = async (req, res) => {
+  const { email } = req.user;
+  const { orientation, offerFor, services } = req.body;
+  try {
+    const profile = await EscortProfile.findOne({ email });
+    if (!profile) {
+      return res
+        .status(404)
+        .json({ message: "Escort profile not found", statusCode: 404 });
+    }
+
+    if (orientation) {
+      if (typeof about !== "string") {
+        throw new Error("Invalid data type for secondCity");
+      }
+      profile.orientation = orientation;
+    }
+    if (services) {
+      if (typeof services !== "object" && !services.isArray()) {
+        throw new Error("Invalid data type for services");
+      }
+      let currentServices = [...profile.services];
+      if (services.length) {
+        services.forEach((service) => {
+          if (!profile.service.includes(service)) {
+            currentServices.push(service);
+          }
+        });
+      }
+      profile.services = currentServices;
+    }
+    if (offerFor) {
+      if (typeof offerFor !== "object" && !services.isArray()) {
+        throw new Error("Invalid data type for services");
+      }
+      let currentOfferFor = [...profile.offerFor];
+      if (offerFor.length) {
+        offerFor.forEach((offer) => {
+          if (!profile.offerFor.includes(offer)) {
+            currentServices.push(offer);
+          }
+        });
+      }
+      profile.offerFor = currentOfferFor;
+    }
+
+    await profile.save();
+    res.status(200).json({
+      message: "Services data updated successfully",
+      data: profile,
+      statusCode: 200,
+    });
+  } catch (error) {
+    // Handle known errors
+    if (error.name === "ValidationError") {
+      // If the error is due to data type validation, send an error response
+      return res.status(400).json({
+        message: "Data type validation failed",
+        error: error.message,
+        statusCode: 400,
+      });
+    } else if (error instanceof Error) {
+      // If a custom error is thrown, send an error response
+      return res.status(400).json({ message: error.message, statusCode: 400 });
+    }
+
+    // Handle unknown errors
+    res
+      .status(500)
+      .json({ message: "Failed to update services data", statusCode: 500 });
+  }
+};
+
+//Update Contact Data
 exports.updateContactData = async (req, res) => {
   const { email: userEmail } = req.user; // Extract the ID of the escort profile from the request params
   const { phone, phoneDirection, apps, website, email } = req.body; // Extract the updated contact data from the request body
@@ -355,6 +433,7 @@ exports.updateContactData = async (req, res) => {
   }
 };
 
+//Get all escorts data
 exports.getAllEscort = async (req, res) => {
   try {
     let { limit, offset, gender } = req.query;
@@ -381,6 +460,7 @@ exports.getAllEscort = async (req, res) => {
   }
 };
 
+//Get escort data
 exports.getEscort = async (req, res) => {
   try {
     let { username } = req.query;
@@ -401,6 +481,7 @@ exports.getEscort = async (req, res) => {
   }
 };
 
+//Get escorts data
 exports.getEscorts = async (req, res) => {
   try {
     let {
@@ -558,6 +639,7 @@ exports.uploadFile = async (req, res) => {
   }
 };
 
+//Get escort data by category
 exports.getEscortByCat = async (req, res) => {
   try {
     let { cat } = req.params;
@@ -584,6 +666,7 @@ exports.getEscortByCat = async (req, res) => {
   }
 };
 
+//Get escort data by categories
 exports.escortCategories = async (req, res) => {
   let categories = searchQueries;
   res.status(200).json({ data: categories });
