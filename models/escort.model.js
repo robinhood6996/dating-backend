@@ -9,24 +9,26 @@ const EscortProfileSchema = new Schema(
     email: { type: String, required: true, unique: true },
     slogan: { type: String },
     age: { type: Number },
-    gender: { type: String },
-    ethnicity: { type: String },
-    nationality: { type: String },
+    gender: { type: String, lowercase: true },
+    ethnicity: { type: String, lowercase: true },
+    nationality: { type: String, lowercase: true },
+    country: { type: String, lowercase: true },
+    state: { type: String, lowercase: true },
     userName: { type: String },
 
     // Physical
-    hairColor: { type: String },
-    eyeColor: { type: String },
-    height: { type: Number },
-    weight: { type: Number },
-    dressSize: { type: String },
-    shoeSize: { type: String },
-    bustWaistHips: { type: String },
-    brest: { type: String },
-    pubicHair: { type: String },
+    hairColor: { type: String, lowercase: true },
+    eyeColor: { type: String, lowercase: true },
+    height: { type: String, lowercase: true },
+    weight: { type: String, lowercase: true },
+    dressSize: { type: String, lowercase: true },
+    shoeSize: { type: String, lowercase: true },
+    bustWaistHips: { type: String, lowercase: true },
+    brest: { type: String, lowercase: true },
+    pubicHair: { type: String, lowercase: true },
 
     // Additional
-    about: { type: String },
+    about: { type: String, lowercase: true },
     smoking: { type: Boolean },
     drinking: { type: Boolean },
     tattoos: { type: Boolean },
@@ -34,10 +36,10 @@ const EscortProfileSchema = new Schema(
 
     // Contact
     phone: { type: String },
-    phoneDirection: { type: String },
-    apps: { type: String },
-    website: { type: String },
-    email: { type: String },
+    phoneDirection: { type: String, lowercase: true },
+    apps: { type: String, lowercase: true },
+    website: { type: String, lowercase: true },
+    email: { type: String, lowercase: true },
     // Languages
     languages: { type: Array, default: [] },
 
@@ -55,7 +57,7 @@ const EscortProfileSchema = new Schema(
 
     // Services
     services: { type: Array, default: [] },
-
+    orientation: { type: String, default: "", lowercase: true },
     // Rates
     reachHome: {
       hour: { type: Number, default: null },
@@ -74,14 +76,18 @@ const EscortProfileSchema = new Schema(
       weekend: { type: Number, default: null },
     },
     workingCities: {
-      baseCity: { type: String, default: null },
-      secondCity: { type: String, default: null },
-      thirdCity: { type: String, default: null },
-      fourthCity: { type: String, default: null },
-      selectedTimezone: { type: String, default: null },
+      baseCity: { type: String, default: null, lowercase: true },
+      secondCity: { type: String, default: null, lowercase: true },
+      thirdCity: { type: String, default: null, lowercase: true },
+      fourthCity: { type: String, default: null, lowercase: true },
+      selectedTimezone: { type: String, default: null, lowercase: true },
     },
     // Gallery
     images: { type: Array, default: [] },
+    realPics: { type: Boolean, default: false },
+    verified: { type: Boolean, default: false },
+    pornStar: { type: Boolean, default: false },
+    withVideo: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

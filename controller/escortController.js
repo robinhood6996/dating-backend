@@ -316,13 +316,109 @@ exports.getEscort = async (req, res) => {
 
 exports.getEscorts = async (req, res) => {
   try {
-    let { country, baseCity, limit, offset } = req.query;
-    let query = {};
+    let {
+      country,
+      nationality,
+      state,
+      baseCity,
+      realPics,
+      verified,
+      pornStar,
+      withVideo,
+      limit,
+      offset,
+      services,
+      inCall,
+      outCall,
+      hairColor,
+      eyeColor,
+      breastSize,
+      ethnicity,
+      gender,
+      height,
+      orientation,
+      weight,
+      tattoos,
+      piercings,
+      available24,
+    } = req.query;
+
+    let query = { $or: [] };
+
     if (country) {
-      query.country = country;
+      query.$or.push({ country });
+    }
+    if (nationality) {
+      query.$or.push({ nationality });
+    }
+    if (state) {
+      query.$or.push({ state });
     }
     if (baseCity) {
-      query.baseCity = baseCity.toLowerCase();
+      query.$or.push({ baseCity: baseCity.toLowerCase() });
+    }
+    if (realPics) {
+      query.$or.push({ realPics });
+    }
+    if (withVideo) {
+      query.$or.push({ withVideo });
+    }
+    if (verified) {
+      query.$or.push({ verified: verified });
+    }
+    if (pornStar) {
+      query.$or.push({ pornStar });
+    }
+    if (tattoos) {
+      query.$or.push({ tattoos });
+    }
+    if (piercings) {
+      query.$or.push({ piercings });
+    }
+    if (available24) {
+      query.$or.push({ available24 });
+    }
+    if (services) {
+      let servicesArray = services.split(",");
+      query.$or.push({ services: { $in: servicesArray } });
+    }
+    if (weight) {
+      let weights = weight.split(",").map((h) => h.trim().toLowerCase());
+      query.$or.push({ weight: { $in: weights } });
+    }
+    if (height) {
+      let heights = height.split(",").map((h) => h.trim().toLowerCase());
+      query.$or.push({ height: { $in: heights } });
+    }
+    if (hairColor) {
+      query.$or.push({ hairColor: hairColor.toLowerCase() });
+    }
+    if (eyeColor) {
+      query.$or.push({ hairColor: hairColor.toLowerCase() });
+    }
+    if (breastSize) {
+      query.$or.push({ breastSize: breastSize.toLowerCase() });
+    }
+    if (ethnicity) {
+      query.$or.push({ ethnicity: ethnicity.toLowerCase() });
+    }
+    if (gender) {
+      let genders = gender.split(",").map((h) => h.trim().toLowerCase());
+      query.$or.push({ gender: { $in: genders } });
+    }
+    if (inCall) {
+      let inCalls = inCall.split(",").map((h) => h.trim().toLowerCase());
+      query.$or.push({ inCall: { $in: inCalls } });
+    }
+    if (outCall) {
+      let outCalls = outCall.split(",").map((h) => h.trim().toLowerCase());
+      query.$or.push({ outCall: { $in: outCalls } });
+    }
+    if (orientation) {
+      let orientations = orientation
+        .split(",")
+        .map((h) => h.trim().toLowerCase());
+      query.$or.push({ orientation: { $in: orientations } });
     }
 
     let escort = await EscortProfile.find(query)
