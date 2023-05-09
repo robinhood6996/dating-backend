@@ -76,12 +76,13 @@ const EscortProfileSchema = new Schema(
       weekend: { type: Number, default: null },
     },
     workingCities: {
-      baseCity: { type: String, default: null, lowercase: true },
       secondCity: { type: String, default: null, lowercase: true },
       thirdCity: { type: String, default: null, lowercase: true },
       fourthCity: { type: String, default: null, lowercase: true },
       selectedTimezone: { type: String, default: null, lowercase: true },
     },
+    inCall: { type: String, default: "" },
+    outCall: { type: String, default: "" },
     // Gallery
     images: { type: Array, default: [] },
     realPics: { type: Boolean, default: false },

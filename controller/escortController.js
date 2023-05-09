@@ -4,7 +4,17 @@ const searchQueries = require("../helpers/categories.json");
 // Update Biography Data
 exports.updateBiographyData = async (req, res) => {
   const user = req.user;
-  const { name, email, slogan, age, gender, ethnicity, nationality } = req.body;
+  const {
+    name,
+    email,
+    slogan,
+    age,
+    gender,
+    ethnicity,
+    nationality,
+    country,
+    state,
+  } = req.body;
   try {
     // Find the escort profile by profileId
     const profile = await EscortProfile.findOne({ email: user.email });
@@ -16,6 +26,8 @@ exports.updateBiographyData = async (req, res) => {
     if (gender) profile.gender = gender;
     if (ethnicity) profile.ethnicity = ethnicity;
     if (nationality) profile.nationality = nationality;
+    if (country) profile.country = country;
+    if (state) profile.state = state;
     // Save the updated profile
     await profile.save();
 
@@ -56,6 +68,11 @@ exports.updatePhysicalData = async (req, res) => {
     bustWaistHips,
     brest,
     pubicHair,
+    smoke,
+    drinking,
+    tattoos,
+    piercings,
+    languages,
   } = req.body; // Extract the updated physical data from the request body
 
   try {
@@ -68,55 +85,16 @@ exports.updatePhysicalData = async (req, res) => {
         .json({ message: "Escort profile not found", statusCode: 404 });
     }
     // Update the physical data
-    profile.hairColor = hairColor;
-    profile.eyeColor = eyeColor;
-    profile.height = height;
-    profile.weight = weight;
-    profile.dressSize = dressSize;
-    profile.shoeSize = shoeSize;
-    profile.bustWaistHips = bustWaistHips;
-    profile.brest = brest;
-    profile.pubicHair = pubicHair;
-    // Save the updated profile to the database
-    await profile.save();
-    // Send a success response
-    res.status(200).json({
-      message: "Physical data updated successfully",
-      data: profile,
-      statusCode: 200,
-    });
-  } catch (error) {
-    // Send an error response if something goes wrong
-    res.status(500).json({
-      message: "Something went wrong",
-      error: error.message,
-      statusCode: 500,
-    });
-  }
-};
+    if (hairColor) profile.hairColor = hairColor;
 
-exports.updateAdditionalData = async (req, res) => {
-  const { email } = req.user; // Extract the ID of the escort profile from the request params
-  const { about, smoking, drinking, tattoos, piercings, languages } = req.body; // Extract the updated additional data from the request body
-
-  try {
-    // Find the escort profile by ID
-    const profile = await EscortProfile.findOne({ email });
-
-    // If the profile is not found, send an error response
-    if (!profile) {
-      return res
-        .status(404)
-        .json({ message: "Escort profile not found", statusCode: 404 });
-    }
-
-    // Validate and update the additional data
-    if (about) {
-      if (typeof about !== "string") {
-        throw new Error("Invalid data type for about");
-      }
-      profile.about = about;
-    }
+    if (eyeColor) profile.eyeColor = eyeColor;
+    if (height) profile.height = height;
+    if (weight) profile.weight = weight;
+    if (dressSize) profile.dressSize = dressSize;
+    if (shoeSize) profile.shoeSize = shoeSize;
+    if (bustWaistHips) profile.bustWaistHips = bustWaistHips;
+    if (brest) profile.brest = brest;
+    if (pubicHair) profile.pubicHair = pubicHair;
     if (smoking !== undefined) {
       if (typeof smoking !== "boolean") {
         throw new Error("Invalid data type for smoking");
@@ -163,6 +141,47 @@ exports.updateAdditionalData = async (req, res) => {
     }
     // Save the updated profile to the database
     await profile.save();
+    // Send a success response
+    res.status(200).json({
+      message: "Physical data updated successfully",
+      data: profile,
+      statusCode: 200,
+    });
+  } catch (error) {
+    // Send an error response if something goes wrong
+    res.status(500).json({
+      message: "Something went wrong",
+      error: error.message,
+      statusCode: 500,
+    });
+  }
+};
+
+exports.updateAdditionalData = async (req, res) => {
+  const { email } = req.user; // Extract the ID of the escort profile from the request params
+  const { about } = req.body; // Extract the updated additional data from the request body
+
+  try {
+    // Find the escort profile by ID
+    const profile = await EscortProfile.findOne({ email });
+
+    // If the profile is not found, send an error response
+    if (!profile) {
+      return res
+        .status(404)
+        .json({ message: "Escort profile not found", statusCode: 404 });
+    }
+
+    // Validate and update the additional data
+    if (about) {
+      if (typeof about !== "string") {
+        throw new Error("Invalid data type for about");
+      }
+      profile.about = about;
+    }
+
+    // Save the updated profile to the database
+    await profile.save();
 
     // Send a success response
     res.status(200).json({
@@ -191,6 +210,74 @@ exports.updateAdditionalData = async (req, res) => {
   }
 };
 
+exports.workingCity = async (req, res) => {
+  const { email } = req.user;
+  const { secondCity, thirdCity, fourthCity, inCall, outCall } = req.body;
+  try {
+    const profile = await EscortProfile.findOne({ email });
+    if (!profile) {
+      return res
+        .status(404)
+        .json({ message: "Escort profile not found", statusCode: 404 });
+    }
+    let workingCities = {};
+    if (secondCity) {
+      if (typeof about !== "string") {
+        throw new Error("Invalid data type for secondCity");
+      }
+      profile.workingCities.secondCity = secondCity;
+    }
+    if (thirdCity) {
+      if (typeof about !== "string") {
+        throw new Error("Invalid data type for thirdCity");
+      }
+      profile.workingCities.thirdCity = thirdCity;
+    }
+    if (fourthCity) {
+      if (typeof about !== "string") {
+        throw new Error("Invalid data type for fourthCity");
+      }
+      profile.workingCities.fourthCity = fourthCity;
+    }
+    if (inCall) {
+      if (typeof inCall !== "string") {
+        throw new Error("Invalid data type for inCall");
+      }
+      profile.inCall = inCall;
+    }
+    if (outCall) {
+      if (typeof outCall !== "string") {
+        throw new Error("Invalid data type for inCall");
+      }
+      profile.outCall = outCall;
+    }
+
+    await profile.save();
+    res.status(200).json({
+      message: "Working cities data updated successfully",
+      data: profile,
+      statusCode: 200,
+    });
+  } catch (error) {
+    // Handle known errors
+    if (error.name === "ValidationError") {
+      // If the error is due to data type validation, send an error response
+      return res.status(400).json({
+        message: "Data type validation failed",
+        error: error.message,
+        statusCode: 400,
+      });
+    } else if (error instanceof Error) {
+      // If a custom error is thrown, send an error response
+      return res.status(400).json({ message: error.message, statusCode: 400 });
+    }
+
+    // Handle unknown errors
+    res
+      .status(500)
+      .json({ message: "Failed to update additional data", statusCode: 500 });
+  }
+};
 exports.updateContactData = async (req, res) => {
   const { email: userEmail } = req.user; // Extract the ID of the escort profile from the request params
   const { phone, phoneDirection, apps, website, email } = req.body; // Extract the updated contact data from the request body
