@@ -685,11 +685,15 @@ exports.uploadVideos = async (req, res) => {
       });
       let escort = await EscortProfile.findOne({ email: user.email });
       console.log("escort", escort);
-      let currentVideos = [...escort.videos];
-      files.map((file) => {
-        currentVideos.push(file);
-      });
-      escort.videos = currentVideos;
+      if (escort?.videos.length > 0) {
+        let currentVideos = [...escort.videos];
+        files.map((file) => {
+          currentVideos.push(file);
+        });
+        escort.videos = currentVideos;
+      } else {
+        escort.videos = files;
+      }
       await escort.save();
       return res.status(200).json({
         message: "Video Uploaded",

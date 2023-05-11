@@ -39,6 +39,10 @@ mongoose
       const { filename } = req.params;
       res.sendFile(`${__dirname}/uploads/escort/${filename}`);
     });
+    app.get("/esc/video/:filename", (req, res) => {
+      const { filename } = req.params;
+      res.sendFile(`${__dirname}/uploads/escort/videos/${filename}`);
+    });
     app.use("/", settingsRoutes);
     app.use("/auth", authRoutes);
     app.use("/escort", escortRoutes);
