@@ -16,7 +16,7 @@ const app = express();
 app.use(
   cors({
     origin: "https://incontriesc.onrender.com",
-    origin: "http://localhost:3011",
+    // origin: "http://localhost:3011",
   })
 );
 app.use(express.json());
