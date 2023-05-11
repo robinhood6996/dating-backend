@@ -15,8 +15,8 @@ const functions = require("firebase-functions");
 const app = express();
 app.use(
   cors({
-    origin: "https://incontriesc.onrender.com",
-    // origin: "http://localhost:3011",
+    origin: "https://incontrisc.netlify.app",
+    origin: "http://localhost:3011",
   })
 );
 app.use(express.json());
