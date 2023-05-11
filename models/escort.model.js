@@ -7,7 +7,7 @@ const EscortProfileSchema = new Schema(
     // Biography
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
-    slogan: { type: String },
+    category: { type: String },
     age: { type: Number },
     gender: { type: String, lowercase: true },
     ethnicity: { type: String, lowercase: true },
@@ -19,20 +19,24 @@ const EscortProfileSchema = new Schema(
     // Physical
     hairColor: { type: String, lowercase: true },
     eyeColor: { type: String, lowercase: true },
+    hairLength: { type: String, lowercase: true },
     height: { type: String, lowercase: true },
     weight: { type: String, lowercase: true },
     dressSize: { type: String, lowercase: true },
     shoeSize: { type: String, lowercase: true },
     bustWaistHips: { type: String, lowercase: true },
     brest: { type: String, lowercase: true },
+    brestSize: { type: String, lowercase: true },
     pubicHair: { type: String, lowercase: true },
+    smoking: { type: String },
+    drinking: { type: String },
+    tattoos: { type: Boolean },
+    piercings: { type: Boolean },
+    // Languages
+    languages: { type: Array, default: [] },
 
     // Additional
     about: { type: String, lowercase: true },
-    smoking: { type: Boolean },
-    drinking: { type: Boolean },
-    tattoos: { type: Boolean },
-    piercings: { type: Boolean },
 
     // Contact
     phone: { type: String },
@@ -40,8 +44,6 @@ const EscortProfileSchema = new Schema(
     apps: { type: String, lowercase: true },
     website: { type: String, lowercase: true },
     email: { type: String, lowercase: true },
-    // Languages
-    languages: { type: Array, default: [] },
 
     // Availability
     available24: { type: Boolean, default: true },

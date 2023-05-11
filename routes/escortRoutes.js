@@ -48,7 +48,8 @@ router.put(
   escortController.updateServices
 );
 router.get("/get-all", escortController.getAllEscort);
-router.get("/", escortController.getEscort);
+router.get("/", authenticate, escortController.getEscort);
+router.get("/profile", authenticate, escortController.getEscortProfile);
 router.get("/category/:cat", escortController.getEscortByCat);
 router.get("/filter", escortController.getEscorts);
 router.get("/search-query", escortController.escortCategories);
