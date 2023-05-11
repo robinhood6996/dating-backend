@@ -89,6 +89,7 @@ const EscortProfileSchema = new Schema(
     outCall: { type: String, default: "" },
     // Gallery
     images: { type: Array, default: [] },
+    videos: { thpe: [], default: [] },
     realPics: { type: Boolean, default: false },
     verified: { type: Boolean, default: false },
     pornStar: { type: Boolean, default: false },

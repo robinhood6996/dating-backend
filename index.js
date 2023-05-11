@@ -13,7 +13,12 @@ const bannerController = require("./routes/banner.route");
 const cityTour = require("./routes/tour.route");
 const functions = require("firebase-functions");
 const app = express();
-app.use(cors());
+app.use(
+  cors({
+    origin: "https://incontriesc.onrender.com",
+    origin: "http://localhost:3011",
+  })
+);
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 //mongodb+srv://datingadmin:D88CQRZrzRSvTGD@cluster0.oulrk.mongodb.net/?retryWrites=true&w=majority

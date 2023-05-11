@@ -662,16 +662,44 @@ exports.uploadFile = async (req, res) => {
       });
       escort.images = currentImages;
       await escort.save();
-      return res
-        .status(200)
-        .json({
-          message: "Photo Uploaded",
-          images: escort.images,
-          statusCode: 200,
-        });
+      return res.status(200).json({
+        message: "Photo Uploaded",
+        images: escort.images,
+        statusCode: 200,
+      });
     }
     res.send();
   } catch (error) {
+    return res.status(500).json({ message: "Error", error, statusCode: 500 });
+  }
+};
+exports.uploadVideos = async (req, res) => {
+  try {
+    let user = req.user;
+    if (req.files) {
+      let files = req.files.map((file) => {
+        console.log("file", file);
+        // let image = file.path.replace("\\", "/");
+        // let image2 = image.replace("\\", "/");
+        return file;
+      });
+      let escort = await EscortProfile.findOne({ email: user.email });
+      console.log("escort", escort);
+      let currentVideos = [...escort.videos];
+      files.map((file) => {
+        currentVideos.push(file);
+      });
+      escort.videos = currentVideos;
+      await escort.save();
+      return res.status(200).json({
+        message: "Video Uploaded",
+        images: escort.videos,
+        statusCode: 200,
+      });
+    }
+    res.send();
+  } catch (error) {
+    console.log(error);
     return res.status(500).json({ message: "Error", error, statusCode: 500 });
   }
 };
