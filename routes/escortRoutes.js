@@ -5,7 +5,7 @@ const { authenticate } = require("../middleware/tokenMiddleware");
 // const upload = require("../middleware/upload");
 const multer = require("multer");
 
-var storage = multer.diskStorage({
+const storage = multer.diskStorage({
   destination: function (request, file, callback) {
     callback(null, "./uploads/escort");
   },
@@ -15,7 +15,7 @@ var storage = multer.diskStorage({
   },
 });
 
-var upload = multer({ storage: storage });
+const upload = multer({ storage: storage });
 // const fUpload = multer({ dest: "../uploads/" });
 router.put(
   "/update-bio",
@@ -56,7 +56,7 @@ router.get("/search-query", escortController.escortCategories);
 router.post(
   "/upload",
   authenticate,
-  upload.array("photos", 10),
+  upload.any("photos"),
   escortController.uploadFile
 );
 
