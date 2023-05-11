@@ -10,12 +10,14 @@ exports.updateBiographyData = async (req, res) => {
     email,
     slogan,
     age,
-    gender,
+    sex,
     ethnicity,
     nationality,
     country,
     state,
+    category,
   } = req.body;
+  console.log(req.body);
   try {
     // Find the escort profile by profileId
     const profile = await EscortProfile.findOne({ email: user.email });
@@ -24,11 +26,12 @@ exports.updateBiographyData = async (req, res) => {
     if (email) profile.email = email;
     if (slogan) profile.slogan = slogan;
     if (age) profile.age = age;
-    if (gender) profile.gender = gender;
+    if (sex) profile.gender = sex;
     if (ethnicity) profile.ethnicity = ethnicity;
     if (nationality) profile.nationality = nationality;
     if (country) profile.country = country;
     if (state) profile.state = state;
+    if (category) profile.category = category;
     // Save the updated profile
     await profile.save();
 
@@ -63,12 +66,14 @@ exports.updatePhysicalData = async (req, res) => {
   const {
     hairColor,
     eyeColor,
+    hairLength,
     height,
     weight,
     dressSize,
     shoeSize,
     bustWaistHips,
     brest,
+    brestSize,
     pubicHair,
     smoke,
     drinking,
@@ -88,7 +93,7 @@ exports.updatePhysicalData = async (req, res) => {
     }
     // Update the physical data
     if (hairColor) profile.hairColor = hairColor;
-
+    if (hairLength) profile.hairLength = hairLength;
     if (eyeColor) profile.eyeColor = eyeColor;
     if (height) profile.height = height;
     if (weight) profile.weight = weight;
@@ -96,12 +101,13 @@ exports.updatePhysicalData = async (req, res) => {
     if (shoeSize) profile.shoeSize = shoeSize;
     if (bustWaistHips) profile.bustWaistHips = bustWaistHips;
     if (brest) profile.brest = brest;
+    if (brestSize) profile.brestSize = brestSize;
     if (pubicHair) profile.pubicHair = pubicHair;
-    if (smoking !== undefined) {
-      if (typeof smoking !== "boolean") {
+    if (smoke !== undefined) {
+      if (typeof smoke !== "boolean") {
         throw new Error("Invalid data type for smoking");
       }
-      profile.smoking = smoking;
+      profile.smoking = smoke;
     }
     if (drinking !== undefined) {
       if (typeof drinking !== "boolean") {
@@ -128,18 +134,19 @@ exports.updatePhysicalData = async (req, res) => {
         );
       }
       languages.forEach((lang) => {
-        if (Object.keys(lang).length > 2) {
+        if (Object.keys(lang).length > 3) {
           throw new Error(
             "Invalid data type for language, expecting two keys language and expertise"
           );
         }
-        if (lang["language"] === undefined && lang["expertise"] === undefined) {
+        if (lang["language"] === undefined && lang["type"] === undefined) {
           throw new Error(
             "Invalid data type for language, expecting two keys language and expertise"
           );
         }
       });
-      profile.languages = languages;
+      let mergeSet = new Set([...profile.language, languages]);
+      profile.languages = [...mergeSet];
     }
     // Save the updated profile to the database
     await profile.save();
@@ -151,6 +158,7 @@ exports.updatePhysicalData = async (req, res) => {
     });
   } catch (error) {
     // Send an error response if something goes wrong
+    console.log(error);
     res.status(500).json({
       message: "Something went wrong",
       error: error.message,
@@ -226,19 +234,19 @@ exports.workingCity = async (req, res) => {
     }
     let workingCities = {};
     if (secondCity) {
-      if (typeof about !== "string") {
+      if (typeof secondCity !== "string") {
         throw new Error("Invalid data type for secondCity");
       }
       profile.workingCities.secondCity = secondCity;
     }
     if (thirdCity) {
-      if (typeof about !== "string") {
+      if (typeof thirdCity !== "string") {
         throw new Error("Invalid data type for thirdCity");
       }
       profile.workingCities.thirdCity = thirdCity;
     }
     if (fourthCity) {
-      if (typeof about !== "string") {
+      if (typeof fourthCity !== "string") {
         throw new Error("Invalid data type for fourthCity");
       }
       profile.workingCities.fourthCity = fourthCity;
@@ -247,13 +255,13 @@ exports.workingCity = async (req, res) => {
       if (typeof inCall !== "string") {
         throw new Error("Invalid data type for inCall");
       }
-      profile.inCall = inCall;
+      profile.incomingCall = inCall;
     }
     if (outCall) {
       if (typeof outCall !== "string") {
         throw new Error("Invalid data type for inCall");
       }
-      profile.outCall = outCall;
+      profile.outgoingCall = outCall;
     }
 
     await profile.save();
@@ -294,19 +302,20 @@ exports.updateServices = async (req, res) => {
     }
 
     if (orientation) {
-      if (typeof about !== "string") {
+      if (typeof orientation !== "string") {
         throw new Error("Invalid data type for secondCity");
       }
       profile.orientation = orientation;
     }
     if (services) {
+      console.log(services);
       if (typeof services !== "object" && !services.isArray()) {
         throw new Error("Invalid data type for services");
       }
       let currentServices = [...profile.services];
       if (services.length) {
         services.forEach((service) => {
-          if (!profile.service.includes(service)) {
+          if (!currentServices?.includes(service)) {
             currentServices.push(service);
           }
         });
@@ -466,6 +475,26 @@ exports.getEscort = async (req, res) => {
     let { username } = req.query;
     console.log("escort", username);
     let escort = await EscortProfile.findOne({ username });
+    if (escort) {
+      return res.status(200).json({ data: escort, statusCode: 200 });
+    } else {
+      return res
+        .status(404)
+        .json({ message: "No escort found", statusCode: 404 });
+    }
+  } catch (error) {
+    console.log("error", error);
+    return res
+      .status(500)
+      .json({ message: "Something went wrong", statusCode: 500 });
+  }
+};
+//Get escort data
+exports.getEscortProfile = async (req, res) => {
+  try {
+    let { email } = req.user;
+
+    let escort = await EscortProfile.findOne({ email });
     if (escort) {
       return res.status(200).json({ data: escort, statusCode: 200 });
     } else {
