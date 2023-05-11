@@ -318,15 +318,11 @@ exports.updateServices = async (req, res) => {
       if (typeof services !== "object" && !services.isArray()) {
         throw new Error("Invalid data type for services");
       }
-      let currentServices = [...profile.services];
+      const currentServices = [...profile.services];
       if (services.length) {
-        services.forEach((service) => {
-          if (!currentServices?.includes(service)) {
-            currentServices.push(service);
-          }
-        });
+        let servicesSet = new Set([...currentServices, ...services]);
+        profile.services = [...servicesSet];
       }
-      profile.services = currentServices;
     }
     if (offerFor) {
       if (typeof offerFor !== "object" && !services.isArray()) {
@@ -336,7 +332,7 @@ exports.updateServices = async (req, res) => {
       if (offerFor.length) {
         offerFor.forEach((offer) => {
           if (!profile.offerFor.includes(offer)) {
-            currentServices.push(offer);
+            currentOfferFor.push(offer);
           }
         });
       }
@@ -453,8 +449,10 @@ exports.getAllEscort = async (req, res) => {
   try {
     let { limit, offset, gender } = req.query;
     let genderN = gender?.toLowerCase();
+    let query = {};
+    if (gender) query.gender = genderN;
     // Fetch all escort profiles from the database
-    const escorts = await EscortProfile.find({ gender: genderN })
+    const escorts = await EscortProfile.find({ ...query })
       .limit(limit || 0)
       .skip(offset || 0)
       .exec();
@@ -499,7 +497,7 @@ exports.getEscort = async (req, res) => {
 exports.getEscortProfile = async (req, res) => {
   try {
     let { email } = req.user;
-
+    console.log(req.user);
     let escort = await EscortProfile.findOne({ email });
     if (escort) {
       return res.status(200).json({ data: escort, statusCode: 200 });
@@ -666,7 +664,11 @@ exports.uploadFile = async (req, res) => {
       await escort.save();
       return res
         .status(200)
-        .json({ message: "Photo Uploaded", statusCode: 200 });
+        .json({
+          message: "Photo Uploaded",
+          images: escort.images,
+          statusCode: 200,
+        });
     }
     res.send();
   } catch (error) {
