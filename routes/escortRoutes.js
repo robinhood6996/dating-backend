@@ -56,7 +56,7 @@ router.get("/search-query", escortController.escortCategories);
 router.post(
   "/upload",
   authenticate,
-  upload.array("images", 10),
+  upload.array("photos", 10),
   escortController.uploadFile
 );
 

@@ -170,7 +170,7 @@ exports.updatePhysicalData = async (req, res) => {
 //update escort about data
 exports.updateAdditionalData = async (req, res) => {
   const { email } = req.user; // Extract the ID of the escort profile from the request params
-  const { about } = req.body; // Extract the updated additional data from the request body
+  const { about, aboutItalian } = req.body; // Extract the updated additional data from the request body
 
   try {
     // Find the escort profile by ID
@@ -189,6 +189,12 @@ exports.updateAdditionalData = async (req, res) => {
         throw new Error("Invalid data type for about");
       }
       profile.about = about;
+    }
+    if (aboutItalian) {
+      if (typeof aboutItalian !== "string") {
+        throw new Error("Invalid data type for about Italian");
+      }
+      profile.aboutItalian = aboutItalian;
     }
 
     // Save the updated profile to the database
