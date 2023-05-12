@@ -766,7 +766,7 @@ exports.deleteImage = async (req, res) => {
   try {
     let user = req.user;
     const { filename } = req.query;
-    const directoryPath = __basedir + "/uploads/escort/";
+    const directoryPath = `../uploads/escort`;
     if (filename) {
       let escort = await EscortProfile.findOne({ email: user.email });
       if (escort) {
@@ -794,6 +794,7 @@ exports.deleteImage = async (req, res) => {
       }
     }
   } catch (error) {
+    console.log(error);
     return res.status(500).json({ message: "Error", error, statusCode: 500 });
   }
 };
