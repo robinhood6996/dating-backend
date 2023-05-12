@@ -1,7 +1,7 @@
 const { EscortProfile } = require("../models/escort.model");
 const User = require("../models/user.model");
 const searchQueries = require("../helpers/categories.json");
-
+const fs = require("fs");
 // Update Biography Data
 exports.updateBiographyData = async (req, res) => {
   const user = req.user;
@@ -447,10 +447,11 @@ exports.updateContactData = async (req, res) => {
 //Get all escorts data
 exports.getAllEscort = async (req, res) => {
   try {
-    let { limit, offset, gender } = req.query;
+    let { limit, offset, gender, category } = req.query;
     let genderN = gender?.toLowerCase();
     let query = {};
     if (gender) query.gender = genderN;
+    if (category) query.category = category;
     // Fetch all escort profiles from the database
     const escorts = await EscortProfile.find({ ...query })
       .limit(limit || 0)
@@ -662,16 +663,48 @@ exports.uploadFile = async (req, res) => {
       });
       escort.images = currentImages;
       await escort.save();
-      return res
-        .status(200)
-        .json({
-          message: "Photo Uploaded",
-          images: escort.images,
-          statusCode: 200,
-        });
+      return res.status(200).json({
+        message: "Photo Uploaded",
+        images: escort.images,
+        statusCode: 200,
+      });
     }
     res.send();
   } catch (error) {
+    return res.status(500).json({ message: "Error", error, statusCode: 500 });
+  }
+};
+exports.uploadVideos = async (req, res) => {
+  try {
+    let user = req.user;
+    if (req.files) {
+      let files = req.files.map((file) => {
+        console.log("file", file);
+        // let image = file.path.replace("\\", "/");
+        // let image2 = image.replace("\\", "/");
+        return file;
+      });
+      let escort = await EscortProfile.findOne({ email: user.email });
+      console.log("escort", escort);
+      if (escort?.videos.length > 0) {
+        let currentVideos = [...escort.videos];
+        files.map((file) => {
+          currentVideos.push(file);
+        });
+        escort.videos = currentVideos;
+      } else {
+        escort.videos = files;
+      }
+      await escort.save();
+      return res.status(200).json({
+        message: "Video Uploaded",
+        images: escort.videos,
+        statusCode: 200,
+      });
+    }
+    res.send();
+  } catch (error) {
+    console.log(error);
     return res.status(500).json({ message: "Error", error, statusCode: 500 });
   }
 };
@@ -707,4 +740,60 @@ exports.getEscortByCat = async (req, res) => {
 exports.escortCategories = async (req, res) => {
   let categories = searchQueries;
   res.status(200).json({ data: categories });
+};
+
+exports.uploadProfileImage = async (req, res) => {
+  try {
+    let user = req.user;
+    if (req.files) {
+      let files = req.files[0];
+      let profileImage = files.filename;
+      let escort = await EscortProfile.findOne({ email: user.email });
+
+      escort.profileImage = profileImage;
+      await escort.save();
+      return res.status(200).json({
+        message: "Profile Photo Uploaded",
+        escort,
+        statusCode: 200,
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({ message: "Error", error, statusCode: 500 });
+  }
+};
+exports.deleteImage = async (req, res) => {
+  try {
+    let user = req.user;
+    const { filename } = req.query;
+    const directoryPath = __basedir + "/uploads/escort/";
+    if (filename) {
+      let escort = await EscortProfile.findOne({ email: user.email });
+      if (escort) {
+        fs.unlink(directoryPath + filename, (err) => {
+          if (err) {
+            res.status(500).send({
+              message: "Could not delete the file. " + err,
+            });
+          }
+        });
+        let filtered = escort.images.filter((img) => img.filename !== filename);
+        escort.images = filtered;
+        await escort.save();
+        return res.status(200).json({
+          message: "Deleted image",
+          escort,
+          statusCode: 200,
+        });
+      } else {
+        return res.status(401).json({
+          message: "Escort not found",
+          escort,
+          statusCode: 200,
+        });
+      }
+    }
+  } catch (error) {
+    return res.status(500).json({ message: "Error", error, statusCode: 500 });
+  }
 };

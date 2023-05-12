@@ -14,8 +14,18 @@ const storage = multer.diskStorage({
     callback(null, Date.now() + "-" + file.originalname);
   },
 });
+const storageVideos = multer.diskStorage({
+  destination: function (request, file, callback) {
+    callback(null, "./uploads/escort/videos");
+  },
+  filename: function (request, file, callback) {
+    console.log(file);
+    callback(null, Date.now() + "-" + file.originalname);
+  },
+});
 
 const upload = multer({ storage: storage });
+const uploadVideos = multer({ storage: storageVideos });
 // const fUpload = multer({ dest: "../uploads/" });
 router.put(
   "/update-bio",
@@ -58,6 +68,24 @@ router.post(
   authenticate,
   upload.any("photos"),
   escortController.uploadFile
+);
+router.post(
+  "/upload/videos",
+  authenticate,
+  uploadVideos.any("videos"),
+  escortController.uploadVideos
+);
+router.post(
+  "/upload/profile-image",
+  authenticate,
+  upload.any("image"),
+  escortController.uploadProfileImage
+);
+router.deleteImage(
+  "/upload",
+  authenticate,
+  upload.any("image"),
+  escortController.uploadProfileImage
 );
 
 module.exports = router;
