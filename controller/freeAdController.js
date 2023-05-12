@@ -1,22 +1,19 @@
+const { EscortProfile } = require("../models/escort.model");
 const { FreeAd } = require("../models/freeads.model");
+const fs = require("fs");
 exports.createAd = async (req, res) => {
   try {
     const user = req.user;
-    const { title, category, description, phone, email, photo1, duration } =
-      req.body;
+    const files = req.files;
+    const { title, category, description, phone, email, duration } = req.body;
+    const escort = await EscortProfile.findOne({ email: user.email });
     // Check if request body exists
     if (!req.body) {
       return res.status(400).json({ message: "Request body is required" });
     }
 
     // Check if required fields exist in request body
-    const requiredFields = [
-      "title",
-      "category",
-      "description",
-      "phone",
-      "photo1",
-    ];
+    const requiredFields = ["title", "category", "description", "phone"];
     const missingFields = requiredFields.filter(
       (field) => !(field in req.body)
     );
@@ -31,13 +28,23 @@ exports.createAd = async (req, res) => {
         return res.status(400).json({ message: "Invalid email address" });
       }
     }
-    if (duration) {
-      if (typeof duration !== "number") {
-        return res
-          .status(400)
-          .json({ message: "Invalid duration, expecting number of days" });
-      }
+    if (files?.length < 1) {
+      return res
+        .status(400)
+        .json({ message: "Minimum one photo is required!" });
     }
+
+    console.log(
+      "freead",
+      title,
+      category,
+      req.body.city,
+      description,
+      phone,
+      email,
+      duration,
+      files
+    );
     // Create new free ad document
     const freeAd = new FreeAd({
       title,
@@ -47,16 +54,14 @@ exports.createAd = async (req, res) => {
       phone,
       email: email || "",
       duration: req.body.duration || 15,
-      photo1,
-      photo2: req.body.photo2 || "",
-      photo3: req.body.photo3 || "",
       status: req.body.status || "inactive",
       author: user.email,
+      photos: files,
+      ownerEmail: escort.email,
     });
 
     // Save new free ad document
     const savedFreeAd = await freeAd.save();
-
     res.status(201).json({ freeAd: savedFreeAd, message: "Free ad added" });
   } catch (err) {
     console.error(err);
@@ -124,8 +129,8 @@ exports.inactiveAds = async (req, res) => {
 exports.getAll = async (req, res) => {
   try {
     const { category, city, limit, offset } = req.query;
-    let query = { status: "active" };
-
+    let query = {};
+    //status: "active"
     if (category) {
       query.category = category;
     }
@@ -156,11 +161,49 @@ exports.getSingleAd = async (req, res) => {
 };
 exports.deleteAd = async (req, res) => {
   try {
+    const { email } = req.user;
     const { adId } = req.params;
-    await FreeAd.deleteById(adId);
-    res.status(200).json({ message: "Deleted successfully", statusCode: 200 });
+    const foundAd = await FreeAd.findOne({ email, _id: adId });
+    if (foundAd) {
+      let images = foundAd.photos;
+      if (images.length > 0) {
+        const directoryPath = __dirname + "/../uploads/escort/";
+        let filenames = images.map((img) => img.filename);
+        filenames.forEach((file) => {
+          fs.unlinkSync(directoryPath + file, (err) => {
+            if (err) {
+              res.status(500).send({
+                message: "Could not delete the file. " + err,
+              });
+            }
+          });
+        });
+      }
+      await FreeAd.deleteById(adId);
+      return res
+        .status(200)
+        .json({ message: "Deleted successfully", statusCode: 200 });
+    }
+    return res.status(404).json({ message: "Ad not found", statusCode: 404 });
   } catch (error) {
     console.log("error", error);
     res.status(500).json({ message: "Internal server error", statusCode: 500 });
+  }
+};
+
+//Get own free ads
+exports.getMyAds = async (req, res) => {
+  const { email } = req.user;
+  try {
+    const { limit, offset } = req.query;
+    let query = { email };
+    let data = await FreeAd.find(query)
+      .limit(limit || 0)
+      .skip(offset || 0)
+      .exec();
+    return res.status(200).json({ data, count: data.length });
+  } catch (error) {
+    console.log("error", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };

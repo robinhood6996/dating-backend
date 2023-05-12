@@ -10,11 +10,8 @@ const freeAdSchema = new Schema(
     phone: { type: Number, required: true },
     email: { type: String },
     duration: { type: Number },
-    photo1: { type: String, required: true },
-    photo2: { type: String },
-    photo3: { type: String },
-    status: { type: String },
-    author: { type: String },
+    photos: { type: Array, required: true },
+    ownerEmail: { type: String, required: true },
   },
   { timestamps: true }
 );

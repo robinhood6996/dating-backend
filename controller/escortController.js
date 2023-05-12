@@ -2,6 +2,8 @@ const { EscortProfile } = require("../models/escort.model");
 const User = require("../models/user.model");
 const searchQueries = require("../helpers/categories.json");
 const fs = require("fs");
+const Countries = require("../models/countries.model");
+const citiesModel = require("../models/cities.model");
 // Update Biography Data
 exports.updateBiographyData = async (req, res) => {
   const user = req.user;
@@ -16,6 +18,7 @@ exports.updateBiographyData = async (req, res) => {
     country,
     state,
     category,
+    baseCity,
   } = req.body;
   console.log(req.body);
   try {
@@ -29,7 +32,22 @@ exports.updateBiographyData = async (req, res) => {
     if (sex) profile.gender = sex;
     if (ethnicity) profile.ethnicity = ethnicity;
     if (nationality) profile.nationality = nationality;
-    if (country) profile.country = country;
+    if (country) {
+      profile.country = country;
+      let foundCountry = await Countries.findOne({ name: country });
+      if (foundCountry) {
+        foundCountry.escortCount += 1;
+      }
+      await foundCountry.save();
+    }
+    if (baseCity) {
+      profile.baseCity = baseCity;
+      let foundCity = await citiesModel.findOne({ name: baseCity });
+      if (foundCity) {
+        foundCity.escortCount += 1;
+        await foundCity.save();
+      }
+    }
     if (state) profile.state = state;
     if (category) profile.category = category;
     // Save the updated profile
@@ -369,7 +387,8 @@ exports.updateServices = async (req, res) => {
 //Update Contact Data
 exports.updateContactData = async (req, res) => {
   const { email: userEmail } = req.user; // Extract the ID of the escort profile from the request params
-  const { phone, phoneDirection, apps, website, email } = req.body; // Extract the updated contact data from the request body
+  const { countryCode, phone, phoneDirection, apps, website, contactEmail } =
+    req.body; // Extract the updated contact data from the request body
 
   try {
     // Find the escort profile by ID
@@ -383,10 +402,10 @@ exports.updateContactData = async (req, res) => {
     }
 
     // Validate and update the contact data
+    if (countryCode) {
+      profile.countryCode = countryCode;
+    }
     if (phone) {
-      if (typeof phone !== "string") {
-        throw new Error("Invalid data type for phone");
-      }
       profile.phone = phone;
     }
     if (phoneDirection) {
@@ -396,10 +415,12 @@ exports.updateContactData = async (req, res) => {
       profile.phoneDirection = phoneDirection;
     }
     if (apps) {
-      if (typeof apps !== "string") {
-        throw new Error("Invalid data type for apps");
+      if (profile?.apps.length > 0) {
+        let prevApps = new Set([...profile.apps, ...apps]);
+        profile.apps = [...prevApps];
+      } else {
+        profile.apps = [...apps];
       }
-      profile.apps = apps;
     }
     if (website) {
       if (typeof website !== "string") {
@@ -407,11 +428,11 @@ exports.updateContactData = async (req, res) => {
       }
       profile.website = website;
     }
-    if (email) {
-      if (typeof website !== "string") {
+    if (contactEmail) {
+      if (typeof contactEmail !== "string") {
         throw new Error("Invalid data type for email");
       }
-      profile.website = website;
+      profile.contactEmail = contactEmail;
     }
 
     // Save the updated profile to the database
@@ -425,6 +446,7 @@ exports.updateContactData = async (req, res) => {
     });
   } catch (error) {
     // Handle known errors
+    console.log(error);
     if (error.name === "ValidationError") {
       // If the error is due to data type validation, send an error response
       return res.status(400).json({
@@ -644,6 +666,7 @@ exports.getEscorts = async (req, res) => {
   }
 };
 
+//Upload photo
 exports.uploadFile = async (req, res) => {
   try {
     let user = req.user;
@@ -674,6 +697,8 @@ exports.uploadFile = async (req, res) => {
     return res.status(500).json({ message: "Error", error, statusCode: 500 });
   }
 };
+
+//Upload video
 exports.uploadVideos = async (req, res) => {
   try {
     let user = req.user;
@@ -742,6 +767,7 @@ exports.escortCategories = async (req, res) => {
   res.status(200).json({ data: categories });
 };
 
+//Upload profile image
 exports.uploadProfileImage = async (req, res) => {
   try {
     let user = req.user;
@@ -762,6 +788,7 @@ exports.uploadProfileImage = async (req, res) => {
     return res.status(500).json({ message: "Error", error, statusCode: 500 });
   }
 };
+//Delete images
 exports.deleteImage = async (req, res) => {
   try {
     let user = req.user;
@@ -813,6 +840,8 @@ exports.deleteImage = async (req, res) => {
     return res.status(500).json({ message: "Error", error, statusCode: 500 });
   }
 };
+
+//Delete videos
 exports.deleteVideo = async (req, res) => {
   try {
     let user = req.user;
@@ -861,6 +890,65 @@ exports.deleteVideo = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
+    return res.status(500).json({ message: "Error", error, statusCode: 500 });
+  }
+};
+
+exports.workingHours = async (req, res) => {
+  let { email } = req.user;
+  const { available24, availableDate, vacation } = req.query;
+
+  try {
+    let escort = await EscortProfile.findOne({ email });
+    if (escort) {
+      if (available24) {
+        escort.available24 = available24;
+      }
+      if (availableDate) {
+        if (escort?.availableDate?.length > 0) {
+          let formated = availableDate.map((date) => {
+            let exist = escort?.availableDate.find(
+              (date2) => date2.day === date.day
+            );
+            if (exist) {
+              return {
+                ...exist,
+                from: date.from,
+                to: date.to,
+              };
+            }
+            return date;
+          });
+          escort.availableDate = formated;
+        } else {
+          escort.availableDate = availableDate;
+        }
+      }
+      if (vacation) {
+        const { from, to } = vacation;
+        // Check if from and to dates are not in the past
+        if (new Date(from) < new Date() || new Date(to) < new Date()) {
+          return res.status(400).json({
+            message: "Vacation date must not be in the past",
+            statusCode: 400,
+          });
+        }
+        escort.vacation = vacation;
+      }
+
+      await escort.save();
+      return res.status(200).json({
+        message: "Working hours data updated",
+        escort,
+        statusCode: 200,
+      });
+    }
+    return res.status(401).json({
+      message: "Escort not found",
+      escort,
+      statusCode: 401,
+    });
+  } catch (error) {
     return res.status(500).json({ message: "Error", error, statusCode: 500 });
   }
 };

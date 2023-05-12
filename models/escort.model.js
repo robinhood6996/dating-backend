@@ -14,6 +14,7 @@ const EscortProfileSchema = new Schema(
     nationality: { type: String, lowercase: true },
     country: { type: String, lowercase: true },
     state: { type: String, lowercase: true },
+    baseCity: { type: String, lowercase: true },
     userName: { type: String },
     profileImage: { type: String, default: "" },
 
@@ -37,15 +38,16 @@ const EscortProfileSchema = new Schema(
     languages: { type: Array, default: [] },
 
     // Additional
-    about: { type: String },
-    aboutItalian: { type: String },
+    about: { type: String, default: "" },
+    aboutItalian: { type: String, default: "" },
 
     // Contact
-    phone: { type: String },
-    phoneDirection: { type: String, lowercase: true },
-    apps: { type: String, lowercase: true },
-    website: { type: String, lowercase: true },
-    email: { type: String, lowercase: true },
+    countryCode: { type: String, default: null },
+    phone: { type: String, default: null },
+    phoneDirection: { type: String, lowercase: true, default: "" },
+    apps: { type: Array, default: [] },
+    website: { type: String, lowercase: true, default: null },
+    contactEmail: { type: String, default: null },
 
     // Availability
     available24: { type: Boolean, default: true },
@@ -64,6 +66,7 @@ const EscortProfileSchema = new Schema(
     orientation: { type: String, default: "", lowercase: true },
     offerFor: { type: Array, default: [], lowercase: true },
     // Rates
+    currency: { type: String, default: "EUR" },
     reachHome: {
       hour: { type: Number, default: null },
       threeHour: { type: Number, default: null },

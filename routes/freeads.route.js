@@ -2,14 +2,36 @@ const express = require("express");
 const router = express.Router();
 const freeAdController = require("../controller/freeAdController");
 const { authenticate } = require("../middleware/tokenMiddleware");
-const upload = require("multer")();
+const multer = require("multer");
 
-router.post("/create", authenticate, upload.any(), freeAdController.createAd);
-router.put("/update/:id", upload.any(), freeAdController.editFreeAd);
-router.get("/active", freeAdController.activeAds);
-router.get("/inactive", freeAdController.inactiveAds);
-router.get("/", freeAdController.getAll);
-router.get("/:adId", freeAdController.getSingleAd);
-router.delete("/:adId", freeAdController.deleteAd);
+const storage = multer.diskStorage({
+  destination: function (request, file, callback) {
+    callback(null, "./uploads/escort");
+  },
+  filename: function (request, file, callback) {
+    console.log(file);
+    callback(null, Date.now() + "-" + file.originalname);
+  },
+});
+const upload = multer({ storage: storage });
+
+router.post(
+  "/create",
+  authenticate,
+  upload.any("photos"),
+  freeAdController.createAd
+);
+router.put(
+  "/update/:id",
+  authenticate,
+  upload.any(),
+  freeAdController.editFreeAd
+);
+router.get("/active", authenticate, freeAdController.activeAds);
+router.get("/inactive", authenticate, freeAdController.inactiveAds);
+router.get("/", authenticate, freeAdController.getAll);
+router.get("/my", authenticate, freeAdController.getMyAds);
+router.get("/:adId", authenticate, freeAdController.getSingleAd);
+router.delete("/:adId", authenticate, freeAdController.deleteAd);
 
 module.exports = router;
