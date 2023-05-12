@@ -2,6 +2,8 @@ const { EscortProfile } = require("../models/escort.model");
 const User = require("../models/user.model");
 const searchQueries = require("../helpers/categories.json");
 const fs = require("fs");
+const Countries = require("../models/countries.model");
+const citiesModel = require("../models/cities.model");
 // Update Biography Data
 exports.updateBiographyData = async (req, res) => {
   const user = req.user;
@@ -16,6 +18,7 @@ exports.updateBiographyData = async (req, res) => {
     country,
     state,
     category,
+    baseCity,
   } = req.body;
   console.log(req.body);
   try {
@@ -29,7 +32,22 @@ exports.updateBiographyData = async (req, res) => {
     if (sex) profile.gender = sex;
     if (ethnicity) profile.ethnicity = ethnicity;
     if (nationality) profile.nationality = nationality;
-    if (country) profile.country = country;
+    if (country) {
+      profile.country = country;
+      let foundCountry = await Countries.findOne({ name: country });
+      if (foundCountry) {
+        foundCountry.escortCount += 1;
+      }
+      await foundCountry.save();
+    }
+    if (baseCity) {
+      profile.baseCity = baseCity;
+      let foundCity = await citiesModel.findOne({ name: baseCity });
+      if (foundCity) {
+        foundCity.escortCount += 1;
+        await foundCity.save();
+      }
+    }
     if (state) profile.state = state;
     if (category) profile.category = category;
     // Save the updated profile
@@ -428,6 +446,7 @@ exports.updateContactData = async (req, res) => {
     });
   } catch (error) {
     // Handle known errors
+    console.log(error);
     if (error.name === "ValidationError") {
       // If the error is due to data type validation, send an error response
       return res.status(400).json({

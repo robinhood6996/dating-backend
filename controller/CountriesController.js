@@ -27,7 +27,6 @@ exports.createCountry = async (req, res) => {
   }
 };
 
-
 //Get all countries
 exports.getAllCountries = async (req, res) => {
   try {
@@ -42,13 +41,12 @@ exports.getAllCountries = async (req, res) => {
 };
 
 exports.deleteCountry = async (req, res) => {
-  try{
-     let countryId = req.params.id;
-     await Countries.deleteOne({_id: countryId}).then(response => {
-      res.status(200).json({message: 'Country deleted'})
-     })
-  }catch(err){
+  try {
+    let countryId = req.params.id;
+    await Countries.deleteOne({ _id: countryId }).then((response) => {
+      res.status(200).json({ message: "Country deleted" });
+    });
+  } catch (err) {
     res.status(500).json({ message: "Internal server error" });
-      
   }
-}
+};

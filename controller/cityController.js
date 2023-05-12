@@ -4,8 +4,7 @@ const Countries = require("../models/countries.model");
 exports.addCity = async (req, res) => {
   try {
     console.log("city", req.body);
-    const { name } = req.body;
-    const { country } = req?.params;
+    const { name, country } = req.body;
 
     if (!country) {
       return res.status(400).json({ message: "Country name is required." });
