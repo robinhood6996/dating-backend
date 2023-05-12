@@ -1,7 +1,7 @@
 const { EscortProfile } = require("../models/escort.model");
 const User = require("../models/user.model");
 const searchQueries = require("../helpers/categories.json");
-
+const fs = require("fs");
 // Update Biography Data
 exports.updateBiographyData = async (req, res) => {
   const user = req.user;
@@ -757,6 +757,41 @@ exports.uploadProfileImage = async (req, res) => {
         escort,
         statusCode: 200,
       });
+    }
+  } catch (error) {
+    return res.status(500).json({ message: "Error", error, statusCode: 500 });
+  }
+};
+exports.deleteImage = async (req, res) => {
+  try {
+    let user = req.user;
+    const { filename } = req.query;
+    const directoryPath = __basedir + "/uploads/escort/";
+    if (filename) {
+      let escort = await EscortProfile.findOne({ email: user.email });
+      if (escort) {
+        fs.unlink(directoryPath + filename, (err) => {
+          if (err) {
+            res.status(500).send({
+              message: "Could not delete the file. " + err,
+            });
+          }
+        });
+        let filtered = escort.images.filter((img) => img.filename !== filename);
+        escort.images = filtered;
+        await escort.save();
+        return res.status(200).json({
+          message: "Deleted image",
+          escort,
+          statusCode: 200,
+        });
+      } else {
+        return res.status(401).json({
+          message: "Escort not found",
+          escort,
+          statusCode: 200,
+        });
+      }
     }
   } catch (error) {
     return res.status(500).json({ message: "Error", error, statusCode: 500 });

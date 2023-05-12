@@ -81,5 +81,11 @@ router.post(
   upload.any("image"),
   escortController.uploadProfileImage
 );
+router.deleteImage(
+  "/upload",
+  authenticate,
+  upload.any("image"),
+  escortController.uploadProfileImage
+);
 
 module.exports = router;
