@@ -57,6 +57,18 @@ router.put(
   upload.any(),
   escortController.updateServices
 );
+router.put(
+  "/working-hours",
+  authenticate,
+  upload.any(),
+  escortController.workingHours
+);
+router.put(
+  "/contact",
+  authenticate,
+  upload.any(),
+  escortController.updateContactData
+);
 router.get("/get-all", escortController.getAllEscort);
 router.get("/", authenticate, escortController.getEscort);
 router.get("/profile", authenticate, escortController.getEscortProfile);
