@@ -25,6 +25,11 @@ exports.createAd = async (req, res) => {
         return res.status(400).json({ message: "Invalid email address" });
       }
     }
+    if (!files) {
+      return res
+        .status(400)
+        .json({ message: "Minimum one photo is required!" });
+    }
 
     console.log(
       "freead",
@@ -38,22 +43,22 @@ exports.createAd = async (req, res) => {
       files
     );
     // Create new free ad document
-    // const freeAd = new FreeAd({
-    //   title,
-    //   category,
-    //   city: req.body.city || "",
-    //   description,
-    //   phone,
-    //   email: email || "",
-    //   duration: req.body.duration || 15,
-    //   status: req.body.status || "inactive",
-    //   author: user.email,
-    // });
+    const freeAd = new FreeAd({
+      title,
+      category,
+      city: req.body.city || "",
+      description,
+      phone,
+      email: email || "",
+      duration: req.body.duration || 15,
+      status: req.body.status || "inactive",
+      author: user.email,
+      photos: files,
+    });
 
     // Save new free ad document
-    // const savedFreeAd = await freeAd.save();
-
-    res.status(201).json({ freeAd: "savedFreeAd", message: "Free ad added" });
+    const savedFreeAd = await freeAd.save();
+    res.status(201).json({ freeAd: savedFreeAd, message: "Free ad added" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Internal server error" });
@@ -120,8 +125,8 @@ exports.inactiveAds = async (req, res) => {
 exports.getAll = async (req, res) => {
   try {
     const { category, city, limit, offset } = req.query;
-    let query = { status: "active" };
-
+    let query = {};
+    //status: "active"
     if (category) {
       query.category = category;
     }
