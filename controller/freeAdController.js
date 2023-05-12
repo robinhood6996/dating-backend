@@ -1,5 +1,6 @@
 const { EscortProfile } = require("../models/escort.model");
 const { FreeAd } = require("../models/freeads.model");
+const fs = require("fs");
 exports.createAd = async (req, res) => {
   try {
     const user = req.user;
@@ -164,9 +165,19 @@ exports.deleteAd = async (req, res) => {
     const { adId } = req.params;
     const foundAd = await FreeAd.findOne({ email, _id: adId });
     if (foundAd) {
-      let images = foundAd.images;
+      let images = foundAd.photos;
       if (images.length > 0) {
-        //
+        const directoryPath = __dirname + "/../uploads/escort/";
+        let filenames = images.map((img) => img.filename);
+        filenames.forEach((file) => {
+          fs.unlinkSync(directoryPath + file, (err) => {
+            if (err) {
+              res.status(500).send({
+                message: "Could not delete the file. " + err,
+              });
+            }
+          });
+        });
       }
       await FreeAd.deleteById(adId);
       return res
