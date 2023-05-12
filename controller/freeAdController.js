@@ -1,9 +1,11 @@
+const { EscortProfile } = require("../models/escort.model");
 const { FreeAd } = require("../models/freeads.model");
 exports.createAd = async (req, res) => {
   try {
     const user = req.user;
     const files = req.files;
     const { title, category, description, phone, email, duration } = req.body;
+    const escort = await EscortProfile.findOne({ email: user.email });
     // Check if request body exists
     if (!req.body) {
       return res.status(400).json({ message: "Request body is required" });
@@ -54,6 +56,7 @@ exports.createAd = async (req, res) => {
       status: req.body.status || "inactive",
       author: user.email,
       photos: files,
+      ownerEmail: escort.email,
     });
 
     // Save new free ad document
@@ -157,11 +160,39 @@ exports.getSingleAd = async (req, res) => {
 };
 exports.deleteAd = async (req, res) => {
   try {
+    const { email } = req.user;
     const { adId } = req.params;
-    await FreeAd.deleteById(adId);
-    res.status(200).json({ message: "Deleted successfully", statusCode: 200 });
+    const foundAd = await FreeAd.findOne({ email, _id: adId });
+    if (foundAd) {
+      let images = foundAd.images;
+      if (images.length > 0) {
+        //
+      }
+      await FreeAd.deleteById(adId);
+      return res
+        .status(200)
+        .json({ message: "Deleted successfully", statusCode: 200 });
+    }
+    return res.status(404).json({ message: "Ad not found", statusCode: 404 });
   } catch (error) {
     console.log("error", error);
     res.status(500).json({ message: "Internal server error", statusCode: 500 });
+  }
+};
+
+//Get own free ads
+exports.getMyAds = async (req, res) => {
+  const { email } = req.user;
+  try {
+    const { limit, offset } = req.query;
+    let query = { email };
+    let data = await FreeAd.find(query)
+      .limit(limit || 0)
+      .skip(offset || 0)
+      .exec();
+    return res.status(200).json({ data, count: data.length });
+  } catch (error) {
+    console.log("error", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };

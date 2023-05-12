@@ -21,11 +21,17 @@ router.post(
   upload.any("photos"),
   freeAdController.createAd
 );
-router.put("/update/:id", upload.any(), freeAdController.editFreeAd);
-router.get("/active", freeAdController.activeAds);
-router.get("/inactive", freeAdController.inactiveAds);
-router.get("/", freeAdController.getAll);
-router.get("/:adId", freeAdController.getSingleAd);
-router.delete("/:adId", freeAdController.deleteAd);
+router.put(
+  "/update/:id",
+  authenticate,
+  upload.any(),
+  freeAdController.editFreeAd
+);
+router.get("/active", authenticate, freeAdController.activeAds);
+router.get("/inactive", authenticate, freeAdController.inactiveAds);
+router.get("/", authenticate, freeAdController.getAll);
+router.get("/my", authenticate, freeAdController.getMyAds);
+router.get("/:adId", authenticate, freeAdController.getSingleAd);
+router.delete("/:adId", authenticate, freeAdController.deleteAd);
 
 module.exports = router;
