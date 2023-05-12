@@ -2,21 +2,15 @@ const { FreeAd } = require("../models/freeads.model");
 exports.createAd = async (req, res) => {
   try {
     const user = req.user;
-    const { title, category, description, phone, email, photo1, duration } =
-      req.body;
+    const files = req.files;
+    const { title, category, description, phone, email, duration } = req.body;
     // Check if request body exists
     if (!req.body) {
       return res.status(400).json({ message: "Request body is required" });
     }
 
     // Check if required fields exist in request body
-    const requiredFields = [
-      "title",
-      "category",
-      "description",
-      "phone",
-      "photo1",
-    ];
+    const requiredFields = ["title", "category", "description", "phone"];
     const missingFields = requiredFields.filter(
       (field) => !(field in req.body)
     );
@@ -31,33 +25,35 @@ exports.createAd = async (req, res) => {
         return res.status(400).json({ message: "Invalid email address" });
       }
     }
-    if (duration) {
-      if (typeof duration !== "number") {
-        return res
-          .status(400)
-          .json({ message: "Invalid duration, expecting number of days" });
-      }
-    }
-    // Create new free ad document
-    const freeAd = new FreeAd({
+
+    console.log(
+      "freead",
       title,
       category,
-      city: req.body.city || "",
+      req.body.city,
       description,
       phone,
-      email: email || "",
-      duration: req.body.duration || 15,
-      photo1,
-      photo2: req.body.photo2 || "",
-      photo3: req.body.photo3 || "",
-      status: req.body.status || "inactive",
-      author: user.email,
-    });
+      email,
+      duration,
+      files
+    );
+    // Create new free ad document
+    // const freeAd = new FreeAd({
+    //   title,
+    //   category,
+    //   city: req.body.city || "",
+    //   description,
+    //   phone,
+    //   email: email || "",
+    //   duration: req.body.duration || 15,
+    //   status: req.body.status || "inactive",
+    //   author: user.email,
+    // });
 
     // Save new free ad document
-    const savedFreeAd = await freeAd.save();
+    // const savedFreeAd = await freeAd.save();
 
-    res.status(201).json({ freeAd: savedFreeAd, message: "Free ad added" });
+    res.status(201).json({ freeAd: "savedFreeAd", message: "Free ad added" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Internal server error" });

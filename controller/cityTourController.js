@@ -1,5 +1,6 @@
 const { EscortProfile } = require("../models/escort.model");
 const CityTour = require("../models/tour.model");
+const User = require("../models/user.model");
 
 exports.getAllCityTours = async (req, res) => {
   try {
@@ -26,12 +27,6 @@ exports.createCityTour = async (req, res) => {
     if (!emailRegex.test(email)) {
       return res.status(400).json({ message: "Invalid email address" });
     }
-
-    // Check if the user type is correct
-    // if (user.type !== 'admin') {
-    //   return res.status(403).json({ message: 'Unauthorized access' });
-    // }
-
     const cityTour = new CityTour({
       name,
       dateFrom,
@@ -57,11 +52,13 @@ exports.deleteCityTour = async (req, res) => {
   try {
     const { email } = req.user;
     const { id } = req.query;
+    const user = await User.findOne({ email });
+
     const cityTour = await CityTour.findOne({ _id: id });
     if (cityTour) {
       let hasAccess = cityTour.escortEmail === email;
-      if (hasAccess) {
-        await cityTour.deleteById(id);
+      if (hasAccess || user.type === "admin") {
+        await cityTour.deleteOne({ _id: id });
         return res
           .status(200)
           .json({ message: "Deleted successfully", statusCode: 200 });
@@ -74,6 +71,17 @@ exports.deleteCityTour = async (req, res) => {
     res
       .status(404)
       .json({ message: "Not found city tour data", statusCode: 404 });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+exports.getUserCityTour = async (req, res) => {
+  const { email } = req.user;
+  try {
+    const cityTours = await CityTour.find({ escortEmail: email });
+    res.json({ cityTours });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
