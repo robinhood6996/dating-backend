@@ -25,7 +25,7 @@ exports.createAd = async (req, res) => {
         return res.status(400).json({ message: "Invalid email address" });
       }
     }
-    if (!files) {
+    if (files?.length < 1) {
       return res
         .status(400)
         .json({ message: "Minimum one photo is required!" });
