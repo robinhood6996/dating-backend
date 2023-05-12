@@ -11,6 +11,7 @@ const freeAdSchema = new Schema(
     email: { type: String },
     duration: { type: Number },
     photos: { type: Array, required: true },
+    ownerEmail: { type: String, required: true },
   },
   { timestamps: true }
 );
