@@ -1,7 +1,7 @@
 const { EscortProfile } = require("../models/escort.model");
 const User = require("../models/user.model");
 const searchQueries = require("../helpers/categories.json");
-
+const fs = require("fs");
 // Update Biography Data
 exports.updateBiographyData = async (req, res) => {
   const user = req.user;
@@ -447,10 +447,11 @@ exports.updateContactData = async (req, res) => {
 //Get all escorts data
 exports.getAllEscort = async (req, res) => {
   try {
-    let { limit, offset, gender } = req.query;
+    let { limit, offset, gender, category } = req.query;
     let genderN = gender?.toLowerCase();
     let query = {};
     if (gender) query.gender = genderN;
+    if (category) query.category = category;
     // Fetch all escort profiles from the database
     const escorts = await EscortProfile.find({ ...query })
       .limit(limit || 0)
@@ -739,4 +740,127 @@ exports.getEscortByCat = async (req, res) => {
 exports.escortCategories = async (req, res) => {
   let categories = searchQueries;
   res.status(200).json({ data: categories });
+};
+
+exports.uploadProfileImage = async (req, res) => {
+  try {
+    let user = req.user;
+    if (req.files) {
+      let files = req.files[0];
+      let profileImage = files.filename;
+      let escort = await EscortProfile.findOne({ email: user.email });
+
+      escort.profileImage = profileImage;
+      await escort.save();
+      return res.status(200).json({
+        message: "Profile Photo Uploaded",
+        escort,
+        statusCode: 200,
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({ message: "Error", error, statusCode: 500 });
+  }
+};
+exports.deleteImage = async (req, res) => {
+  try {
+    let user = req.user;
+    const { filename } = req.query;
+    const directoryPath = __dirname + "/../uploads/escort/";
+    if (filename) {
+      let escort = await EscortProfile.findOne({ email: user.email });
+      if (escort) {
+        let existFile = escort?.images?.find(
+          (img) => img.filename === filename
+        );
+        if (existFile) {
+          fs.unlinkSync(directoryPath + filename, (err) => {
+            if (err) {
+              res.status(500).send({
+                message: "Could not delete the file. " + err,
+              });
+            }
+          });
+          let filtered = escort.images.filter(
+            (img) => img.filename !== filename
+          );
+          escort.images = filtered;
+          await escort.save();
+          return res.status(200).json({
+            message: "Deleted image",
+            escort,
+            statusCode: 200,
+          });
+        }
+        return res.status(403).json({
+          message: "You are not allowed for this action",
+          statusCode: 403,
+        });
+      } else {
+        return res.status(401).json({
+          message: "Escort not found",
+          escort,
+          statusCode: 401,
+        });
+      }
+    }
+    return res.status(400).json({
+      message: "image parameter expected with filename",
+      statusCode: 400,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Error", error, statusCode: 500 });
+  }
+};
+exports.deleteVideo = async (req, res) => {
+  try {
+    let user = req.user;
+    const { filename } = req.query;
+    const directoryPath = __dirname + "/../uploads/escort/videos/";
+    if (filename) {
+      let escort = await EscortProfile.findOne({ email: user.email });
+      if (escort) {
+        let existFile = escort?.videos?.find(
+          (vid) => vid.filename === filename
+        );
+        if (existFile) {
+          fs.unlinkSync(directoryPath + filename, (err) => {
+            if (err) {
+              res.status(500).send({
+                message: "Could not delete the file. " + err,
+              });
+            }
+          });
+          let filtered = escort.videos.filter(
+            (vid) => vid.filename !== filename
+          );
+          escort.videos = filtered;
+          await escort.save();
+          return res.status(200).json({
+            message: "Deleted video",
+            escort,
+            statusCode: 200,
+          });
+        }
+        return res.status(403).json({
+          message: "You are not allowed for this action",
+          statusCode: 403,
+        });
+      } else {
+        return res.status(401).json({
+          message: "Escort not found",
+          escort,
+          statusCode: 401,
+        });
+      }
+    }
+    return res.status(400).json({
+      message: "video parameter expected with filename",
+      statusCode: 400,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Error", error, statusCode: 500 });
+  }
 };

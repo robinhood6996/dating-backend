@@ -75,5 +75,23 @@ router.post(
   uploadVideos.any("videos"),
   escortController.uploadVideos
 );
+router.post(
+  "/upload/profile-image",
+  authenticate,
+  upload.any("image"),
+  escortController.uploadProfileImage
+);
+router.delete(
+  "/upload",
+  authenticate,
+  upload.any("image"),
+  escortController.deleteImage
+);
+router.delete(
+  "/upload/videos",
+  authenticate,
+  upload.any("video"),
+  escortController.deleteVideo
+);
 
 module.exports = router;
