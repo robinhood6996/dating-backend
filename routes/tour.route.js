@@ -5,6 +5,7 @@ const { authenticate } = require("../middleware/tokenMiddleware");
 const upload = require("multer")();
 router.post("/", authenticate, upload.any(), cityTour.createCityTour);
 router.get("/", authenticate, cityTour.getAllCityTours);
+router.get("/my", authenticate, cityTour.getUserCityTour);
 router.delete("/", authenticate, cityTour.deleteCityTour);
 
 module.exports = router;

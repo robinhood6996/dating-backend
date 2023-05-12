@@ -4,7 +4,12 @@ const freeAdController = require("../controller/freeAdController");
 const { authenticate } = require("../middleware/tokenMiddleware");
 const upload = require("multer")();
 
-router.post("/create", authenticate, upload.any(), freeAdController.createAd);
+router.post(
+  "/create",
+  authenticate,
+  upload.any("photos"),
+  freeAdController.createAd
+);
 router.put("/update/:id", upload.any(), freeAdController.editFreeAd);
 router.get("/active", freeAdController.activeAds);
 router.get("/inactive", freeAdController.inactiveAds);
