@@ -447,10 +447,11 @@ exports.updateContactData = async (req, res) => {
 //Get all escorts data
 exports.getAllEscort = async (req, res) => {
   try {
-    let { limit, offset, gender } = req.query;
+    let { limit, offset, gender, category } = req.query;
     let genderN = gender?.toLowerCase();
     let query = {};
     if (gender) query.gender = genderN;
+    if (category) query.category = category;
     // Fetch all escort profiles from the database
     const escorts = await EscortProfile.find({ ...query })
       .limit(limit || 0)
@@ -739,4 +740,25 @@ exports.getEscortByCat = async (req, res) => {
 exports.escortCategories = async (req, res) => {
   let categories = searchQueries;
   res.status(200).json({ data: categories });
+};
+
+exports.uploadProfileImage = async (req, res) => {
+  try {
+    let user = req.user;
+    if (req.files) {
+      let files = req.files[0];
+      let profileImage = files.filename;
+      let escort = await EscortProfile.findOne({ email: user.email });
+
+      escort.profileImage = profileImage;
+      await escort.save();
+      return res.status(200).json({
+        message: "Profile Photo Uploaded",
+        escort,
+        statusCode: 200,
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({ message: "Error", error, statusCode: 500 });
+  }
 };

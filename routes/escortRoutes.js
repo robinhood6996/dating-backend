@@ -75,5 +75,11 @@ router.post(
   uploadVideos.any("videos"),
   escortController.uploadVideos
 );
+router.post(
+  "/upload/profile-image",
+  authenticate,
+  upload.any("image"),
+  escortController.uploadProfileImage
+);
 
 module.exports = router;

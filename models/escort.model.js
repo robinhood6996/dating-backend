@@ -15,6 +15,7 @@ const EscortProfileSchema = new Schema(
     country: { type: String, lowercase: true },
     state: { type: String, lowercase: true },
     userName: { type: String },
+    profileImage: { type: String, default: "" },
 
     // Physical
     hairColor: { type: String, lowercase: true },
