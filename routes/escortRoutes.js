@@ -87,5 +87,11 @@ router.delete(
   upload.any("image"),
   escortController.deleteImage
 );
+router.delete(
+  "/upload/videos",
+  authenticate,
+  upload.any("video"),
+  escortController.deleteVideo
+);
 
 module.exports = router;
