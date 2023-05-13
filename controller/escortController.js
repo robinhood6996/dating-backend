@@ -2,6 +2,9 @@ const { EscortProfile } = require("../models/escort.model");
 const User = require("../models/user.model");
 const searchQueries = require("../helpers/categories.json");
 const fs = require("fs");
+const Countries = require("../models/countries.model");
+const citiesModel = require("../models/cities.model");
+const userModel = require("../models/user.model");
 // Update Biography Data
 exports.updateBiographyData = async (req, res) => {
   const user = req.user;
@@ -16,6 +19,7 @@ exports.updateBiographyData = async (req, res) => {
     country,
     state,
     category,
+    baseCity,
   } = req.body;
   console.log(req.body);
   try {
@@ -29,7 +33,42 @@ exports.updateBiographyData = async (req, res) => {
     if (sex) profile.gender = sex;
     if (ethnicity) profile.ethnicity = ethnicity;
     if (nationality) profile.nationality = nationality;
-    if (country) profile.country = country;
+    if (country) {
+      let previousCountry = profile.country;
+      if (previousCountry === country) {
+        profile.country = country;
+      } else {
+        let previous = await Countries.findOne({ name: profile?.country });
+        if (previous) {
+          previous.escortCount = previous.escortCount - 1;
+          await previous.save();
+        }
+        let foundCountry = await Countries.findOne({ name: country });
+        if (foundCountry) {
+          foundCountry.escortCount += 1;
+          await foundCountry.save();
+        }
+        profile.country = country;
+      }
+    }
+    if (baseCity) {
+      let previousCity = profile.baseCity;
+      if (previousCity === baseCity) {
+        profile.baseCity = baseCity;
+      } else {
+        let previous = await citiesModel.findOne({ name: profile?.baseCity });
+        if (previous) {
+          previous.escortCount = previous.escortCount - 1;
+          await previous.save();
+        }
+        let foundCity = await citiesModel.findOne({ name: baseCity });
+        if (foundCity) {
+          foundCity.escortCount += 1;
+          await foundCity.save();
+        }
+        profile.baseCity = baseCity;
+      }
+    }
     if (state) profile.state = state;
     if (category) profile.category = category;
     // Save the updated profile
@@ -428,6 +467,7 @@ exports.updateContactData = async (req, res) => {
     });
   } catch (error) {
     // Handle known errors
+    console.log(error);
     if (error.name === "ValidationError") {
       // If the error is due to data type validation, send an error response
       return res.status(400).json({
@@ -931,5 +971,28 @@ exports.workingHours = async (req, res) => {
     });
   } catch (error) {
     return res.status(500).json({ message: "Error", error, statusCode: 500 });
+  }
+};
+
+exports.deleteEscort = async (req, res) => {
+  let { email } = req.user;
+  try {
+    let { username } = req.query;
+    let userProfile = await userModel.findOne({ email });
+    if (userProfile.type === "admin") {
+      let escort = await EscortProfile.findOne({ username });
+      if (escort) {
+        await EscortProfile.deleteOne({ username });
+      }
+      await userProfile.deleteOne({ email });
+
+      return res
+        .status(200)
+        .json({ message: "User & escort profile deleted", statusCode: 200 });
+    }
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Something went wrong", statusCode: 500 });
   }
 };

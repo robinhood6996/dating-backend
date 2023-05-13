@@ -14,6 +14,7 @@ const EscortProfileSchema = new Schema(
     nationality: { type: String, lowercase: true },
     country: { type: String, lowercase: true },
     state: { type: String, lowercase: true },
+    baseCity: { type: String, lowercase: true },
     userName: { type: String },
     profileImage: { type: String, default: "" },
 

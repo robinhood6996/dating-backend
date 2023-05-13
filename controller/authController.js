@@ -20,6 +20,8 @@ exports.registerUser = async (req, res) => {
     // Hash the password
     // const hashedPassword = await bcrypt.hash(req.body.password, 10);
     // Create a new user document
+    let nameSplit = req.body.email.split("@")[0];
+    let username = nameSplit + generateRandomNumber();
     const user = new User({
       name: req.body.name,
       email: req.body.email,
@@ -27,14 +29,13 @@ exports.registerUser = async (req, res) => {
       gender: req.body.gender,
       age: req.body.age,
       type: req.body.type,
+      username,
     });
 
     // Save the user document
     await user.save();
     console.log(user.type);
     if (user.type === "escort") {
-      let nameSplit = user.name.split(" ")[0];
-      let username = nameSplit + generateRandomNumber();
       let escort = new EscortProfile({
         name: user.name,
         email: user.email,
@@ -118,14 +119,14 @@ exports.logout = async (req, res) => {
 exports.deleteUser = async (req, res) => {
   try {
     let requestedUser = req.user;
-    let email = req.body.email;
-    let userExist = await User.findOne({ email });
+    let { username } = req.query;
+    let userExist = await User.findOne({ username });
 
     // if (requestedUser.type === "admin") {
     if (userExist) {
       await User.deleteOne({ email });
       if (userExist.type === "escort") {
-        await EscortProfile.deleteOne({ email });
+        await EscortProfile.deleteOne({ username });
       }
       res.json({ message: "Deleted user" });
     } else {
