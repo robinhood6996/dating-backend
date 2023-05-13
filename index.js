@@ -10,6 +10,7 @@ const countryRoutes = require("./routes/country.route");
 const cityRoutes = require("./routes/cities.route");
 const freeAdController = require("./routes/freeads.route");
 const bannerController = require("./routes/banner.route");
+const verification = require("./routes/verificaion.route");
 const cityTour = require("./routes/tour.route");
 const functions = require("firebase-functions");
 const app = express();
@@ -64,6 +65,7 @@ mongoose
     app.use("/freead", freeAdController);
     app.use("/banner", bannerController);
     app.use("/city-tour", cityTour);
+    app.use("/verification", verification);
     exports.api = functions.https.onRequest(app);
   })
   .catch((error) => {

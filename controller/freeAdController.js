@@ -34,17 +34,6 @@ exports.createAd = async (req, res) => {
         .json({ message: "Minimum one photo is required!" });
     }
 
-    console.log(
-      "freead",
-      title,
-      category,
-      req.body.city,
-      description,
-      phone,
-      email,
-      duration,
-      files
-    );
     // Create new free ad document
     const freeAd = new FreeAd({
       title,

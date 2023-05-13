@@ -63,6 +63,7 @@ router.put(
   upload.any(),
   escortController.workingHours
 );
+router.put("/rates", authenticate, upload.any(), escortController.updateRates);
 router.put(
   "/contact",
   authenticate,

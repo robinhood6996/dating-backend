@@ -2,27 +2,29 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const VerificationSchema = new Schema({
-  photo1: { type: String, required: true },
-  photo2: { type: String, required: true },
-  photo3: { type: String, required: true },
-  extraPhotos: { type: [], default: [] },
-  status: { type: String, default: "pending" },
+  name: { type: String, required: true },
+  photos: { type: [], required: true, default: [] },
   username: { type: String, required: true },
   userEmail: { type: String, required: true },
+  status: {
+    type: String,
+    default: "pending",
+    enum: ["pending", "approved", "rejected"],
+  },
 });
 
-freeAdSchema.methods = {
+VerificationSchema.methods = {
   findApproved: function () {
     return mongoose.model("verification").find({ approved: "approved" });
   },
   findPending: function () {
-    return mongoose.model("FreeAd").find({ approved: "pending" });
+    return mongoose.model("verification").find({ approved: "pending" });
   },
   findRejected: function () {
-    return mongoose.model("FreeAd").find({ approved: "rejected" });
+    return mongoose.model("verification").find({ approved: "rejected" });
   },
   findAll: function () {
-    return mongoose.model("FreeAd").find({});
+    return mongoose.model("verification").find({});
   },
 };
 
