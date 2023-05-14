@@ -917,7 +917,7 @@ exports.deleteVideo = async (req, res) => {
 
 exports.workingHours = async (req, res) => {
   let { email } = req.user;
-  const { available24, availableDate, vacation } = req.query;
+  const { available24, availableDate, vacation } = req.body;
 
   try {
     let escort = await EscortProfile.findOne({ email });
@@ -974,6 +974,50 @@ exports.workingHours = async (req, res) => {
   }
 };
 
+//Update rates
+exports.updateRates = async (req, res) => {
+  let { email } = req.user;
+  const { currency, reachHome, host } = req.body;
+
+  try {
+    let escort = await EscortProfile.findOne({ email });
+    if (escort) {
+      if (currency) {
+        escort.currency = currency;
+      }
+      if (reachHome) {
+        escort.reachHome = {
+          hour: reachHome.hour || escort.reachHome.hour,
+          threeHour: reachHome.threeHour || escort.reachHome.threeHour,
+          additionHour: reachHome.additionHour || escort.reachHome.additionHour,
+          night: reachHome.night || escort.reachHome.night,
+          dinner: reachHome.dinner || escort.reachHome.dinner,
+          weekend: reachHome.weekend || escort.reachHome.weekend,
+        };
+      }
+      if (host) {
+        escort.host = {
+          hour: host.hour || escort.host.hour,
+          threeHour: host.threeHour || escort.host.threeHour,
+          additionHour: host.additionHour || escort.host.additionHour,
+          night: host.night || escort.host.night,
+          dinner: host.dinner || escort.host.dinner,
+          weekend: host.weekend || escort.host.weekend,
+        };
+      }
+
+      const updatedData = await escort.save();
+      return res.status(200).json({
+        message: "Working hours data updated",
+        updatedData,
+        statusCode: 200,
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Error", error, statusCode: 500 });
+  }
+};
 exports.deleteEscort = async (req, res) => {
   let { email } = req.user;
   try {
