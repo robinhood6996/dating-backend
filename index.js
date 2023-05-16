@@ -13,6 +13,7 @@ const bannerController = require("./routes/banner.route");
 const verification = require("./routes/verificaion.route");
 const cityTour = require("./routes/tour.route");
 const functions = require("firebase-functions");
+const stripe = require("./routes/stripe");
 const app = express();
 app.use(cors());
 const allowedOrigins = [
@@ -66,6 +67,7 @@ mongoose
     app.use("/banner", bannerController);
     app.use("/city-tour", cityTour);
     app.use("/verification", verification);
+    app.use("/stripe", stripe);
     exports.api = functions.https.onRequest(app);
   })
   .catch((error) => {
