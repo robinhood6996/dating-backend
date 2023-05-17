@@ -1,7 +1,5 @@
 const { EscortProfile } = require("../models/escort.model");
-const {
-  verification: VerificationModel,
-} = require("../models/verification.model");
+const { verification } = require("../models/verification.model");
 
 exports.verificationRequest = async (req, res) => {
   try {
@@ -10,14 +8,15 @@ exports.verificationRequest = async (req, res) => {
       let files = req.files;
       let escort = await EscortProfile.findOne({ email: user.email });
       console.log(escort);
-      const verification = new VerificationModel({
+      const verify = new verification({
         name: escort.name,
-        userEmail: user.email,
+        userEmail: user.userEmail,
         username: escort.username,
         photos: files,
         status: "pending",
       });
-      await verification.save();
+      console.log(verify);
+      await verify.save();
       return res.status(200).json({
         message: "Verification request sent",
         statusCode: 200,

@@ -85,6 +85,7 @@ exports.login = async (req, res) => {
           email: existingUser.email,
           gender: existingUser.gender,
           type: existingUser.type,
+          username: existingUser.username,
         };
         res.status(200).json({ user, token });
       } else {
