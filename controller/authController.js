@@ -6,6 +6,7 @@ const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const { EscortProfile } = require("../models/escort.model");
 const { generateRandomNumber } = require("../helpers/utils");
+const { defaultUser } = require("../models/defaultUser.model");
 
 exports.registerUser = async (req, res) => {
   try {
@@ -45,10 +46,20 @@ exports.registerUser = async (req, res) => {
       });
       await escort.save();
     }
+    if (user.type === "default") {
+      let user = new defaultUser({
+        name: user.name,
+        email: user.email,
+        age: user.age,
+        gender: user.gender.toLowerCase(),
+        username,
+      });
+      await user.save();
+    }
     return res.status(201).json({ message: "Successfully registered" });
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ message: "Something went wrong" });
+    return res.status(500).json({ message: "Something went wrong", error });
   }
 };
 

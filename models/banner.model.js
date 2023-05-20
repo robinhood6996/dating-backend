@@ -12,9 +12,9 @@ const bannerSchema = new mongoose.Schema(
     image: { type: [], required: true },
     duration: { type: Number, required: true },
     price: { type: Number, required: true },
-    user: { type: String, required: true },
-    paymentStatus: { type: String, default: "unpaid" },
-    transactionId: { type: String, default: null },
+    userName: { type: String, required: true },
+    userEmail: { type: String, required: true },
+    paymentStatus: { type: Number, default: 0, enum: [1, 0] },
   },
   { timestamps: true }
 );
