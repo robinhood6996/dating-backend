@@ -28,7 +28,8 @@ exports.registerUser = async (req, res) => {
       email: req.body.email,
       password: req.body.password,
       gender: req.body.gender,
-      age: req.body.age,
+      age: req.body.age || null,
+      phone: req.body.phone,
       type: req.body.type,
       username,
     });
@@ -41,6 +42,7 @@ exports.registerUser = async (req, res) => {
         name: user.name,
         email: user.email,
         age: user.age,
+        phone: req.body.phone,
         gender: user.gender.toLowerCase(),
         username,
       });
@@ -48,10 +50,11 @@ exports.registerUser = async (req, res) => {
     }
     if (user.type === "default") {
       let user = new defaultUser({
-        name: user.name,
-        email: user.email,
-        age: user.age,
-        gender: user.gender.toLowerCase(),
+        name: req.body.name,
+        email: req.body.email,
+        age: req.body.age,
+        phone: req.body.phone,
+        gender: req.body.gender.toLowerCase(),
         username,
       });
       await user.save();
@@ -136,9 +139,12 @@ exports.deleteUser = async (req, res) => {
 
     // if (requestedUser.type === "admin") {
     if (userExist) {
-      await User.deleteOne({ email });
+      await User.deleteOne({ username });
       if (userExist.type === "escort") {
         await EscortProfile.deleteOne({ username });
+      }
+      if (userExist.type === "default") {
+        await defaultUser.deleteOne({ username });
       }
       res.json({ message: "Deleted user" });
     } else {
