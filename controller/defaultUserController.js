@@ -1,46 +1,66 @@
-const { defaultUser } = require("../models/defaultUser.model");
+const DefaultUser = require("../models/defaultUser.model");
+const fs = require("fs");
 
 exports.editDefaultUser = async (req, res) => {
+  const { username } = req.user; // Assuming the ID of the user to update is provided in the request URL
+
+  const {
+    name,
+    phone,
+    email,
+    age,
+    gender,
+    ethnicity,
+    nationality,
+    country,
+    city,
+  } = req.body;
+  const image = req.file;
+  const directoryPath = __dirname + "/../uploads/escort/";
   try {
-    const { username } = req.user; // Assuming userId is passed as a parameter
-    console.log("user", req.user);
-    const { name, phone, gender, ethnicity, nationality, country, city, age } =
-      req.body;
-
-    // Construct the update object with the provided fields
-    const update = {
-      name,
-      phone,
-      gender,
-      ethnicity,
-      nationality,
-      country,
-      city,
-      age,
-    };
-
-    // Find the user by ID and update the fields
-    const existUser = await defaultUser.findOne({ username });
-    if (existUser) {
-      if (name) existUser.name = name;
-      if (phone) existUser.phone = phone;
-      if (gender) existUser.gender = gender;
-      if (ethnicity) existUser.ethnicity = ethnicity;
-      if (nationality) existUser.nationality = nationality;
-      if (country) existUser.country = country;
-      if (city) existUser.city = city;
-      if (age) existUser.age = age;
-      await existUser.save();
-      return res
-        .status(200)
-        .json({ user: existUser, message: "User updated successfully" });
-    } else {
-      return res
-        .status(404)
-        .json({ message: "User not found", statusCode: 404 });
+    let user = await DefaultUser.findOne({ username: username });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
-  } catch (error) {
-    console.error("Error updating user:", error);
-    res.status(500).json({ message: "Internal server error" });
+    user.name = name || user.name;
+    user.phone = phone || user.phone;
+    user.email = email || user.email;
+    user.age = age || user.age;
+    if (user.profileImage.filename) {
+      fs.unlinkSync(directoryPath + user.profileImage.filename, (err) => {
+        if (err) {
+          res.status(500).send({
+            message: "Could not delete the file. " + err,
+          });
+        }
+      });
+      user.profileImage = { filename: image.filename, path: image.path };
+    } else {
+      user.profileImage = { filename: image.filename, path: image.path };
+    }
+
+    user.gender = gender || user.gender;
+    user.ethnicity = ethnicity || user.ethnicity;
+    user.nationality = nationality || user.nationality;
+    user.country = country || user.country;
+    user.city = city || user.city;
+
+    const updatedUser = await user.save();
+    res
+      .status(200)
+      .json({ updatedUser, statusCode: 200, message: "Profile updated" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+exports.getAllUsers = async (req, res) => {
+  try {
+    const users = await DefaultUser.find();
+    res.json(users);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
   }
 };

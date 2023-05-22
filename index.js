@@ -15,7 +15,7 @@ const cityTour = require("./routes/tour.route");
 const functions = require("firebase-functions");
 const stripe = require("./routes/stripe");
 const defaultUser = require("./routes/defaultUser.route");
-
+const Rating = require("./routes/rating.route");
 const app = express();
 app.use(cors());
 const allowedOrigins = [
@@ -74,6 +74,7 @@ mongoose
     app.use("/banner", bannerController);
     app.use("/city-tour", cityTour);
     app.use("/verification", verification);
+    app.use("/rating", Rating);
     app.use("/stripe", stripe);
     exports.api = functions.https.onRequest(app);
   })

@@ -1,10 +1,11 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const defaultUserSchema = new Schema({
+const DefaultUserSchema = new Schema({
   name: { type: String, required: true },
   phone: { type: String, required: true },
   email: { type: String, required: true },
+  profileImage: { type: Object },
   age: { type: String, required: true },
   gender: { type: String, required: true },
   username: { type: String, required: true },
@@ -14,5 +15,4 @@ const defaultUserSchema = new Schema({
   city: { type: String },
 });
 
-const defaultUser = new mongoose.model("DefaultUser", defaultUserSchema);
-module.exports = { defaultUser };
+module.exports = mongoose.model("DefaultUser", DefaultUserSchema);
