@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const multer = require("multer");
-const verification = require("../controller/VerificationController");
+const userController = require("../controller/defaultUserController");
 const { authenticate } = require("../middleware/tokenMiddleware");
+const multer = require("multer");
 const storage = multer.diskStorage({
   destination: function (request, file, callback) {
     callback(null, "./uploads/escort");
@@ -13,18 +13,13 @@ const storage = multer.diskStorage({
   },
 });
 const upload = multer({ storage: storage });
-
-router.post(
-  "/",
-  authenticate,
-  upload.any("photos"),
-  verification.verificationRequest
-);
+// Route to register a new user
 router.put(
-  "/update",
+  "/edit",
   authenticate,
-  upload.any("photos"),
-  verification.verificationApprove
+  upload.single("profileImage"),
+  userController.editDefaultUser
 );
+router.get("/", authenticate, userController.getAllUsers);
 
 module.exports = router;

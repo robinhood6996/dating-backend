@@ -10,8 +10,12 @@ const countryRoutes = require("./routes/country.route");
 const cityRoutes = require("./routes/cities.route");
 const freeAdController = require("./routes/freeads.route");
 const bannerController = require("./routes/banner.route");
+const verification = require("./routes/verificaion.route");
 const cityTour = require("./routes/tour.route");
 const functions = require("firebase-functions");
+const stripe = require("./routes/stripe");
+const defaultUser = require("./routes/defaultUser.route");
+const Rating = require("./routes/rating.route");
 const app = express();
 app.use(cors());
 const allowedOrigins = [
@@ -56,14 +60,22 @@ mongoose
       const { filename } = req.params;
       res.sendFile(`${__dirname}/uploads/escort/videos/${filename}`);
     });
+    app.get("/banner/:filename", (req, res) => {
+      const { filename } = req.params;
+      res.sendFile(`${__dirname}/uploads/banner/${filename}`);
+    });
     app.use("/", settingsRoutes);
     app.use("/auth", authRoutes);
+    app.use("/default-user", defaultUser);
     app.use("/escort", escortRoutes);
     app.use("/country", countryRoutes);
     app.use("/city", cityRoutes);
     app.use("/freead", freeAdController);
     app.use("/banner", bannerController);
     app.use("/city-tour", cityTour);
+    app.use("/verification", verification);
+    app.use("/rating", Rating);
+    app.use("/stripe", stripe);
     exports.api = functions.https.onRequest(app);
   })
   .catch((error) => {

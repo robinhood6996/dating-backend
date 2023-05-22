@@ -1,57 +1,69 @@
-const { FreeAd } = require("../models/verification.model");
-exports.createAd = async (req, res) => {
-  try {
-    const { userId } = req.params;
-    const { photo1, photo2, photo3, extraPhotos, userEmail, status } = req.body;
-    // Check if request body exists
-    if (!req.body) {
-      return res.status(400).json({ message: "Request body is required" });
-    }
+const { EscortProfile } = require("../models/escort.model");
+const { verification } = require("../models/verification.model");
 
-    // Check if required fields exist in request body
-    const requiredFields = [
-      "photo1",
-      "photo2",
-      "description",
-      "photo3",
-      "userEmail",
-    ];
-    const missingFields = requiredFields.filter(
-      (field) => !(field in req.body)
-    );
-    if (missingFields.length > 0) {
-      return res.status(400).json({
-        message: `Missing required fields: ${missingFields.join(", ")}`,
+exports.verificationRequest = async (req, res) => {
+  try {
+    let user = req.user;
+    if (req.files) {
+      let files = req.files;
+      let escort = await EscortProfile.findOne({ email: user.email });
+      console.log(escort);
+      const verify = new verification({
+        name: escort.name,
+        userEmail: user.userEmail,
+        username: escort.username,
+        photos: files,
+        status: "pending",
+      });
+      console.log(verify);
+      await verify.save();
+      return res.status(200).json({
+        message: "Verification request sent",
+        statusCode: 200,
       });
     }
-    if (userEmail) {
-      const emailRegex = /\S+@\S+\.\S+/;
-      if (!emailRegex.test(email)) {
-        return res.status(400).json({ message: "Invalid email address" });
+    res.send();
+  } catch (error) {
+    return res.status(500).json({ message: "Error", error, statusCode: 500 });
+  }
+};
+exports.verificationApprove = async (req, res) => {
+  try {
+    let user = req.user;
+    if (user.type === "admin") {
+      if (req.query) {
+        let { id, status } = req.query;
+        let verification = await VerificationModel.findOne({ _id: id });
+        verification.status = status;
+        let escort = await EscortProfile.findOne({
+          email: verification.userEmail,
+        });
+        if (escort) {
+          escort.verified = status === "approved" ? true : false;
+          await verification.save();
+          await escort.save();
+        } else {
+          return res.status(404).json({
+            message: "Not found escort",
+            statusCode: 404,
+          });
+        }
+        return res.status(200).json({
+          message: "Verification approved",
+          statusCode: 200,
+        });
+      } else {
+        return res.status(400).json({
+          message: "verification id is required",
+          statusCode: 400,
+        });
       }
     }
-
-    // Create new free ad document
-    const verification = new FreeAd({
-      title,
-      category,
-      city: req.body.city || "",
-      description,
-      phone,
-      email: email || "",
-      duration: req.body.duration || 15,
-      photo1,
-      photo2: req.body.photo2 || "",
-      photo3: req.body.photo3 || "",
-      status: req.body.status || "inactive",
+    return res.status(403).json({
+      message: "Sorry you are not allowed to do this action",
+      statusCode: 403,
     });
-
-    // Save new free ad document
-    const savedFreeAd = await freeAd.save();
-
-    res.status(201).json({ freeAd: savedFreeAd, message: "Free ad added" });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Internal server error" });
+  } catch (error) {
+    return res.status(500).json({ message: "Error", error, statusCode: 500 });
   }
 };

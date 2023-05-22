@@ -63,6 +63,7 @@ router.put(
   upload.any(),
   escortController.workingHours
 );
+router.put("/rates", authenticate, upload.any(), escortController.updateRates);
 router.put(
   "/contact",
   authenticate,
@@ -104,6 +105,12 @@ router.delete(
   authenticate,
   upload.any("video"),
   escortController.deleteVideo
+);
+router.delete(
+  "/delete",
+  authenticate,
+  upload.any(),
+  escortController.deleteEscort
 );
 
 module.exports = router;

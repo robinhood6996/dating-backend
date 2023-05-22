@@ -6,6 +6,7 @@ const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const { EscortProfile } = require("../models/escort.model");
 const { generateRandomNumber } = require("../helpers/utils");
+const { defaultUser } = require("../models/defaultUser.model");
 
 exports.registerUser = async (req, res) => {
   try {
@@ -20,34 +21,48 @@ exports.registerUser = async (req, res) => {
     // Hash the password
     // const hashedPassword = await bcrypt.hash(req.body.password, 10);
     // Create a new user document
+    let nameSplit = req.body.email.split("@")[0];
+    let username = nameSplit + generateRandomNumber();
     const user = new User({
       name: req.body.name,
       email: req.body.email,
       password: req.body.password,
       gender: req.body.gender,
-      age: req.body.age,
+      age: req.body.age || null,
+      phone: req.body.phone,
       type: req.body.type,
+      username,
     });
 
     // Save the user document
     await user.save();
     console.log(user.type);
     if (user.type === "escort") {
-      let nameSplit = user.name.split(" ")[0];
-      let username = nameSplit + generateRandomNumber();
       let escort = new EscortProfile({
         name: user.name,
         email: user.email,
         age: user.age,
+        phone: req.body.phone,
         gender: user.gender.toLowerCase(),
         username,
       });
       await escort.save();
     }
+    if (user.type === "default") {
+      let user = new defaultUser({
+        name: req.body.name,
+        email: req.body.email,
+        age: req.body.age,
+        phone: req.body.phone,
+        gender: req.body.gender.toLowerCase(),
+        username,
+      });
+      await user.save();
+    }
     return res.status(201).json({ message: "Successfully registered" });
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ message: "Something went wrong" });
+    return res.status(500).json({ message: "Something went wrong", error });
   }
 };
 
@@ -84,6 +99,7 @@ exports.login = async (req, res) => {
           email: existingUser.email,
           gender: existingUser.gender,
           type: existingUser.type,
+          username: existingUser.username,
         };
         res.status(200).json({ user, token });
       } else {
@@ -118,14 +134,17 @@ exports.logout = async (req, res) => {
 exports.deleteUser = async (req, res) => {
   try {
     let requestedUser = req.user;
-    let email = req.body.email;
-    let userExist = await User.findOne({ email });
+    let { username } = req.query;
+    let userExist = await User.findOne({ username });
 
     // if (requestedUser.type === "admin") {
     if (userExist) {
-      await User.deleteOne({ email });
+      await User.deleteOne({ username });
       if (userExist.type === "escort") {
-        await EscortProfile.deleteOne({ email });
+        await EscortProfile.deleteOne({ username });
+      }
+      if (userExist.type === "default") {
+        await defaultUser.deleteOne({ username });
       }
       res.json({ message: "Deleted user" });
     } else {

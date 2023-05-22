@@ -1,30 +1,37 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const bannerSchema = new mongoose.Schema({
-  position: { type: String, required: true },
-  country: { type: String, required: true },
-  city: { type: String, required: true },
-  image: { type: String, required: true },
-  duration: { type: Number, required: true },
-  price: { type: Number, required: true },
-  user: { type: String, required: true },
-  paymentStatus: { type: String, default: 'unpaid' },
-  transactionId: { type: String, default: null }
-},{timestamps: true});
+const bannerSchema = new mongoose.Schema(
+  {
+    position: {
+      type: String,
+      required: true,
+      enum: ["profile", "right", "left"],
+    },
+    country: { type: String, required: true },
+    city: { type: String, required: true },
+    image: { type: [], required: true },
+    duration: { type: Number, required: true },
+    price: { type: Number, required: true },
+    userName: { type: String, required: true },
+    userEmail: { type: String, required: true },
+    paymentStatus: { type: Number, default: 0, enum: [1, 0] },
+  },
+  { timestamps: true }
+);
 
 bannerSchema.methods = {
   findPaid: function () {
-    return mongoose.model('Banner').find({ paymentStatus: 'paid' })
+    return mongoose.model("Banner").find({ paymentStatus: "paid" });
   },
-  findUnpaid: function(){
-    return mongoose.model("Banner").find({paymentStatus: "unpaid"})
+  findUnpaid: function () {
+    return mongoose.model("Banner").find({ paymentStatus: "unpaid" });
   },
-  findByEmail: function (email){
-    return mongoose.model("Banner").find({user: email})
+  findByEmail: function (email) {
+    return mongoose.model("Banner").find({ user: email });
   },
-  findAll: function(){
-    return mongoose.model("Banner").find({})
+  findAll: function () {
+    return mongoose.model("Banner").find({});
   },
-}
+};
 
-module.exports = mongoose.model('Banner', bannerSchema);
+module.exports = mongoose.model("Banner", bannerSchema);

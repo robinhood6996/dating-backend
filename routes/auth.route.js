@@ -8,7 +8,7 @@ router.post("/register", upload.any(), authController.registerUser);
 router.get("/user", authController.getAllUser);
 router.post("/login", upload.any(), authController.login);
 router.get("/logout", authController.logout);
-router.post(
+router.delete(
   "/delete-user",
   authenticate,
   upload.any(),
