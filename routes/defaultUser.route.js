@@ -21,5 +21,6 @@ router.put(
   userController.editDefaultUser
 );
 router.get("/", authenticate, userController.getAllUsers);
+router.get("/profile", authenticate, userController.getDefaultUserProfile);
 
 module.exports = router;

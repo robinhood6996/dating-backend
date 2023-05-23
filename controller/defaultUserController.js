@@ -64,3 +64,14 @@ exports.getAllUsers = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+exports.getDefaultUserProfile = async (req, res) => {
+  try {
+    const { username } = req.user;
+    const user = await DefaultUser.findOne({ username });
+    res.json(user);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
