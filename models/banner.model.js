@@ -2,6 +2,9 @@ const mongoose = require("mongoose");
 
 const bannerSchema = new mongoose.Schema(
   {
+    name: { type: String, required: true },
+    email: { type: String, required: true },
+    username: { type: String, required: true },
     position: {
       type: String,
       required: true,
@@ -11,10 +14,10 @@ const bannerSchema = new mongoose.Schema(
     city: { type: String, required: true },
     image: { type: [], required: true },
     duration: { type: Number, required: true },
-    price: { type: Number, required: true },
-    userName: { type: String, required: true },
-    userEmail: { type: String, required: true },
-    paymentStatus: { type: Number, default: 0, enum: [1, 0] },
+    payAmount: { type: Number, required: true },
+    paymentDetails: { type: Object, default: {} },
+    isPaid: { type: Boolean, default: false },
+    isBank: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

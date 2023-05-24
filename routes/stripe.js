@@ -1,6 +1,7 @@
 const express = require("express");
 const Stripe = require("stripe");
 const EscortAd = require("../models/escortAds.model");
+const Banner = require("../models/banner.model");
 require("dotenv").config();
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 const router = express.Router();
@@ -12,6 +13,7 @@ router.post("/checkout-payment", async (req, res) => {
       userEmail: req.body.userEmail,
       name: req.body.name,
       cart: JSON.stringify(req.body.cartItems),
+      type: req.body.type,
     },
   });
 
@@ -89,7 +91,11 @@ router.post(
           try {
             console.log(customer);
             // CREATE ORDER
-            createMembershipOrder(customer, data);
+            if (type === "escortAd") {
+              createMembershipOrder(customer, data);
+            } else if (type === "bannerAd") {
+              addBanner(customer, data);
+            }
           } catch (err) {
             console.log(typeof createOrder);
             console.log(err);
@@ -139,4 +145,91 @@ const createMembershipOrder = async (customer, data) => {
   }
 };
 
+const addBanner = async (customer, data) => {
+  try {
+    const orderDetails = JSON.parse(customer.metadata.cart)[0];
+    const username = customer.metadata.userId;
+    const {
+      position,
+      country,
+      city,
+      duration,
+      payAmount,
+      name,
+      email,
+      images,
+    } = orderDetails;
+    const files = req.file;
+    // Check if required fields are provided
+    if (
+      !position ||
+      !country ||
+      !city ||
+      !duration ||
+      !payAmount ||
+      !email ||
+      !name
+    ) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    // Check if position is a valid value
+    const validPositions = ["top", "left", "right"];
+    if (!validPositions.includes(position)) {
+      return res.status(400).json({ message: "Invalid position" });
+    }
+
+    // Check if duration is a positive number
+    if (duration <= 0) {
+      return res
+        .status(400)
+        .json({ message: "Duration must be a positive number" });
+    }
+
+    // Check if price is a positive number
+    if (payAmount <= 0) {
+      return res
+        .status(400)
+        .json({ message: "Price must be a positive number" });
+    }
+
+    // Check if paymentStatus is a valid value
+    let paymentDetails = {
+      paymentIntentId: data.paymentIntentId,
+      paymentStatus: data.payment_status,
+      customerId: data.customer,
+      userId: customer.metadata.userId,
+    };
+    // Create and save the new banner
+    const banner = new Banner({
+      position,
+      country,
+      city,
+      image: images,
+      duration,
+      price,
+      username,
+      email,
+      paymentDetails,
+      isPaid: true,
+      isBank: false,
+    });
+    await banner.save();
+
+    res.status(201).json({
+      banner,
+      message: "You purchased banner advertisement successfully",
+    });
+  } catch (error) {
+    console.error(error);
+
+    // If the error is a Mongoose validation error, return the specific error message
+    if (error.name === "ValidationError") {
+      const errors = Object.values(error.errors).map((err) => err.message);
+      return res.status(400).json({ message: errors.join(", ") });
+    }
+
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
 module.exports = router;
