@@ -1,6 +1,6 @@
 const EscortAd = require("../models/escortAds.model"); // Assuming you have the EscortAd model defined
 
-const addEscortAd = async (req, res) => {
+exports.addEscortAd = async (req, res) => {
   const { username, email, name } = req.user; // Assuming userName and email are available in req.user
   const {
     packageType,

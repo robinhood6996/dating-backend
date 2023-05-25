@@ -16,6 +16,7 @@ const functions = require("firebase-functions");
 const stripe = require("./routes/stripe");
 const defaultUser = require("./routes/defaultUser.route");
 const Rating = require("./routes/rating.route");
+const escortAd = require("./routes/escortAds.route");
 const cron = require("node-cron");
 
 const app = express();
