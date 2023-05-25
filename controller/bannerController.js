@@ -6,16 +6,16 @@ exports.addBanner = async (req, res) => {
       position,
       country,
       city,
-      image,
       duration,
       price,
-      user,
+      userName,
+      userEmail,
       paymentStatus,
-      transactionId,
     } = req.body;
-
+    const files = req.file;
+    console.log("files", files, req.body);
     //Check user existence
-    let userExist = await User.findOne({ email: user });
+    let userExist = await User.findOne({ email: userEmail });
     if (!userExist) {
       return res.send(401).json("Unauthorised");
     }
@@ -25,10 +25,10 @@ exports.addBanner = async (req, res) => {
       !position ||
       !country ||
       !city ||
-      !image ||
       !duration ||
       !price ||
-      !user
+      !userName ||
+      !userEmail
     ) {
       return res.status(400).json({ message: "Missing required fields" });
     }
@@ -54,22 +54,18 @@ exports.addBanner = async (req, res) => {
     }
 
     // Check if paymentStatus is a valid value
-    const validPaymentStatuses = ["paid", "unpaid"];
-    if (!validPaymentStatuses.includes(paymentStatus)) {
-      return res.status(400).json({ message: "Invalid payment status" });
-    }
 
     // Create and save the new banner
     const banner = new Banner({
       position,
       country,
       city,
-      image,
+      image: { filename: files.filename, path: files.path },
       duration,
       price,
-      user,
+      userName,
+      userEmail,
       paymentStatus,
-      transactionId,
     });
     await banner.save();
 

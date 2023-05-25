@@ -1,5 +1,7 @@
 const express = require("express");
 const Stripe = require("stripe");
+const EscortAd = require("../models/escortAds.model");
+const Banner = require("../models/banner.model");
 require("dotenv").config();
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 const router = express.Router();
@@ -8,7 +10,10 @@ router.post("/checkout-payment", async (req, res) => {
   const customer = await stripe.customers.create({
     metadata: {
       userId: req.body.userId,
+      userEmail: req.body.userEmail,
+      name: req.body.name,
       cart: JSON.stringify(req.body.cartItems),
+      type: req.body.type,
     },
   });
 
@@ -40,7 +45,8 @@ router.post("/checkout-payment", async (req, res) => {
 });
 
 //Webhook
-
+let endpointSecret =
+  "whsec_013f5baf84ef59e967095114e698669c4d0627a3684b8dfa35cb6b4eb3a86551";
 router.post(
   "/webhook",
   express.json({ type: "application/json" }),
@@ -83,8 +89,13 @@ router.post(
         .retrieve(data.customer)
         .then(async (customer) => {
           try {
+            console.log(customer);
             // CREATE ORDER
-            // createOrder(customer, data);
+            if (type === "escortAd") {
+              createMembershipOrder(customer, data);
+            } else if (type === "bannerAd") {
+              addBanner(customer, data);
+            }
           } catch (err) {
             console.log(typeof createOrder);
             console.log(err);
@@ -92,9 +103,133 @@ router.post(
         })
         .catch((err) => console.log(err.message));
     }
-
     res.status(200).end();
   }
 );
 
+const createMembershipOrder = async (customer, data) => {
+  const orderDetails = JSON.parse(customer.metadata.cart)[0];
+  let packageType = orderDetails.name.includes("VIP")
+    ? 1
+    : orderDetails.name.includes("Featured")
+    ? 2
+    : orderDetails.name.includes("month")
+    ? 3
+    : 4;
+  let paymentMedia = "card";
+  let paymentDetails = {
+    paymentIntentId: data.paymentIntentId,
+    paymentStatus: data.payment_status,
+    customerId: data.customer,
+    userId: customer.metadata.userId,
+  };
+
+  let escortAd = new EscortAd({
+    name: customer.metadata.name,
+    email: customer.metadata.userEmail,
+    username: customer.metadata.userId,
+    packageType,
+    duration: orderDetails.duration,
+    payAmount: data.amount_total,
+    isPaid: true,
+    paymentMedia,
+    paymentDetails,
+  });
+  try {
+    let ad = await escortAd.save();
+    console.log("processed ad:", ad);
+    // res.status(200).send({ message: "Membership purchase successfully" });
+  } catch (error) {
+    // res.status(500).json({ message: "Failed to create order" });
+    console.log(error);
+  }
+};
+
+const addBanner = async (customer, data) => {
+  try {
+    const orderDetails = JSON.parse(customer.metadata.cart)[0];
+    const username = customer.metadata.userId;
+    const {
+      position,
+      country,
+      city,
+      duration,
+      payAmount,
+      name,
+      email,
+      images,
+    } = orderDetails;
+    const files = req.file;
+    // Check if required fields are provided
+    if (
+      !position ||
+      !country ||
+      !city ||
+      !duration ||
+      !payAmount ||
+      !email ||
+      !name
+    ) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    // Check if position is a valid value
+    const validPositions = ["top", "left", "right"];
+    if (!validPositions.includes(position)) {
+      return res.status(400).json({ message: "Invalid position" });
+    }
+
+    // Check if duration is a positive number
+    if (duration <= 0) {
+      return res
+        .status(400)
+        .json({ message: "Duration must be a positive number" });
+    }
+
+    // Check if price is a positive number
+    if (payAmount <= 0) {
+      return res
+        .status(400)
+        .json({ message: "Price must be a positive number" });
+    }
+
+    // Check if paymentStatus is a valid value
+    let paymentDetails = {
+      paymentIntentId: data.paymentIntentId,
+      paymentStatus: data.payment_status,
+      customerId: data.customer,
+      userId: customer.metadata.userId,
+    };
+    // Create and save the new banner
+    const banner = new Banner({
+      position,
+      country,
+      city,
+      image: images,
+      duration,
+      price,
+      username,
+      email,
+      paymentDetails,
+      isPaid: true,
+      isBank: false,
+    });
+    await banner.save();
+
+    res.status(201).json({
+      banner,
+      message: "You purchased banner advertisement successfully",
+    });
+  } catch (error) {
+    console.error(error);
+
+    // If the error is a Mongoose validation error, return the specific error message
+    if (error.name === "ValidationError") {
+      const errors = Object.values(error.errors).map((err) => err.message);
+      return res.status(400).json({ message: errors.join(", ") });
+    }
+
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
 module.exports = router;
