@@ -17,7 +17,7 @@ const upload = multer({ storage: storage });
 router.post(
   "/",
   authenticate,
-  upload.any("photos"),
+  upload.array("photos"),
   verification.verificationRequest
 );
 router.put(
@@ -26,5 +26,6 @@ router.put(
   upload.any("photos"),
   verification.verificationApprove
 );
+router.get("/", authenticate, verification.getVerificationItems);
 
 module.exports = router;

@@ -85,7 +85,7 @@ mongoose
     app.use("/verification", verification);
     app.use("/rating", Rating);
     app.use("/stripe", stripe);
-    cron.schedule("* * * * *", myController);
+    // cron.schedule("* * * * *", myConstroller);
     exports.api = functions.https.onRequest(app);
   })
   .catch((error) => {

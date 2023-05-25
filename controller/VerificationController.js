@@ -4,26 +4,30 @@ const { verification } = require("../models/verification.model");
 exports.verificationRequest = async (req, res) => {
   try {
     let user = req.user;
+    console.log(req.user);
     if (req.files) {
       let files = req.files;
       let escort = await EscortProfile.findOne({ email: user.email });
-      console.log(escort);
+      if (!escort) {
+        return res.status(403).json({ message: "Not allowed" });
+      }
       const verify = new verification({
         name: escort.name,
-        userEmail: user.userEmail,
-        username: escort.username,
+        userEmail: user.email,
+        username: user.username,
         photos: files,
         status: "pending",
       });
-      console.log(verify);
+
       await verify.save();
       return res.status(200).json({
         message: "Verification request sent",
         statusCode: 200,
       });
     }
-    res.send();
+    return res.status(400).json({ message: "Images are required" });
   } catch (error) {
+    console.log("error", error);
     return res.status(500).json({ message: "Error", error, statusCode: 500 });
   }
 };
@@ -33,7 +37,7 @@ exports.verificationApprove = async (req, res) => {
     if (user.type === "admin") {
       if (req.query) {
         let { id, status } = req.query;
-        let verification = await VerificationModel.findOne({ _id: id });
+        let verification = await verification.findOne({ _id: id });
         verification.status = status;
         let escort = await EscortProfile.findOne({
           email: verification.userEmail,
@@ -65,5 +69,26 @@ exports.verificationApprove = async (req, res) => {
     });
   } catch (error) {
     return res.status(500).json({ message: "Error", error, statusCode: 500 });
+  }
+};
+
+exports.getVerificationItems = async (req, res) => {
+  const { status } = req.query;
+  const { type } = req.user;
+  try {
+    let query = {};
+    if (status) {
+      query.status = status;
+    }
+
+    const verificationItems = await verification.find(query);
+    if (type === "admin") {
+      res.status(200).json(verificationItems);
+    } else {
+      res.status(403).json({ message: "You are not allowed" });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
   }
 };

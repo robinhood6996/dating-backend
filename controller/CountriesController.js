@@ -31,7 +31,6 @@ exports.createCountry = async (req, res) => {
 exports.getAllCountries = async (req, res) => {
   try {
     const query = await Countries.find({});
-
     const countries = query;
     res.status(200).json({ countries, counts: countries.length });
   } catch (err) {

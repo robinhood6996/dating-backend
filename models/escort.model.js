@@ -106,6 +106,7 @@ const EscortProfileSchema = new Schema(
     //others
     memberShip: { type: Boolean, default: null },
     memberShipDetails: { type: MembershipSchema, default: {} },
+    isActive: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
