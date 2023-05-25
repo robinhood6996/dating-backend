@@ -1,6 +1,11 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
+//Mermbership details schema
+const MembershipSchema = {
+  startDate: { type: Date },
+  endDate: { type: Date },
+};
 // Schema
 const EscortProfileSchema = new Schema(
   {
@@ -98,6 +103,9 @@ const EscortProfileSchema = new Schema(
     verified: { type: Boolean, default: false },
     pornStar: { type: Boolean, default: false },
     withVideo: { type: Boolean, default: false },
+    //others
+    memberShip: { type: Boolean, default: null },
+    memberShipDetails: { type: MembershipSchema, default: {} },
   },
   { timestamps: true }
 );

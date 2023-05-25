@@ -5,6 +5,7 @@ const Banner = require("../models/banner.model");
 require("dotenv").config();
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 const router = express.Router();
+const { EscortProfile } = require("../models/escort.model");
 
 router.post("/checkout-payment", async (req, res) => {
   const customer = await stripe.customers.create({
@@ -137,8 +138,16 @@ const createMembershipOrder = async (customer, data) => {
   });
   try {
     let ad = await escortAd.save();
-    console.log("processed ad:", ad);
-    // res.status(200).send({ message: "Membership purchase successfully" });
+    let escort = EscortProfile.findOne({ username });
+    if (escort) {
+      escort.memberShip = packageType;
+      escort.memberShipDetails = {
+        startDate: getFutureDate(0),
+        endDate: getFutureDate(duration),
+      };
+      await escort.save();
+    }
+    res.status(200).send({ message: "Membership purchase successfully" });
   } catch (error) {
     // res.status(500).json({ message: "Failed to create order" });
     console.log(error);

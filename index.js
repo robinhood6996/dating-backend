@@ -16,6 +16,8 @@ const functions = require("firebase-functions");
 const stripe = require("./routes/stripe");
 const defaultUser = require("./routes/defaultUser.route");
 const Rating = require("./routes/rating.route");
+const cron = require("node-cron");
+
 const app = express();
 app.use(cors());
 const allowedOrigins = [
@@ -41,6 +43,13 @@ app.use((req, res, next) => {
   );
   next();
 });
+
+// Function to be executed every hour
+function myController() {
+  // Your controller logic goes here
+  console.log("Controller executed");
+}
+
 mongoose
   .connect(
     "mongodb+srv://datingadmin:D88CQRZrzRSvTGD@cluster0.oulrk.mongodb.net/?retryWrites=true&w=majority",
@@ -76,6 +85,7 @@ mongoose
     app.use("/verification", verification);
     app.use("/rating", Rating);
     app.use("/stripe", stripe);
+    cron.schedule("* * * * *", myController);
     exports.api = functions.https.onRequest(app);
   })
   .catch((error) => {

@@ -15,9 +15,9 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 // POST route to add a new banner
-router.post("/", upload.single("image"), Banner.addBanner);
+// router.post("/", upload.single("image"), Banner.addBanner);
 router.get("/", Banner.getAllBanners);
-router.put("/:bannerId", upload.any(), Banner.editBanner);
+// router.put("/:bannerId", upload.any(), Banner.editBanner);
 router.delete("/:bannerId", Banner.deleteBanner);
 
 module.exports = router;
