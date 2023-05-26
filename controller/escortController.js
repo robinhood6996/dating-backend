@@ -492,7 +492,7 @@ exports.getAllEscort = async (req, res) => {
   try {
     let { limit, offset, gender, category } = req.query;
     let genderN = gender?.toLowerCase();
-    let query = {};
+    let query = { isActive: true };
     if (gender) query.gender = genderN;
     if (category) query.category = category;
     // Fetch all escort profiles from the database
