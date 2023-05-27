@@ -92,3 +92,14 @@ exports.getVerificationItems = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+exports.getSingleUserVerifications = async (req, res) => {
+  const { username } = req.params;
+
+  try {
+    const verificationItems = await verification.find({ username });
+    res.status(200).json(verificationItems);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};

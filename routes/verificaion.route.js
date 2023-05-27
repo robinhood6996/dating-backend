@@ -27,5 +27,6 @@ router.put(
   verification.verificationApprove
 );
 router.get("/", authenticate, verification.getVerificationItems);
+router.get("/:username", authenticate, verification.getSingleUserVerifications);
 
 module.exports = router;
