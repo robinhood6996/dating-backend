@@ -104,7 +104,7 @@ const EscortProfileSchema = new Schema(
     pornStar: { type: Boolean, default: false },
     withVideo: { type: Boolean, default: false },
     //others
-    memberShip: { type: Boolean, default: null },
+    memberShip: { type: Number, default: null },
     memberShipDetails: { type: MembershipSchema, default: {} },
     isActive: { type: Boolean, default: false },
   },

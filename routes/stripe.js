@@ -7,6 +7,18 @@ const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 const router = express.Router();
 const { EscortProfile } = require("../models/escort.model");
 
+function getFutureDate(numberOfDays) {
+  // Create a new Date object for the current date
+  let currentDate = new Date();
+
+  // Calculate the future date by adding the specified number of days
+  let futureDate = new Date();
+  futureDate.setDate(currentDate.getDate() + numberOfDays);
+
+  // Return the future date
+  return futureDate;
+}
+
 router.post("/checkout-payment", async (req, res) => {
   console.log("checkout-body", req.body);
   const customer = await stripe.customers.create({
@@ -16,6 +28,10 @@ router.post("/checkout-payment", async (req, res) => {
       name: req.body.name,
       cart: JSON.stringify(req.body.cartItems),
       type: req.body.type,
+      packageType: req.body.packageType,
+      duration: req.body.duration,
+      price: req.body.price,
+      orderId: req.body.orderId,
     },
   });
 
@@ -47,8 +63,8 @@ router.post("/checkout-payment", async (req, res) => {
 });
 
 //Webhook
-let endpointSecret =
-  "whsec_013f5baf84ef59e967095114e698669c4d0627a3684b8dfa35cb6b4eb3a86551";
+// let endpointSecret =
+//   "whsec_013f5baf84ef59e967095114e698669c4d0627a3684b8dfa35cb6b4eb3a86551";
 router.post(
   "/webhook",
   express.json({ type: "application/json" }),
@@ -88,19 +104,20 @@ router.post(
     // Handle the checkout.session.completed event
     if (eventType === "checkout.session.completed") {
       console.log("event", data);
-      const type = data?.metadata?.type;
+
       stripe.customers
         .retrieve(data.customer)
         .then(async (customer) => {
           try {
-            console.log(customer);
+            // console.log(type, customer);
             // CREATE ORDER
-            if (type === "escortAd") {
-              console.log("escortAd");
-              createMembershipOrder(customer, data);
-            } else if (type === "bannerAd") {
-              addBanner(customer, data);
-            }
+            createMembershipOrder(customer, data);
+            // if (data?.metadata?.type === "escortAd") {
+            //   console.log("escortAd");
+            //   createMembershipOrder(customer, data);
+            // } else if (data?.metadata?.type === "bannerAd") {
+            //   addBanner(customer, data);
+            // }
           } catch (err) {
             console.log(typeof createOrder);
             console.log(err);
@@ -116,29 +133,37 @@ const createMembershipOrder = async (customer, data) => {
   const orderDetails = JSON.parse(customer.metadata.cart)[0];
   console.log("customer", customer, data);
   let paymentDetails = {
-    paymentIntentId: data.paymentIntentId,
+    paymentIntentId: data.payment_intent,
     paymentStatus: data.payment_status,
     customerId: data.customer,
     userId: customer.metadata.userId,
   };
 
   try {
-    let Ad = await EscortAd.fineOne({ _id: orderDetails?.orderId });
+    let Ad = await EscortAd.findOne({ _id: orderDetails?.orderId });
     if (Ad) {
       Ad.paymentDetails = paymentDetails;
       Ad.isPaid = true;
       await Ad.save();
     }
-    let escort = EscortProfile.findOne({ username: customer.metadata.userId });
-    if (escort) {
-      escort.memberShip = packageType;
-      escort.memberShipDetails = {
-        startDate: getFutureDate(0),
-        endDate: getFutureDate(duration),
-      };
-      await escort.save();
-    }
-    res.status(200).send({ message: "Membership purchase successfully" });
+    EscortProfile.findOneAndUpdate(
+      {
+        username: customer.metadata.userId,
+      },
+      {
+        memberShip: customer.metadata.packageType,
+        memberShipDetails: {
+          startDate: getFutureDate(0),
+          endDate: getFutureDate(parseInt(customer.metadata.duration)),
+        },
+      }
+    )
+      .then((res) => {
+        console.log("escort updated");
+      })
+      .catch((err) => {
+        console.log("escort err", err);
+      });
   } catch (error) {
     // res.status(500).json({ message: "Failed to create order" });
     console.log(error);

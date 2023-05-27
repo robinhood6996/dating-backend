@@ -1,4 +1,5 @@
 const EscortAd = require("../models/escortAds.model"); // Assuming you have the EscortAd model defined
+const { EscortProfile } = require("../models/escort.model");
 
 exports.addEscortAd = async (req, res) => {
   const { username, email, name } = req.user; // Assuming userName and email are available in req.user
@@ -43,5 +44,21 @@ exports.addEscortAd = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
+  }
+};
+
+exports.getFeaturedEscorts = async (req, res) => {
+  try {
+    const currentDate = new Date();
+
+    const escorts = await EscortProfile.find({
+      memberShip: 2,
+      "memberShipDetails.endDate": { $gte: currentDate },
+    });
+
+    res.status(200).json({ escorts });
+  } catch (error) {
+    console.error("Error retrieving escorts:", error);
+    res.status(500).json({ error: "Failed to retrieve escorts" });
   }
 };
