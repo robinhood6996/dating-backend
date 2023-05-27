@@ -6,6 +6,7 @@ const { authenticate } = require("../middleware/tokenMiddleware");
 const upload = require("multer")();
 
 router.post("/", authenticate, upload.any(), adsController.addEscortAd);
+router.put("/:adId", authenticate, adsController.updateIsPaidStatus);
 router.get("/featured", authenticate, adsController.getFeaturedEscorts);
 
 module.exports = router;

@@ -73,15 +73,16 @@ exports.getFeaturedEscorts = async (req, res) => {
   }
 };
 
-async function updateIsPaidStatus(req, res) {
+exports.updateIsPaidStatus = async (req, res) => {
   const { type } = req.user;
-  const { adId, isPaid } = req.body;
+  const { adId } = req.params;
+  const { isPaid, media } = req.body;
 
   if (type === "admin") {
     try {
       const updatedAd = await EscortAd.findByIdAndUpdate(
         adId,
-        { $set: { isPaid } },
+        { $set: { isPaid, paymentMedia: media } },
         { new: true }
       );
 
@@ -118,4 +119,4 @@ async function updateIsPaidStatus(req, res) {
   } else {
     return res.status(403).json("You are not allowed");
   }
-}
+};
