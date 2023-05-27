@@ -98,3 +98,15 @@ exports.getRatingsByUsernames = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+exports.getSingleRatings = async (req, res) => {
+  const { ratingId } = req.params;
+
+  try {
+    const rating = await Rating.findOne({ _id: ratingId });
+    res.status(200).json({ rating });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
