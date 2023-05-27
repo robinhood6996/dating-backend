@@ -6,7 +6,6 @@ exports.addEscortAd = async (req, res) => {
     packageType,
     duration,
     payAmount,
-    isPaid,
     paymentMedia,
     paymentDetails,
     isBank,
@@ -18,7 +17,7 @@ exports.addEscortAd = async (req, res) => {
     const newEscortAd = new EscortAd({
       name,
       email,
-      username: userName,
+      username,
       packageType,
       duration,
       payAmount,

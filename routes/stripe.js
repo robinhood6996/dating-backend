@@ -8,6 +8,7 @@ const router = express.Router();
 const { EscortProfile } = require("../models/escort.model");
 
 router.post("/checkout-payment", async (req, res) => {
+  console.log("checkout-body", req.body);
   const customer = await stripe.customers.create({
     metadata: {
       userId: req.body.userId,
@@ -86,6 +87,8 @@ router.post(
 
     // Handle the checkout.session.completed event
     if (eventType === "checkout.session.completed") {
+      console.log("event", data);
+      const type = data?.metadata?.type;
       stripe.customers
         .retrieve(data.customer)
         .then(async (customer) => {
@@ -93,6 +96,7 @@ router.post(
             console.log(customer);
             // CREATE ORDER
             if (type === "escortAd") {
+              console.log("escortAd");
               createMembershipOrder(customer, data);
             } else if (type === "bannerAd") {
               addBanner(customer, data);
@@ -110,14 +114,7 @@ router.post(
 
 const createMembershipOrder = async (customer, data) => {
   const orderDetails = JSON.parse(customer.metadata.cart)[0];
-  let packageType = orderDetails.name.includes("VIP")
-    ? 1
-    : orderDetails.name.includes("Featured")
-    ? 2
-    : orderDetails.name.includes("month")
-    ? 3
-    : 4;
-  let paymentMedia = "card";
+  console.log("customer", customer, data);
   let paymentDetails = {
     paymentIntentId: data.paymentIntentId,
     paymentStatus: data.payment_status,
@@ -125,20 +122,14 @@ const createMembershipOrder = async (customer, data) => {
     userId: customer.metadata.userId,
   };
 
-  let escortAd = new EscortAd({
-    name: customer.metadata.name,
-    email: customer.metadata.userEmail,
-    username: customer.metadata.userId,
-    packageType,
-    duration: orderDetails.duration,
-    payAmount: data.amount_total,
-    isPaid: true,
-    paymentMedia,
-    paymentDetails,
-  });
   try {
-    let ad = await escortAd.save();
-    let escort = EscortProfile.findOne({ username });
+    let Ad = await EscortAd.fineOne({ _id: orderDetails?.orderId });
+    if (Ad) {
+      Ad.paymentDetails = paymentDetails;
+      Ad.isPaid = true;
+      await Ad.save();
+    }
+    let escort = EscortProfile.findOne({ username: customer.metadata.userId });
     if (escort) {
       escort.memberShip = packageType;
       escort.memberShipDetails = {
