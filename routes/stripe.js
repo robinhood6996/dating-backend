@@ -151,7 +151,7 @@ const createMembershipOrder = async (customer, data) => {
         username: customer.metadata.userId,
       },
       {
-        memberShip: customer.metadata.packageType,
+        $addToSet: { memberShip: parseInt(customer.metadata.packageType) },
         memberShipDetails: {
           startDate: getFutureDate(0),
           endDate: getFutureDate(parseInt(customer.metadata.duration)),

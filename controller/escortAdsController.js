@@ -62,7 +62,7 @@ exports.getFeaturedEscorts = async (req, res) => {
     const currentDate = new Date();
 
     const escorts = await EscortProfile.find({
-      memberShip: 2,
+      memberShip: { $in: [2, 4] },
       "memberShipDetails.endDate": { $gte: currentDate },
     });
 
@@ -78,7 +78,7 @@ exports.getGirlofTheMonth = async (req, res) => {
     const currentDate = new Date();
 
     const escorts = await EscortProfile.find({
-      memberShip: 3,
+      memberShip: { $in: [3] },
       "memberShipDetails.endDate": { $gte: currentDate },
     });
 
