@@ -73,6 +73,22 @@ exports.getFeaturedEscorts = async (req, res) => {
   }
 };
 
+exports.getGirlofTheMonth = async (req, res) => {
+  try {
+    const currentDate = new Date();
+
+    const escorts = await EscortProfile.find({
+      memberShip: 3,
+      "memberShipDetails.endDate": { $gte: currentDate },
+    });
+
+    res.status(200).json({ escorts });
+  } catch (error) {
+    console.error("Error retrieving escorts:", error);
+    res.status(500).json({ error: "Failed to retrieve escorts" });
+  }
+};
+
 exports.updateIsPaidStatus = async (req, res) => {
   const { type } = req.user;
   const { adId } = req.params;
