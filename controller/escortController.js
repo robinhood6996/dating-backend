@@ -1018,6 +1018,37 @@ exports.updateRates = async (req, res) => {
     return res.status(500).json({ message: "Error", error, statusCode: 500 });
   }
 };
+
+//update stats
+exports.updateStatus = async (req, res) => {
+  let { type } = req.user;
+  const { id, isActive } = req.body;
+
+  if (type === "admin") {
+    try {
+      let escort = await EscortProfile.findOne({ _id: id });
+      if (escort) {
+        escort.isActive = isActive;
+
+        const updatedData = await escort.save();
+        return res.status(200).json({
+          message: "Working hours data updated",
+          updatedData,
+          statusCode: 200,
+        });
+      } else {
+        return res
+          .status(404)
+          .json({ message: "Error", error, statusCode: 404 });
+      }
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ message: "Error", error, statusCode: 500 });
+    }
+  } else {
+    return res.status(403).json({ message: "You are not allowed" });
+  }
+};
 exports.deleteEscort = async (req, res) => {
   let { email } = req.user;
   try {
@@ -1028,7 +1059,7 @@ exports.deleteEscort = async (req, res) => {
       if (escort) {
         await EscortProfile.deleteOne({ username });
       }
-      await userProfile.deleteOne({ email });
+      await userModel.deleteOne({ username });
 
       return res
         .status(200)
@@ -1038,5 +1069,34 @@ exports.deleteEscort = async (req, res) => {
     return res
       .status(500)
       .json({ message: "Something went wrong", statusCode: 500 });
+  }
+};
+
+exports.getInactiveEscorts = async (req, res) => {
+  try {
+    let { limit, offset, gender, category } = req.query;
+    let genderN = gender?.toLowerCase();
+    let query = { isActive: false };
+    if (gender) query.gender = genderN;
+    if (category) query.category = category;
+    // Fetch all escort profiles from the database
+    const escorts = await EscortProfile.find({ ...query })
+      .limit(limit || 0)
+      .skip(offset || 0)
+      .exec();
+    // Send the retrieved data as a response
+    res.status(200).json({
+      message: "All escort profiles retrieved successfully",
+      resultCount: escorts.length,
+      data: escorts,
+      statusCode: 200,
+    });
+  } catch (error) {
+    // Send an error response if something goes wrong
+    res.status(500).json({
+      message: "Something went wrong",
+      error: error.message,
+      statusCode: 500,
+    });
   }
 };

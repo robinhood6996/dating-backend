@@ -62,6 +62,49 @@ router.post("/checkout-payment", async (req, res) => {
   res.send({ url: session.url });
 });
 
+//For Banner advertising
+router.post("/checkout-banner", async (req, res) => {
+  console.log("checkout-body", req.body);
+  const customer = await stripe.customers.create({
+    metadata: {
+      userId: req.body.userId,
+      userEmail: req.body.userEmail,
+      name: req.body.name,
+      cart: JSON.stringify(req.body.cartItems),
+      type: req.body.type,
+      packageType: req.body.packageType,
+      duration: req.body.duration,
+      price: req.body.price,
+      orderId: req.body.orderId,
+    },
+  });
+
+  const line_items = req.body.cartItems.map((item) => {
+    return {
+      price_data: {
+        currency: "eur",
+        product_data: {
+          name: item.name,
+          description: item.desc,
+        },
+        unit_amount: item.price * 100,
+      },
+      quantity: item.quantity,
+    };
+  });
+
+  const session = await stripe.checkout.sessions.create({
+    payment_method_types: ["card"],
+    line_items,
+    mode: "payment",
+    customer: customer.id,
+    success_url: `${process.env.CLIENT_URL}/checkout-success`,
+    cancel_url: `${process.env.CLIENT_URL}/cart`,
+  });
+
+  // res.redirect(303, session.url);
+  res.send({ url: session.url });
+});
 //Webhook
 // let endpointSecret =
 //   "whsec_013f5baf84ef59e967095114e698669c4d0627a3684b8dfa35cb6b4eb3a86551";
