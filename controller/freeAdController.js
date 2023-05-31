@@ -46,6 +46,7 @@ exports.createAd = async (req, res) => {
       status: req.body.status || "inactive",
       author: user.email,
       photos: files,
+      username: user.username,
       ownerEmail: escort.email,
     });
 

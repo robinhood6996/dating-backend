@@ -9,6 +9,7 @@ const freeAdSchema = new Schema(
     description: { type: String, required: true },
     phone: { type: Number, required: true },
     email: { type: String },
+    username: { type: String },
     duration: { type: Number },
     photos: { type: Array, required: true },
     ownerEmail: { type: String, required: true },
