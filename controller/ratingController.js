@@ -110,3 +110,17 @@ exports.getSingleRatings = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+exports.deleteReviews = async (req, res) => {
+  const { ratingId } = req.params;
+  const user = req.user;
+  try {
+    const rating = await Rating.findOne({ _id: ratingId });
+    if (user.type === "admin" && rating) {
+      await Rating.deleteOne({ _id: ratingId });
+      res.status(200).json({ message: "Deleted rating" });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};

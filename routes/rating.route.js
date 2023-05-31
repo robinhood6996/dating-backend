@@ -6,6 +6,12 @@ const router = express.Router();
 
 router.post("/add", authenticate, upload.any(), RatingController.addRating);
 router.get("/", authenticate, upload.any(), RatingController.getAllRatings);
+router.delete(
+  "/:ratingId",
+  authenticate,
+  upload.any(),
+  RatingController.deleteReviews
+);
 router.get(
   "/:ratingId",
   authenticate,
