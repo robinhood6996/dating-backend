@@ -9,6 +9,8 @@ const cityTourSchema = new mongoose.Schema({
   city: { type: String, required: true },
   status: { type: String, default: "pending" },
   profileImage: { type: String },
+  username: { type: String },
+  escort: { type: String },
   escortEmail: { type: String, required: true },
 });
 cityTourSchema.statics.deleteById = function (_id) {

@@ -71,8 +71,8 @@ router.post("/checkout-banner", async (req, res) => {
       userEmail: req.body.userEmail,
       name: req.body.name,
       cart: JSON.stringify(req.body.cartItems),
+      position: req.body.type,
       type: req.body.type,
-      packageType: req.body.packageType,
       duration: req.body.duration,
       price: req.body.price,
       orderId: req.body.orderId,
@@ -152,7 +152,7 @@ router.post(
         .retrieve(data.customer)
         .then(async (customer) => {
           try {
-            // console.log(type, customer);
+            console.log("customer", customer);
             // CREATE ORDER
             createMembershipOrder(customer, data);
             // if (data?.metadata?.type === "escortAd") {
