@@ -15,9 +15,12 @@ const bannerSchema = new mongoose.Schema(
     image: { type: [], required: true },
     duration: { type: Number, required: true },
     payAmount: { type: Number, required: true },
+    paymentMedia: { type: String, enum: ["card", "bank"] },
     paymentDetails: { type: Object, default: {} },
     isPaid: { type: Boolean, default: false },
     isBank: { type: Boolean, default: false },
+    startDate: { type: Date },
+    endDate: { type: Date },
   },
   { timestamps: true }
 );
