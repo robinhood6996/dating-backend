@@ -32,6 +32,7 @@ router.post("/checkout-payment", async (req, res) => {
       duration: req.body.duration,
       price: req.body.price,
       orderId: req.body.orderId,
+      payType: req.body.payType,
     },
   });
 
@@ -71,8 +72,6 @@ router.post("/checkout-banner", async (req, res) => {
       userEmail: req.body.userEmail,
       name: req.body.name,
       cart: JSON.stringify(req.body.cartItems),
-      position: req.body.type,
-      type: req.body.type,
       duration: req.body.duration,
       price: req.body.price,
       orderId: req.body.orderId,
@@ -114,7 +113,7 @@ router.post(
   async (req, res) => {
     let data;
     let eventType;
-
+    console.log("req", req);
     // Check if webhook signing is configured.
     let webhookSecret;
     //webhookSecret = process.env.STRIPE_WEB_HOOK;
@@ -154,9 +153,9 @@ router.post(
           try {
             console.log("customer", customer);
             // CREATE ORDER
+            // console.log("escortAd", customer);
             createMembershipOrder(customer, data);
             // if (data?.metadata?.type === "escortAd") {
-            //   console.log("escortAd");
             //   createMembershipOrder(customer, data);
             // } else if (data?.metadata?.type === "bannerAd") {
             //   addBanner(customer, data);
@@ -174,6 +173,9 @@ router.post(
 
 const createMembershipOrder = async (customer, data) => {
   const orderDetails = JSON.parse(customer.metadata.cart)[0];
+  if (orderDetails.payType === "banner") {
+    return addBanner(customer, data);
+  }
   console.log("customer", customer, data);
   let paymentDetails = {
     paymentIntentId: data.payment_intent,
@@ -214,90 +216,30 @@ const createMembershipOrder = async (customer, data) => {
 };
 
 const addBanner = async (customer, data) => {
+  console.log("Banner ...............................");
   try {
     const orderDetails = JSON.parse(customer.metadata.cart)[0];
     const username = customer.metadata.userId;
-    const {
-      position,
-      country,
-      city,
-      duration,
-      payAmount,
-      name,
-      email,
-      images,
-    } = orderDetails;
-    const files = req.file;
-    // Check if required fields are provided
-    if (
-      !position ||
-      !country ||
-      !city ||
-      !duration ||
-      !payAmount ||
-      !email ||
-      !name
-    ) {
-      return res.status(400).json({ message: "Missing required fields" });
-    }
-
-    // Check if position is a valid value
-    const validPositions = ["top", "left", "right"];
-    if (!validPositions.includes(position)) {
-      return res.status(400).json({ message: "Invalid position" });
-    }
-
-    // Check if duration is a positive number
-    if (duration <= 0) {
-      return res
-        .status(400)
-        .json({ message: "Duration must be a positive number" });
-    }
-
-    // Check if price is a positive number
-    if (payAmount <= 0) {
-      return res
-        .status(400)
-        .json({ message: "Price must be a positive number" });
-    }
+    const orderId = customer.metadata.orderId;
+    const type = customer.metadata.type;
 
     // Check if paymentStatus is a valid value
     let paymentDetails = {
       paymentIntentId: data.paymentIntentId,
       paymentStatus: data.payment_status,
-      customerId: data.customer,
       userId: customer.metadata.userId,
     };
-    // Create and save the new banner
-    const banner = new Banner({
-      position,
-      country,
-      city,
-      image: images,
-      duration,
-      price,
-      username,
-      email,
-      paymentDetails,
-      isPaid: true,
-      isBank: false,
-    });
-    await banner.save();
+    let Ad = await Banner.findOne({ _id: orderDetails?.orderId });
+    Ad.paymentDetails = paymentDetails;
+    Ad.isPaid = true;
 
-    res.status(201).json({
-      banner,
-      message: "You purchased banner advertisement successfully",
-    });
+    await Ad.save();
   } catch (error) {
     console.error(error);
-
     // If the error is a Mongoose validation error, return the specific error message
     if (error.name === "ValidationError") {
       const errors = Object.values(error.errors).map((err) => err.message);
-      return res.status(400).json({ message: errors.join(", ") });
     }
-
-    res.status(500).json({ message: "Internal server error" });
   }
 };
 module.exports = router;
