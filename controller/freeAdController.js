@@ -153,7 +153,7 @@ exports.deleteAd = async (req, res) => {
   try {
     const { email } = req.user;
     const { adId } = req.params;
-    const foundAd = await FreeAd.findOne({ email, _id: adId });
+    const foundAd = await FreeAd.findOne({ _id: adId });
     if (foundAd) {
       let images = foundAd.photos;
       if (images.length > 0) {
