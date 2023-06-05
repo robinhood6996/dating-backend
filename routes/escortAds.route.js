@@ -7,7 +7,8 @@ const upload = require("multer")();
 
 router.post("/", authenticate, upload.any(), adsController.addEscortAd);
 router.put("/:adId", authenticate, adsController.updateIsPaidStatus);
-router.get("/featured", authenticate, adsController.getFeaturedEscorts);
-router.get("/girl-of-the-month", authenticate, adsController.getGirlofTheMonth);
+router.get("/get-all", authenticate, adsController.getAllEscortsAd);
+router.get("/featured", adsController.getFeaturedEscorts);
+router.get("/girl-of-the-month", adsController.getGirlofTheMonth);
 
 module.exports = router;

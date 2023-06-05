@@ -113,7 +113,6 @@ router.post(
   async (req, res) => {
     let data;
     let eventType;
-    console.log("req", req);
     // Check if webhook signing is configured.
     let webhookSecret;
     //webhookSecret = process.env.STRIPE_WEB_HOOK;
@@ -145,13 +144,10 @@ router.post(
 
     // Handle the checkout.session.completed event
     if (eventType === "checkout.session.completed") {
-      console.log("event", data);
-
       stripe.customers
         .retrieve(data.customer)
         .then(async (customer) => {
           try {
-            console.log("customer", customer);
             // CREATE ORDER
             // console.log("escortAd", customer);
             createMembershipOrder(customer, data);
@@ -173,10 +169,10 @@ router.post(
 
 const createMembershipOrder = async (customer, data) => {
   const orderDetails = JSON.parse(customer.metadata.cart)[0];
+  console.log("data---------", data, customer);
   if (orderDetails.payType === "banner") {
     return addBanner(customer, data);
   }
-  console.log("customer", customer, data);
   let paymentDetails = {
     paymentIntentId: data.payment_intent,
     paymentStatus: data.payment_status,
@@ -216,12 +212,9 @@ const createMembershipOrder = async (customer, data) => {
 };
 
 const addBanner = async (customer, data) => {
-  console.log("Banner ...............................");
   try {
+    console.log("data=>", data);
     const orderDetails = JSON.parse(customer.metadata.cart)[0];
-    const username = customer.metadata.userId;
-    const orderId = customer.metadata.orderId;
-    const type = customer.metadata.type;
 
     // Check if paymentStatus is a valid value
     let paymentDetails = {
