@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Banner = require("../controller/bannerController");
 const multer = require("multer");
-
+const { authenticate } = require("../middleware/tokenMiddleware");
 const storage = multer.diskStorage({
   destination: function (request, file, callback) {
     callback(null, "./uploads/banner");
@@ -15,9 +15,9 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 // POST route to add a new banner
-// router.post("/", upload.single("image"), Banner.addBanner);
+router.post("/", authenticate, upload.any("image"), Banner.addBanner);
 router.get("/", Banner.getAllBanners);
 // router.put("/:bannerId", upload.any(), Banner.editBanner);
-router.delete("/:bannerId", Banner.deleteBanner);
+router.delete("/:bannerId", authenticate, Banner.deleteBanner);
 
 module.exports = router;

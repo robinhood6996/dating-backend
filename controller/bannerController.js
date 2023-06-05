@@ -1,87 +1,91 @@
 const Banner = require("../models/banner.model");
 const User = require("../models/user.model");
-// exports.addBanner = async (req, res) => {
-//   try {
-//     const {
-//       position,
-//       country,
-//       city,
-//       duration,
-//       price,
-//       userName,
-//       userEmail,
-//       paymentStatus,
-//     } = req.body;
-//     const files = req.file;
-//     console.log("files", files, req.body);
-//     //Check user existence
-//     let userExist = await User.findOne({ email: userEmail });
-//     if (!userExist) {
-//       return res.send(401).json("Unauthorised");
-//     }
+exports.addBanner = async (req, res) => {
+  try {
+    const {
+      position,
+      country,
+      city,
+      duration,
+      payAmount,
+      name,
+      username,
+      email,
+      paymentMedia,
+      paymentStatus,
+    } = req.body;
+    const files = req.files;
+    console.log("files", files, req.body);
+    //Check user existence
+    // let userExist = await User.findOne({ email });
+    // if (!userExist) {
+    //   return res.send(401).json("Unauthorised");
+    // }
 
-//     // Check if required fields are provided
-//     if (
-//       !position ||
-//       !country ||
-//       !city ||
-//       !duration ||
-//       !price ||
-//       !userName ||
-//       !userEmail
-//     ) {
-//       return res.status(400).json({ message: "Missing required fields" });
-//     }
+    // Check if required fields are provided
+    if (
+      !position ||
+      !country ||
+      !city ||
+      !duration ||
+      !payAmount ||
+      !username ||
+      !email
+    ) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
 
-//     // Check if position is a valid value
-//     const validPositions = ["top", "left", "right"];
-//     if (!validPositions.includes(position)) {
-//       return res.status(400).json({ message: "Invalid position" });
-//     }
+    // Check if position is a valid value
+    // const validPositions = ["top", "left", "right"];
+    // if (!validPositions.includes(position)) {
+    //   return res.status(400).json({ message: "Invalid position" });
+    // }
 
-//     // Check if duration is a positive number
-//     if (duration <= 0) {
-//       return res
-//         .status(400)
-//         .json({ message: "Duration must be a positive number" });
-//     }
+    // Check if duration is a positive number
+    if (duration <= 0) {
+      return res
+        .status(400)
+        .json({ message: "Duration must be a positive number" });
+    }
 
-//     // Check if price is a positive number
-//     if (price <= 0) {
-//       return res
-//         .status(400)
-//         .json({ message: "Price must be a positive number" });
-//     }
+    // Check if price is a positive number
+    if (payAmount <= 0) {
+      return res
+        .status(400)
+        .json({ message: "Price must be a positive number" });
+    }
 
-//     // Check if paymentStatus is a valid value
+    // Check if paymentStatus is a valid value
 
-//     // Create and save the new banner
-//     const banner = new Banner({
-//       position,
-//       country,
-//       city,
-//       image: { filename: files.filename, path: files.path },
-//       duration,
-//       price,
-//       userName,
-//       userEmail,
-//       paymentStatus,
-//     });
-//     await banner.save();
+    // Create and save the new banner
+    const banner = new Banner({
+      position,
+      country,
+      city,
+      image: { filename: files[0].filename, path: files[0].path },
+      duration,
+      payAmount: parseInt(payAmount),
+      paymentMedia,
+      name,
+      username,
+      email,
+      paymentStatus,
+    });
+    await banner.save();
 
-//     res.status(201).json({ banner });
-//   } catch (error) {
-//     console.error(error);
+    return res.status(201).json({ banner });
+  } catch (error) {
+    console.error(error);
 
-//     // If the error is a Mongoose validation error, return the specific error message
-//     if (error.name === "ValidationError") {
-//       const errors = Object.values(error.errors).map((err) => err.message);
-//       return res.status(400).json({ message: errors.join(", ") });
-//     }
+    // If the error is a Mongoose validation error, return the specific error message
+    if (error.name === "ValidationError") {
+      const errors = Object.values(error.errors).map((err) => err.message);
+      return res.status(400).json({ message: errors.join(", ") });
+    }
 
-//     res.status(500).json({ message: "Internal server error" });
-//   }
-// };
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
 
 exports.getAllBanners = async (req, res) => {
   try {
