@@ -89,6 +89,49 @@ exports.getGirlofTheMonth = async (req, res) => {
   }
 };
 
+exports.getAllEscortsAd = async (req, res) => {
+  const { type } = req.user;
+  const { isPaid, expired, limit, offset } = req.query;
+
+  if (type === "admin") {
+    if (expired === undefined) {
+      const query = {};
+      if (isPaid !== undefined) {
+        query.isPaid = isPaid;
+      }
+      const today = new Date();
+      query.expirationDate = { $gt: today };
+      try {
+        const ads = await EscortAd.find(query).limit(limit).skip(offset);
+        res.status(200).json({ ads });
+      } catch (error) {
+        console.error("Error updating isPaid status:", error);
+        res.status(500).json({ error: "Failed to update isPaid status" });
+      }
+    } else {
+      const today = new Date();
+
+      const ads = await EscortAd.aggregate([
+        {
+          $addFields: {
+            expirationDate: {
+              $add: ["$createdAt", { $multiply: ["$duration", 1000] }], // Assuming duration is in seconds
+            },
+          },
+        },
+        {
+          $match: {
+            expirationDate: { $lt: today },
+          },
+        },
+      ]);
+
+      res.status(200).json({ ads });
+    }
+  } else {
+    return res.status(403).json("You are not allowed");
+  }
+};
 exports.updateIsPaidStatus = async (req, res) => {
   const { type } = req.user;
   const { adId } = req.params;
