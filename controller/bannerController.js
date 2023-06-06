@@ -1,11 +1,32 @@
 const Banner = require("../models/banner.model");
 const User = require("../models/user.model");
+
+
+function calculateFutureDate(date, duration) {
+  const millisecondsInDay = 24 * 60 * 60 * 1000; // Number of milliseconds in a day
+
+  // Convert the date to milliseconds
+  const dateInMilliseconds = date.getTime();
+
+  // Calculate the future date by adding the duration (in days) to the given date
+  const futureDateInMilliseconds = dateInMilliseconds + (duration * millisecondsInDay);
+
+  // Create a new Date object with the future date in milliseconds
+  const futureDate = new Date(futureDateInMilliseconds);
+
+  return futureDate;
+}
+
+
 exports.addBanner = async (req, res) => {
   try {
     const {
       position,
       country,
       city,
+      url,
+      startDate,
+      endDate,
       duration,
       payAmount,
       name,
@@ -16,7 +37,7 @@ exports.addBanner = async (req, res) => {
     } = req.body;
     const files = req.files.find(file => file.fieldname === 'image');
     const receipt = req.files.find(file => file.fieldname === 'bank');
-    console.log('receipt',  req.files)
+    console.log('receipt', req.files)
     //Check user existence
     // let userExist = await User.findOne({ email });
     // if (!userExist) {
@@ -31,7 +52,8 @@ exports.addBanner = async (req, res) => {
       !duration ||
       !payAmount ||
       !username ||
-      !email
+      !email ||
+      !startDate
     ) {
       return res.status(400).json({ message: "Missing required fields" });
     }
@@ -55,52 +77,52 @@ exports.addBanner = async (req, res) => {
         .status(400)
         .json({ message: "Price must be a positive number" });
     }
-
-    // Check if paymentStatus is a valid value
-
+ 
     // Create and save the new banner
-  if(paymentMedia === 'bank'){
-    const banner = new Banner({
-      position,
-      country,
-      city,
-      image: { filename: files.filename, path: files.path },
-      duration,
-      payAmount: parseInt(payAmount),
-      paymentMedia,
-      name,
-      username,
-      email,
-      paymentStatus,
-      paymentDetails: {
-        receipt: {
-         filename: receipt.filename,
-         path: files.path
+    if (paymentMedia === 'bank') {
+      const banner = new Banner({
+        position,
+        country,
+        city,
+        image: { filename: files.filename, path: files.path },
+        duration,
+        payAmount: parseInt(payAmount),
+        paymentMedia,
+        name,
+        username,
+        email,
+        startDate,
+        endDate,
+        paymentStatus,
+        paymentDetails: {
+          receipt: {
+            filename: receipt.filename,
+            path: files.path
+          }
         }
-      }
-    });
-     await banner.save();
-     return res.status(201).json({ banner });
-  }else{
-    const banner = new Banner({
-      position,
-      country,
-      city,
-      image: { filename: files[0].filename, path: files[0].path },
-      duration,
-      payAmount: parseInt(payAmount),
-      paymentMedia,
-      name,
-      username,
-      email,
-      paymentStatus,
-    });
-     await banner.save();
-     return res.status(201).json({ banner });
-  }
-   
+      });
+      await banner.save();
+      return res.status(201).json({ banner });
+    } else {
+      const banner = new Banner({
+        position,
+        country,
+        city,
+        image: { filename: files[0].filename, path: files[0].path },
+        duration,
+        payAmount: parseInt(payAmount),
+        paymentMedia,
+        name,
+        username,
+        email,
+        paymentStatus,
+      });
+      await banner.save();
+      return res.status(201).json({ banner });
+    }
 
-    
+
+
   } catch (error) {
     console.error(error);
 
@@ -137,45 +159,45 @@ exports.getAllBanners = async (req, res) => {
   }
 };
 
-// exports.editBanner = async (req, res) => {
-//   try {
-//     const bannerId = req.params.bannerId;
-//     const bannerData = req.body;
+exports.editBanner = async (req, res) => {
+  try {
+    const bannerId = req.params.bannerId;
+    const { isPaid, url,  } = req.body;
 
-//     if (!bannerId) {
-//       return res.status(400).json({ message: "Banner ID is required" });
-//     }
+    if (!bannerId) {
+      return res.status(400).json({ message: "Banner ID is required" });
+    }
 
-//     if (!bannerData) {
-//       return res.status(400).json({ message: "Banner data is required" });
-//     }
+    if (!bannerData) {
+      return res.status(400).json({ message: "Banner data is required" });
+    }
 
-//     const existingBanner = await Banner.findById(bannerId);
+    const existingBanner = await Banner.findById(bannerId);
 
-//     if (!existingBanner) {
-//       return res.status(404).json({ message: "Banner not found" });
-//     }
+    if (!existingBanner) {
+      return res.status(404).json({ message: "Banner not found" });
+    }
 
-//     if (bannerData.user) {
-//       return res.status(400).json({ message: "User cannot be modified" });
-//     }
+    if (bannerData.user) {
+      return res.status(400).json({ message: "User cannot be modified" });
+    }
 
-//     const updatedBanner = await Banner.findByIdAndUpdate(bannerId, bannerData, {
-//       new: true,
-//     });
+    const updatedBanner = await Banner.findByIdAndUpdate(bannerId, bannerData, {
+      new: true,
+    });
 
-//     res.json({ banner: updatedBanner });
-//   } catch (err) {
-//     console.error(err);
-//     if (err instanceof mongoose.Error.ValidationError) {
-//       const errorMessages = Object.values(err.errors).map(
-//         (error) => error.message
-//       );
-//       return res.status(400).json({ message: errorMessages });
-//     }
-//     res.status(500).json({ message: "Internal server error" });
-//   }
-// };
+    res.json({ banner: updatedBanner });
+  } catch (err) {
+    console.error(err);
+    if (err instanceof mongoose.Error.ValidationError) {
+      const errorMessages = Object.values(err.errors).map(
+        (error) => error.message
+      );
+      return res.status(400).json({ message: errorMessages });
+    }
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
 
 exports.deleteBanner = async (req, res) => {
   try {
@@ -195,5 +217,18 @@ exports.deleteBanner = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
+exports.getMyBanners = async (req, res) => {
+  try {
+    const {email} = req.user;
+
+    const banners = await Banner.find({email});
+    return res.status(200).json({ banners });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };

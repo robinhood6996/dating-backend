@@ -147,14 +147,7 @@ router.post(
         .retrieve(data.customer)
         .then(async (customer) => {
           try {
-            // CREATE ORDER
-            // console.log("escortAd", customer);
-            addBanner(customer, data);
-            // if (data?.metadata?.type === "escortAd") {
-            //   createMembershipOrder(customer, data);
-            // } else if (data?.metadata?.type === "bannerAd") {
-            //   addBanner(customer, data);
-            // }
+              createMembershipOrder(customer, data);
           } catch (err) {
             console.log(typeof createOrder);
             console.log(err);

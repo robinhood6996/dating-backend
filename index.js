@@ -70,7 +70,7 @@ mongoose
       const { filename } = req.params;
       res.sendFile(`${__dirname}/uploads/escort/videos/${filename}`);
     });
-    app.get("/banner/:filename", (req, res) => {
+    app.get("/banners/:filename", (req, res) => {
       const { filename } = req.params;
       res.sendFile(`${__dirname}/uploads/banner/${filename}`);
     });
