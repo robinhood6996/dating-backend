@@ -64,7 +64,7 @@ exports.addBanner = async (req, res) => {
       position,
       country,
       city,
-      image: { filename: files[0].filename, path: files[0].path },
+      image: { filename: files.filename, path: files.path },
       duration,
       payAmount: parseInt(payAmount),
       paymentMedia,
@@ -74,13 +74,13 @@ exports.addBanner = async (req, res) => {
       paymentStatus,
       paymentDetails: {
         receipt: {
-         filename: receipt[0].filename,
-         path: files[0].path
+         filename: receipt.filename,
+         path: files.path
         }
       }
     });
-     // await banner.save();
-    //  return res.status(201).json({ banner });
+     await banner.save();
+     return res.status(201).json({ banner });
   }else{
     const banner = new Banner({
       position,
@@ -95,8 +95,8 @@ exports.addBanner = async (req, res) => {
       email,
       paymentStatus,
     });
-     // await banner.save();
-    //  return res.status(201).json({ banner });
+     await banner.save();
+     return res.status(201).json({ banner });
   }
    
 
