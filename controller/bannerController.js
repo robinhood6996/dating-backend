@@ -15,7 +15,6 @@ exports.addBanner = async (req, res) => {
       paymentStatus,
     } = req.body;
     const files = req.files;
-    console.log("files", files, req.body);
     //Check user existence
     // let userExist = await User.findOne({ email });
     // if (!userExist) {

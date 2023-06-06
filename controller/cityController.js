@@ -3,7 +3,6 @@ const Countries = require("../models/countries.model");
 
 exports.addCity = async (req, res) => {
   try {
-    console.log("city", req.body);
     const { name, country } = req.body;
 
     if (!country) {
@@ -20,7 +19,6 @@ exports.addCity = async (req, res) => {
 
     // Check if city exists
     const cityExists = await Cities.findOne({ name: name });
-    console.log("cityExists", cityExists);
     if (cityExists) {
       return res.status(400).json({ message: "City already exists" });
     }

@@ -8,7 +8,6 @@ const storage = multer.diskStorage({
     callback(null, "./uploads/banner");
   },
   filename: function (request, file, callback) {
-    console.log(file);
     callback(null, Date.now() + "-" + file.originalname);
   },
 });

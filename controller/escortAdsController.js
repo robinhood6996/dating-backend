@@ -99,10 +99,9 @@ exports.getAllEscortsAd = async (req, res) => {
       if (isPaid !== undefined) {
         query.isPaid = isPaid;
       }
-      const today = new Date();
-      query.expirationDate = { $gt: today };
+      
       try {
-        const ads = await EscortAd.find(query).limit(limit).skip(offset);
+        const ads = await EscortAd.find({...query}).limit(limit).skip(offset);
         res.status(200).json({ ads });
       } catch (error) {
         console.error("Error updating isPaid status:", error);

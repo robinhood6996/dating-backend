@@ -4,7 +4,6 @@ const { verification } = require("../models/verification.model");
 exports.verificationRequest = async (req, res) => {
   try {
     let user = req.user;
-    console.log(req.user);
     if (req.files) {
       let files = req.files;
       let escort = await EscortProfile.findOne({ email: user.email });

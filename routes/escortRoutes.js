@@ -10,7 +10,6 @@ const storage = multer.diskStorage({
     callback(null, "./uploads/escort");
   },
   filename: function (request, file, callback) {
-    console.log(file);
     callback(null, Date.now() + "-" + file.originalname);
   },
 });
@@ -19,7 +18,6 @@ const storageVideos = multer.diskStorage({
     callback(null, "./uploads/escort/videos");
   },
   filename: function (request, file, callback) {
-    console.log(file);
     callback(null, Date.now() + "-" + file.originalname);
   },
 });

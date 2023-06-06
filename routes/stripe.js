@@ -20,7 +20,6 @@ function getFutureDate(numberOfDays) {
 }
 
 router.post("/checkout-payment", async (req, res) => {
-  console.log("checkout-body", req.body);
   const customer = await stripe.customers.create({
     metadata: {
       userId: req.body.userId,
@@ -65,7 +64,7 @@ router.post("/checkout-payment", async (req, res) => {
 
 //For Banner advertising
 router.post("/checkout-banner", async (req, res) => {
-  console.log("checkout-body", req.body);
+  console.log("checkout-banner", req.body);
   const customer = await stripe.customers.create({
     metadata: {
       userId: req.body.userId,
@@ -150,7 +149,7 @@ router.post(
           try {
             // CREATE ORDER
             // console.log("escortAd", customer);
-            createMembershipOrder(customer, data);
+            addBanner(customer, data);
             // if (data?.metadata?.type === "escortAd") {
             //   createMembershipOrder(customer, data);
             // } else if (data?.metadata?.type === "bannerAd") {
