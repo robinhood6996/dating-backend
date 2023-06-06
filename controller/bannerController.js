@@ -14,7 +14,9 @@ exports.addBanner = async (req, res) => {
       paymentMedia,
       paymentStatus,
     } = req.body;
-    const files = req.files;
+    const files = req.files.find(file => file.fieldname === 'image');
+    const receipt = req.files.find(file => file.fieldname === 'bank');
+    console.log('receipt',  req.files)
     //Check user existence
     // let userExist = await User.findOne({ email });
     // if (!userExist) {
@@ -57,6 +59,29 @@ exports.addBanner = async (req, res) => {
     // Check if paymentStatus is a valid value
 
     // Create and save the new banner
+  if(paymentMedia === 'bank'){
+    const banner = new Banner({
+      position,
+      country,
+      city,
+      image: { filename: files[0].filename, path: files[0].path },
+      duration,
+      payAmount: parseInt(payAmount),
+      paymentMedia,
+      name,
+      username,
+      email,
+      paymentStatus,
+      paymentDetails: {
+        receipt: {
+         filename: receipt[0].filename,
+         path: files[0].path
+        }
+      }
+    });
+     // await banner.save();
+    //  return res.status(201).json({ banner });
+  }else{
     const banner = new Banner({
       position,
       country,
@@ -70,9 +95,12 @@ exports.addBanner = async (req, res) => {
       email,
       paymentStatus,
     });
-    await banner.save();
+     // await banner.save();
+    //  return res.status(201).json({ banner });
+  }
+   
 
-    return res.status(201).json({ banner });
+    
   } catch (error) {
     console.error(error);
 
