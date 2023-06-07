@@ -232,3 +232,13 @@ exports.getMyBanners = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+exports.getPositionBanners = async (req, res) => {
+  try {
+    const {position} = req.query;
+    const banners = await Banner.find({position, isPaid: true});
+    return res.status(200).json({ banners });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
