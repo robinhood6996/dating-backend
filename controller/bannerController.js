@@ -1,7 +1,6 @@
 const Banner = require("../models/banner.model");
 const User = require("../models/user.model");
 
-
 function calculateFutureDate(date, duration) {
   const millisecondsInDay = 24 * 60 * 60 * 1000; // Number of milliseconds in a day
 
@@ -9,14 +8,14 @@ function calculateFutureDate(date, duration) {
   const dateInMilliseconds = date.getTime();
 
   // Calculate the future date by adding the duration (in days) to the given date
-  const futureDateInMilliseconds = dateInMilliseconds + (duration * millisecondsInDay);
+  const futureDateInMilliseconds =
+    dateInMilliseconds + duration * millisecondsInDay;
 
   // Create a new Date object with the future date in milliseconds
   const futureDate = new Date(futureDateInMilliseconds);
 
   return futureDate;
 }
-
 
 exports.addBanner = async (req, res) => {
   try {
@@ -35,9 +34,7 @@ exports.addBanner = async (req, res) => {
       paymentMedia,
       paymentStatus,
     } = req.body;
-    const files = req.files.find(file => file.fieldname === 'image');
-    const receipt = req.files.find(file => file.fieldname === 'bank');
-    console.log('receipt', req.files)
+
     //Check user existence
     // let userExist = await User.findOne({ email });
     // if (!userExist) {
@@ -57,7 +54,7 @@ exports.addBanner = async (req, res) => {
     ) {
       return res.status(400).json({ message: "Missing required fields" });
     }
-
+    console.log("files", req.files);
     // Check if position is a valid value
     // const validPositions = ["top", "left", "right"];
     // if (!validPositions.includes(position)) {
@@ -77,9 +74,11 @@ exports.addBanner = async (req, res) => {
         .status(400)
         .json({ message: "Price must be a positive number" });
     }
- 
+
     // Create and save the new banner
-    if (paymentMedia === 'bank') {
+    if (paymentMedia === "bank") {
+      const files = req.files.find((file) => file.fieldname === "image");
+      const receipt = req.files.find((file) => file.fieldname === "bank");
       const banner = new Banner({
         position,
         country,
@@ -97,18 +96,19 @@ exports.addBanner = async (req, res) => {
         paymentDetails: {
           receipt: {
             filename: receipt.filename,
-            path: files.path
-          }
-        }
+            path: files.path,
+          },
+        },
       });
       await banner.save();
       return res.status(201).json({ banner });
     } else {
+      const files = req.files.find((file) => file.fieldname === "image");
       const banner = new Banner({
         position,
         country,
         city,
-        image: { filename: files[0].filename, path: files[0].path },
+        image: { filename: files.filename, path: files.path },
         duration,
         payAmount: parseInt(payAmount),
         paymentMedia,
@@ -120,9 +120,6 @@ exports.addBanner = async (req, res) => {
       await banner.save();
       return res.status(201).json({ banner });
     }
-
-
-
   } catch (error) {
     console.error(error);
 
@@ -162,7 +159,7 @@ exports.getAllBanners = async (req, res) => {
 exports.editBanner = async (req, res) => {
   try {
     const bannerId = req.params.bannerId;
-    const { isPaid, url,  } = req.body;
+    const { isPaid, url } = req.body;
 
     if (!bannerId) {
       return res.status(400).json({ message: "Banner ID is required" });
@@ -201,18 +198,18 @@ exports.editBanner = async (req, res) => {
 
 exports.deleteBanner = async (req, res) => {
   try {
-    const bannerId = req.params.id;
-    const banner = await Banner.findById(bannerId);
+    const { id } = req.query;
+    const banner = await Banner.findOne({ _id: id });
     if (!banner) {
       return res.status(404).json({ message: "Banner not found" });
     }
-
+    console.log("banner", banner);
     // Check if user type is admin
     // if (req.user.type !== "admin") {
     //   return res.status(403).json({ message: "Not authorized" });
     // }
 
-    await banner.delete();
+    await banner.deleteOne();
     res.json({ message: "Banner deleted successfully" });
   } catch (err) {
     console.error(err);
@@ -220,12 +217,11 @@ exports.deleteBanner = async (req, res) => {
   }
 };
 
-
 exports.getMyBanners = async (req, res) => {
   try {
-    const {email} = req.user;
+    const { email } = req.user;
 
-    const banners = await Banner.find({email});
+    const banners = await Banner.find({ email });
     return res.status(200).json({ banners });
   } catch (err) {
     console.error(err);
@@ -234,8 +230,8 @@ exports.getMyBanners = async (req, res) => {
 };
 exports.getPositionBanners = async (req, res) => {
   try {
-    const {position} = req.query;
-    const banners = await Banner.find({position, isPaid: true});
+    const { position } = req.query;
+    const banners = await Banner.find({ position, isPaid: true });
     return res.status(200).json({ banners });
   } catch (err) {
     console.error(err);

@@ -147,7 +147,7 @@ router.post(
         .retrieve(data.customer)
         .then(async (customer) => {
           try {
-              createMembershipOrder(customer, data);
+            createMembershipOrder(customer, data);
           } catch (err) {
             console.log(typeof createOrder);
             console.log(err);
@@ -210,7 +210,7 @@ const addBanner = async (customer, data) => {
 
     // Check if paymentStatus is a valid value
     let paymentDetails = {
-      paymentIntentId: data.paymentIntentId,
+      paymentIntentId: data.payment_intent,
       paymentStatus: data.payment_status,
       userId: customer.metadata.userId,
     };
