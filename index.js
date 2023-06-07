@@ -16,6 +16,7 @@ const functions = require("firebase-functions");
 const stripe = require("./routes/stripe");
 const defaultUser = require("./routes/defaultUser.route");
 const Rating = require("./routes/rating.route");
+const escortAd = require("./routes/escortAds.route");
 const cron = require("node-cron");
 
 const app = express();
@@ -69,7 +70,7 @@ mongoose
       const { filename } = req.params;
       res.sendFile(`${__dirname}/uploads/escort/videos/${filename}`);
     });
-    app.get("/banner/:filename", (req, res) => {
+    app.get("/banners/:filename", (req, res) => {
       const { filename } = req.params;
       res.sendFile(`${__dirname}/uploads/banner/${filename}`);
     });
@@ -85,6 +86,7 @@ mongoose
     app.use("/verification", verification);
     app.use("/rating", Rating);
     app.use("/stripe", stripe);
+    app.use("/escort-ad", escortAd);
     // cron.schedule("* * * * *", myConstroller);
     exports.api = functions.https.onRequest(app);
   })

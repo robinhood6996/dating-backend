@@ -7,6 +7,18 @@ const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 const router = express.Router();
 const { EscortProfile } = require("../models/escort.model");
 
+function getFutureDate(numberOfDays) {
+  // Create a new Date object for the current date
+  let currentDate = new Date();
+
+  // Calculate the future date by adding the specified number of days
+  let futureDate = new Date();
+  futureDate.setDate(currentDate.getDate() + numberOfDays);
+
+  // Return the future date
+  return futureDate;
+}
+
 router.post("/checkout-payment", async (req, res) => {
   const customer = await stripe.customers.create({
     metadata: {
@@ -15,6 +27,11 @@ router.post("/checkout-payment", async (req, res) => {
       name: req.body.name,
       cart: JSON.stringify(req.body.cartItems),
       type: req.body.type,
+      packageType: req.body.packageType,
+      duration: req.body.duration,
+      price: req.body.price,
+      orderId: req.body.orderId,
+      payType: req.body.payType,
     },
   });
 
@@ -45,16 +62,56 @@ router.post("/checkout-payment", async (req, res) => {
   res.send({ url: session.url });
 });
 
+//For Banner advertising
+router.post("/checkout-banner", async (req, res) => {
+  console.log("checkout-banner", req.body);
+  const customer = await stripe.customers.create({
+    metadata: {
+      userId: req.body.userId,
+      userEmail: req.body.userEmail,
+      name: req.body.name,
+      cart: JSON.stringify(req.body.cartItems),
+      duration: req.body.duration,
+      price: req.body.price,
+      orderId: req.body.orderId,
+    },
+  });
+
+  const line_items = req.body.cartItems.map((item) => {
+    return {
+      price_data: {
+        currency: "eur",
+        product_data: {
+          name: item.name,
+          description: item.desc,
+        },
+        unit_amount: item.price * 100,
+      },
+      quantity: item.quantity,
+    };
+  });
+
+  const session = await stripe.checkout.sessions.create({
+    payment_method_types: ["card"],
+    line_items,
+    mode: "payment",
+    customer: customer.id,
+    success_url: `${process.env.CLIENT_URL}/checkout-success`,
+    cancel_url: `${process.env.CLIENT_URL}/cart`,
+  });
+
+  // res.redirect(303, session.url);
+  res.send({ url: session.url });
+});
 //Webhook
-let endpointSecret =
-  "whsec_013f5baf84ef59e967095114e698669c4d0627a3684b8dfa35cb6b4eb3a86551";
+// let endpointSecret =
+//   "whsec_013f5baf84ef59e967095114e698669c4d0627a3684b8dfa35cb6b4eb3a86551";
 router.post(
   "/webhook",
   express.json({ type: "application/json" }),
   async (req, res) => {
     let data;
     let eventType;
-
     // Check if webhook signing is configured.
     let webhookSecret;
     //webhookSecret = process.env.STRIPE_WEB_HOOK;
@@ -90,13 +147,7 @@ router.post(
         .retrieve(data.customer)
         .then(async (customer) => {
           try {
-            console.log(customer);
-            // CREATE ORDER
-            if (type === "escortAd") {
-              createMembershipOrder(customer, data);
-            } else if (type === "bannerAd") {
-              addBanner(customer, data);
-            }
+            createMembershipOrder(customer, data);
           } catch (err) {
             console.log(typeof createOrder);
             console.log(err);
@@ -110,44 +161,42 @@ router.post(
 
 const createMembershipOrder = async (customer, data) => {
   const orderDetails = JSON.parse(customer.metadata.cart)[0];
-  let packageType = orderDetails.name.includes("VIP")
-    ? 1
-    : orderDetails.name.includes("Featured")
-    ? 2
-    : orderDetails.name.includes("month")
-    ? 3
-    : 4;
-  let paymentMedia = "card";
+  console.log("data---------", data, customer);
+  if (orderDetails.payType === "banner") {
+    return addBanner(customer, data);
+  }
   let paymentDetails = {
-    paymentIntentId: data.paymentIntentId,
+    paymentIntentId: data.payment_intent,
     paymentStatus: data.payment_status,
     customerId: data.customer,
     userId: customer.metadata.userId,
   };
 
-  let escortAd = new EscortAd({
-    name: customer.metadata.name,
-    email: customer.metadata.userEmail,
-    username: customer.metadata.userId,
-    packageType,
-    duration: orderDetails.duration,
-    payAmount: data.amount_total,
-    isPaid: true,
-    paymentMedia,
-    paymentDetails,
-  });
   try {
-    let ad = await escortAd.save();
-    let escort = EscortProfile.findOne({ username });
-    if (escort) {
-      escort.memberShip = packageType;
-      escort.memberShipDetails = {
-        startDate: getFutureDate(0),
-        endDate: getFutureDate(duration),
-      };
-      await escort.save();
+    let Ad = await EscortAd.findOne({ _id: orderDetails?.orderId });
+    if (Ad) {
+      Ad.paymentDetails = paymentDetails;
+      Ad.isPaid = true;
+      await Ad.save();
     }
-    res.status(200).send({ message: "Membership purchase successfully" });
+    EscortProfile.findOneAndUpdate(
+      {
+        username: customer.metadata.userId,
+      },
+      {
+        $addToSet: { memberShip: parseInt(customer.metadata.packageType) },
+        memberShipDetails: {
+          startDate: getFutureDate(0),
+          endDate: getFutureDate(parseInt(customer.metadata.duration)),
+        },
+      }
+    )
+      .then((res) => {
+        console.log("escort updated");
+      })
+      .catch((err) => {
+        console.log("escort err", err);
+      });
   } catch (error) {
     // res.status(500).json({ message: "Failed to create order" });
     console.log(error);
@@ -156,89 +205,26 @@ const createMembershipOrder = async (customer, data) => {
 
 const addBanner = async (customer, data) => {
   try {
+    console.log("data=>", data);
     const orderDetails = JSON.parse(customer.metadata.cart)[0];
-    const username = customer.metadata.userId;
-    const {
-      position,
-      country,
-      city,
-      duration,
-      payAmount,
-      name,
-      email,
-      images,
-    } = orderDetails;
-    const files = req.file;
-    // Check if required fields are provided
-    if (
-      !position ||
-      !country ||
-      !city ||
-      !duration ||
-      !payAmount ||
-      !email ||
-      !name
-    ) {
-      return res.status(400).json({ message: "Missing required fields" });
-    }
-
-    // Check if position is a valid value
-    const validPositions = ["top", "left", "right"];
-    if (!validPositions.includes(position)) {
-      return res.status(400).json({ message: "Invalid position" });
-    }
-
-    // Check if duration is a positive number
-    if (duration <= 0) {
-      return res
-        .status(400)
-        .json({ message: "Duration must be a positive number" });
-    }
-
-    // Check if price is a positive number
-    if (payAmount <= 0) {
-      return res
-        .status(400)
-        .json({ message: "Price must be a positive number" });
-    }
 
     // Check if paymentStatus is a valid value
     let paymentDetails = {
-      paymentIntentId: data.paymentIntentId,
+      paymentIntentId: data.payment_intent,
       paymentStatus: data.payment_status,
-      customerId: data.customer,
       userId: customer.metadata.userId,
     };
-    // Create and save the new banner
-    const banner = new Banner({
-      position,
-      country,
-      city,
-      image: images,
-      duration,
-      price,
-      username,
-      email,
-      paymentDetails,
-      isPaid: true,
-      isBank: false,
-    });
-    await banner.save();
+    let Ad = await Banner.findOne({ _id: orderDetails?.orderId });
+    Ad.paymentDetails = paymentDetails;
+    Ad.isPaid = true;
 
-    res.status(201).json({
-      banner,
-      message: "You purchased banner advertisement successfully",
-    });
+    await Ad.save();
   } catch (error) {
     console.error(error);
-
     // If the error is a Mongoose validation error, return the specific error message
     if (error.name === "ValidationError") {
       const errors = Object.values(error.errors).map((err) => err.message);
-      return res.status(400).json({ message: errors.join(", ") });
     }
-
-    res.status(500).json({ message: "Internal server error" });
   }
 };
 module.exports = router;

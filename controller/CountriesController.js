@@ -6,7 +6,7 @@ exports.createCountry = async (req, res) => {
       let exist = await Countries.findOne({ name: req.body.name });
       if (!exist) {
         let country = new Countries({
-          name: req.body.name,
+          name: req.body.name.toLowerCase(),
           cities: [],
           escortCount: 0,
           cityCount: 0,
@@ -27,6 +27,30 @@ exports.createCountry = async (req, res) => {
   }
 };
 
+exports.editCountry = async (req, res) => {
+  const { id } = req.params; // Assuming the ID is passed as a route parameter
+  const { name } = req.body; // Assuming the new name is provided in the request body
+
+  try {
+    // Find the country by ID
+    const country = await Countries.findById(id);
+
+    if (!country) {
+      // If the country doesn't exist, return an error
+      return res.status(404).json({ error: "Country not found" });
+    }
+    // Update the name of the country
+    country.name = name;
+    // Save the updated country
+    await country.save();
+    // Return the updated country as the response
+    return res.json(country);
+  } catch (error) {
+    // Handle any errors that occur during the process
+    console.error(error);
+    return res.status(500).json({ error: "Server error" });
+  }
+};
 //Get all countries
 exports.getAllCountries = async (req, res) => {
   try {

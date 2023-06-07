@@ -14,7 +14,7 @@ exports.getAllCityTours = async (req, res) => {
 
 exports.createCityTour = async (req, res) => {
   try {
-    const { email: userEmail } = req.user;
+    const { email: userEmail, username } = req.user;
     const { name, dateFrom, dateTo, email, phone, city } = req.body;
     let escort = await EscortProfile.findOne({ email: userEmail });
     // Check if all required fields are present in the request body
@@ -34,6 +34,7 @@ exports.createCityTour = async (req, res) => {
       email,
       phone,
       city,
+      username,
       status: "pending",
       profileImage: escort?.profileImage,
       escortEmail: userEmail,

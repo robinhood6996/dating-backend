@@ -10,7 +10,6 @@ const storage = multer.diskStorage({
     callback(null, "./uploads/escort");
   },
   filename: function (request, file, callback) {
-    console.log(file);
     callback(null, Date.now() + "-" + file.originalname);
   },
 });
@@ -19,7 +18,6 @@ const storageVideos = multer.diskStorage({
     callback(null, "./uploads/escort/videos");
   },
   filename: function (request, file, callback) {
-    console.log(file);
     callback(null, Date.now() + "-" + file.originalname);
   },
 });
@@ -71,6 +69,7 @@ router.put(
   escortController.updateContactData
 );
 router.get("/get-all", escortController.getAllEscort);
+router.get("/get-inactive", escortController.getInactiveEscorts);
 router.get("/", authenticate, escortController.getEscort);
 router.get("/profile", authenticate, escortController.getEscortProfile);
 router.get("/category/:cat", escortController.getEscortByCat);
@@ -111,6 +110,12 @@ router.delete(
   authenticate,
   upload.any(),
   escortController.deleteEscort
+);
+router.put(
+  "/update-status",
+  authenticate,
+  upload.any(),
+  escortController.updateStatus
 );
 
 module.exports = router;

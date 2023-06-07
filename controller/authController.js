@@ -36,7 +36,6 @@ exports.registerUser = async (req, res) => {
 
     // Save the user document
     await user.save();
-    console.log(user.type);
     if (user.type === "escort") {
       let escort = new EscortProfile({
         name: user.name,
@@ -61,7 +60,6 @@ exports.registerUser = async (req, res) => {
     }
     return res.status(201).json({ message: "Successfully registered" });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({ message: "Something went wrong", error });
   }
 };
@@ -82,12 +80,10 @@ exports.login = async (req, res) => {
     const existingUser = await User.findOne({
       email: email,
     });
-    console.log(req.body);
     if (existingUser) {
       // Generate a JWT token
       // const matched = await bcrypt.compare(password, existingUser.password);
       const matched = password === existingUser.password;
-      console.log(matched);
       if (matched) {
         const token = jwt.sign(
           { user: existingUser },
