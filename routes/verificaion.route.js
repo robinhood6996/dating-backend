@@ -14,12 +14,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-router.post(
-  "/",
-  authenticate,
-  upload.array("photos"),
-  verification.verificationRequest
-);
+router.post("/", authenticate, upload.array, verification.verificationRequest);
 router.put(
   "/update",
   authenticate,

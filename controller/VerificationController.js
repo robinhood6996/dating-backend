@@ -6,9 +6,13 @@ exports.verificationRequest = async (req, res) => {
     let user = req.user;
     if (req.files) {
       let files = req.files;
+      console.log("req.files", req.files);
       let escort = await EscortProfile.findOne({ email: user.email });
       if (!escort) {
         return res.status(403).json({ message: "Not allowed" });
+      }
+      if (files.length < 2) {
+        return res.status(400).json({ message: "Photos are required" });
       }
       const verify = new verification({
         name: escort.name,
@@ -36,14 +40,14 @@ exports.verificationApprove = async (req, res) => {
     if (user.type === "admin") {
       if (req.query) {
         let { id, status } = req.query;
-        let verification = await verification.findOne({ _id: id });
-        verification.status = status;
+        let verificationReq = await verification.findOne({ _id: id });
+        verificationReq.status = status;
         let escort = await EscortProfile.findOne({
-          email: verification.userEmail,
+          email: verificationReq.userEmail,
         });
         if (escort) {
           escort.verified = status === "approved" ? true : false;
-          await verification.save();
+          await verificationReq.save();
           await escort.save();
         } else {
           return res.status(404).json({
@@ -67,6 +71,7 @@ exports.verificationApprove = async (req, res) => {
       statusCode: 403,
     });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({ message: "Error", error, statusCode: 500 });
   }
 };
