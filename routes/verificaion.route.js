@@ -12,9 +12,14 @@ const storage = multer.diskStorage({
     callback(null, Date.now() + "-" + file.originalname);
   },
 });
-const upload = multer({ storage: storage });
+let upload = multer({ storage: storage });
 
-router.post("/", authenticate, upload.array, verification.verificationRequest);
+router.post(
+  "/",
+  authenticate,
+  upload.array("photos"),
+  verification.verificationRequest
+);
 router.put(
   "/update",
   authenticate,
@@ -23,5 +28,6 @@ router.put(
 );
 router.get("/", authenticate, verification.getVerificationItems);
 router.get("/:username", authenticate, verification.getSingleUserVerifications);
+router.delete("/delete", authenticate, verification.deleteVerification);
 
 module.exports = router;
