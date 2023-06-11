@@ -907,7 +907,7 @@ exports.workingHours = async (req, res) => {
   try {
     let escort = await EscortProfile.findOne({ email });
     if (escort) {
-      if (available24) {
+      if (available24 !== undefined || available24 !== null) {
         escort.available24 = available24;
       }
       if (availableDate) {
