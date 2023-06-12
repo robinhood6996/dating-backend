@@ -118,5 +118,11 @@ router.put(
   upload.any(),
   escortController.updateStatus
 );
+router.post(
+  "/rate-photo",
+  authenticate,
+  upload.any(),
+  escortController.ratePhotos
+);
 
 module.exports = router;

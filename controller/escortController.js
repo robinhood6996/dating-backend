@@ -1110,13 +1110,13 @@ exports.getEscortVideos = async (req, res) => {
 };
 exports.ratePhotos = async (req, res) => {
   try {
-    let { username: escortUserName, rate } = req.query;
+    let { username: escortUserName, rate } = req.body;
     let { type, email } = req.user;
     if (type !== 'default') {
       return res.status(403).json({ message: 'You should be a user to vote', statusCode: 403 });
     }
     // Fetch all escort profiles from the database
-    const escort = await EscortProfile.findOne({ username });
+    const escort = await EscortProfile.findOne({ username: escortUserName });
     // Send the retrieved data as a response
     let ratedClients = [...escort.ratedClients]
     let exist = ratedClients.find(client => client === email);
@@ -1124,12 +1124,14 @@ exports.ratePhotos = async (req, res) => {
       return res.status(400).json({ message: 'You already voted', statusCode: 400 });
     }
     ratedClients.push(email);
-    let rates = escort.photosRate;
-    existingRate = (existingRate + rate) / ratedClients?.length
-    escort.photosRate = rates;
+    let rates = (parseInt(escort.photosRate) + parseInt(rate));
+    escort.photosRate = Math.ceil(rates);
+    escort.ratedClients = ratedClients;
+    const avg = parseInt(rates) / parseInt(escort.ratedClients?.length);
+    console.log('avg', avg, rates)
+    escort.avgRate = avg.toFixed(1)
     await escort.save();
     return res.status(200).json({ message: 'Successfully rated', statusCode: 200 }); 
-
   } catch (error) {
     // Send an error response if something goes wrong
     res.status(500).json({
