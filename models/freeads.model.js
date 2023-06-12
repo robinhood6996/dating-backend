@@ -5,7 +5,8 @@ const freeAdSchema = new Schema(
   {
     title: { type: String, required: true },
     category: { type: String, required: true },
-    city: { type: String },
+    country: { type: String, required: true },
+    city: { type: String, required: true },
     description: { type: String, required: true },
     phone: { type: Number, required: true },
     email: { type: String },

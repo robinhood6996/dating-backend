@@ -70,6 +70,7 @@ router.put(
 );
 router.get("/get-all", escortController.getAllEscort);
 router.get("/videos", escortController.getEscortVideos);
+router.get("/photo-reviews", escortController.getEscortPhotos);
 router.get("/get-inactive", escortController.getInactiveEscorts);
 router.get("/", authenticate, escortController.getEscort);
 router.get("/profile", authenticate, escortController.getEscortProfile);

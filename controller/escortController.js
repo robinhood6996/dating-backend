@@ -1090,7 +1090,34 @@ exports.getEscortVideos = async (req, res) => {
     let { limit, offset } = req.query;
 
     // Fetch all escort profiles from the database
-    const escorts = await EscortProfile.find({ videos: { $size: 1 } })
+    const escorts = await EscortProfile.find({
+      videos: { $exists: true, $ne: [] },
+    })
+      .limit(limit || 0)
+      .skip(offset || 0)
+      .exec();
+    // Send the retrieved data as a response
+    res.status(200).json({
+      data: escorts,
+      statusCode: 200,
+    });
+  } catch (error) {
+    // Send an error response if something goes wrong
+    res.status(500).json({
+      message: "Something went wrong",
+      error: error.message,
+      statusCode: 500,
+    });
+  }
+};
+exports.getEscortPhotos = async (req, res) => {
+  try {
+    let { limit, offset } = req.query;
+
+    // Fetch all escort profiles from the database
+    const escorts = await EscortProfile.find({
+      images: { $exists: true, $ne: [] },
+    })
       .limit(limit || 0)
       .skip(offset || 0)
       .exec();
@@ -1112,26 +1139,32 @@ exports.ratePhotos = async (req, res) => {
   try {
     let { username: escortUserName, rate } = req.body;
     let { type, email } = req.user;
-    if (type !== 'default') {
-      return res.status(403).json({ message: 'You should be a user to vote', statusCode: 403 });
+    if (type !== "default") {
+      return res
+        .status(403)
+        .json({ message: "You should be a user to vote", statusCode: 403 });
     }
     // Fetch all escort profiles from the database
     const escort = await EscortProfile.findOne({ username: escortUserName });
     // Send the retrieved data as a response
-    let ratedClients = [...escort.ratedClients]
-    let exist = ratedClients.find(client => client === email);
+    let ratedClients = [...escort.ratedClients];
+    let exist = ratedClients.find((client) => client === email);
     if (exist) {
-      return res.status(400).json({ message: 'You already voted', statusCode: 400 });
+      return res
+        .status(400)
+        .json({ message: "You already voted", statusCode: 400 });
     }
     ratedClients.push(email);
-    let rates = (parseInt(escort.photosRate) + parseInt(rate));
+    let rates = parseInt(escort.photosRate) + parseInt(rate);
     escort.photosRate = Math.ceil(rates);
     escort.ratedClients = ratedClients;
     const avg = parseInt(rates) / parseInt(escort.ratedClients?.length);
-    console.log('avg', avg, rates)
-    escort.avgRate = avg.toFixed(1)
+    console.log("avg", avg, rates);
+    escort.avgRate = avg.toFixed(1);
     await escort.save();
-    return res.status(200).json({ message: 'Successfully rated', statusCode: 200 }); 
+    return res
+      .status(200)
+      .json({ message: "Successfully rated", statusCode: 200 });
   } catch (error) {
     // Send an error response if something goes wrong
     res.status(500).json({
