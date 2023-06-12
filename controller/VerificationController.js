@@ -39,7 +39,7 @@ exports.verificationApprove = async (req, res) => {
     let user = req.user;
     if (user.type === "admin") {
       if (req.query) {
-        let { id, status } = req.query;
+        let { id, status } = req.body;
         let verificationReq = await verification.findOne({ _id: id });
         verificationReq.status = status;
         let escort = await EscortProfile.findOne({
@@ -102,6 +102,19 @@ exports.getSingleUserVerifications = async (req, res) => {
   try {
     const verificationItems = await verification.find({ username });
     res.status(200).json(verificationItems);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+exports.deleteVerification = async (req, res) => {
+  const { id } = req.query;
+  console.log("verification", id);
+  try {
+    const verificationItems = await verification.findOne({ _id: id });
+    console.log("verification", verificationItems);
+    await verificationItems.deleteOne();
+    res.status(200).json({ message: "Deleted Successfully" });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
