@@ -93,6 +93,7 @@ exports.addBanner = async (req, res) => {
         startDate,
         endDate,
         paymentStatus,
+        isBank: true,
         paymentDetails: {
           receipt: {
             filename: receipt.filename,
@@ -115,6 +116,7 @@ exports.addBanner = async (req, res) => {
         name,
         username,
         email,
+        isBank: false,
         paymentStatus,
       });
       await banner.save();

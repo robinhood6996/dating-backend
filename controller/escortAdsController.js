@@ -37,6 +37,7 @@ exports.addEscortAd = async (req, res) => {
       isBank,
       country,
       city,
+      status: "active",
     });
     // Validate the schema
     const validationError = newEscortAd.validateSync();
@@ -90,45 +91,53 @@ exports.getGirlofTheMonth = async (req, res) => {
 };
 
 exports.getAllEscortsAd = async (req, res) => {
-  const { type } = req.user;
   const { isPaid, expired, limit, offset } = req.query;
 
-  if (type === "admin") {
-    if (expired === undefined) {
-      const query = {};
-      if (isPaid !== undefined) {
-        query.isPaid = isPaid;
-      }
-      
-      try {
-        const ads = await EscortAd.find({...query}).limit(limit).skip(offset);
-        res.status(200).json({ ads });
-      } catch (error) {
-        console.error("Error updating isPaid status:", error);
-        res.status(500).json({ error: "Failed to update isPaid status" });
-      }
-    } else {
-      const today = new Date();
+  if (expired === undefined) {
+    const query = {};
+    if (isPaid !== undefined) {
+      query.isPaid = isPaid;
+    }
 
-      const ads = await EscortAd.aggregate([
-        {
-          $addFields: {
-            expirationDate: {
-              $add: ["$createdAt", { $multiply: ["$duration", 1000] }], // Assuming duration is in seconds
-            },
-          },
-        },
-        {
-          $match: {
-            expirationDate: { $lt: today },
-          },
-        },
-      ]);
-
+    try {
+      const ads = await EscortAd.find({ ...query })
+        .limit(limit)
+        .skip(offset);
       res.status(200).json({ ads });
+    } catch (error) {
+      console.error("Error updating isPaid status:", error);
+      res.status(500).json({ error: "Failed to update isPaid status" });
     }
   } else {
-    return res.status(403).json("You are not allowed");
+    const today = new Date();
+
+    const ads = await EscortAd.aggregate([
+      {
+        $addFields: {
+          expirationDate: {
+            $add: ["$createdAt", { $multiply: ["$duration", 1000] }], // Assuming duration is in seconds
+          },
+        },
+      },
+      {
+        $match: {
+          expirationDate: { $lt: today },
+        },
+      },
+    ]);
+
+    res.status(200).json({ ads });
+  }
+};
+exports.getMyAds = async (req, res) => {
+  const { username } = req.user;
+
+  try {
+    const ads = await EscortAd.find({ username });
+    res.status(200).json({ ads });
+  } catch (error) {
+    console.error("Error updating isPaid status:", error);
+    res.status(500).json({ error: "Failed to update isPaid status" });
   }
 };
 exports.updateIsPaidStatus = async (req, res) => {

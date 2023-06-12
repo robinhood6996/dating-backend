@@ -14,6 +14,11 @@ const freeAdSchema = new Schema(
     duration: { type: Number },
     photos: { type: Array, required: true },
     ownerEmail: { type: String, required: true },
+    status: {
+      type: String,
+      required: true,
+      enum: ["pending", "active", "deactivate"],
+    },
   },
   { timestamps: true }
 );
