@@ -119,7 +119,7 @@ exports.inactiveAds = async (req, res) => {
 exports.getAll = async (req, res) => {
   try {
     const { category, city, limit, offset } = req.query;
-    let query = {};
+    let query = { status: "active" };
     //status: "active"
     if (category) {
       query.category = category;
@@ -186,7 +186,7 @@ exports.getMyAds = async (req, res) => {
   const { email } = req.user;
   try {
     const { limit, offset } = req.query;
-    let query = { email };
+    let query = { ownerEmail: email };
     let data = await FreeAd.find(query)
       .limit(limit || 0)
       .skip(offset || 0)

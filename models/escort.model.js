@@ -107,6 +107,9 @@ const EscortProfileSchema = new Schema(
     memberShip: { type: [], default: [] },
     memberShipDetails: { type: MembershipSchema, default: {} },
     isActive: { type: Boolean, default: false },
+    photosRate: {type: Number, default: 0},
+    ratedClients: {type: Array, default: []},
+    avgRate: {type: Number, default: 0}
   },
   { timestamps: true }
 );

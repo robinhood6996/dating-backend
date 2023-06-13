@@ -177,6 +177,7 @@ const createMembershipOrder = async (customer, data) => {
     if (Ad) {
       Ad.paymentDetails = paymentDetails;
       Ad.isPaid = true;
+      Ad.active = true;
       await Ad.save();
     }
     EscortProfile.findOneAndUpdate(
@@ -217,7 +218,7 @@ const addBanner = async (customer, data) => {
     let Ad = await Banner.findOne({ _id: orderDetails?.orderId });
     Ad.paymentDetails = paymentDetails;
     Ad.isPaid = true;
-
+    Ad.active = true;
     await Ad.save();
   } catch (error) {
     console.error(error);

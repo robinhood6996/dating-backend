@@ -1,5 +1,5 @@
 const Countries = require("../models/countries.model");
-
+const nationality = require('../helpers/countries.json');
 exports.createCountry = async (req, res) => {
   try {
     if (req.body) {
@@ -59,6 +59,15 @@ exports.getAllCountries = async (req, res) => {
     res.status(200).json({ countries, counts: countries.length });
   } catch (err) {
     console.error(err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+//Get all nationality
+exports.getNationality = async (req, res) => {
+  try {
+    const data = nationality;
+    res.status(200).json({data});
+  } catch (err) {
     res.status(500).json({ message: "Internal server error" });
   }
 };

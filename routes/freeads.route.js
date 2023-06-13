@@ -28,9 +28,9 @@ router.put(
 );
 router.get("/active", authenticate, freeAdController.activeAds);
 router.get("/inactive", authenticate, freeAdController.inactiveAds);
-router.get("/", authenticate, freeAdController.getAll);
+router.get("/", freeAdController.getAll);
 router.get("/my", authenticate, freeAdController.getMyAds);
-router.get("/:adId", authenticate, freeAdController.getSingleAd);
+router.get("/:adId", freeAdController.getSingleAd);
 router.delete("/:adId", authenticate, freeAdController.deleteAd);
 
 module.exports = router;
