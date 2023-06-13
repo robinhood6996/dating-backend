@@ -14,11 +14,12 @@ const escortAdSchema = new Schema(
     paymentMedia: { type: String, required: true, enum: ["card", "bank"] },
     paymentDetails: { type: Object, default: {} },
     isBank: { type: Boolean, default: false },
-    memberShipDetails: {type: Object},
+    memberShipDetails: { type: Object },
     country: { type: String, lowercase: true, default: null },
     city: { type: String, lowercase: true, default: null },
-    startDate: {type: Date},
-    endDate: {type: Date},
+    startDate: { type: Date },
+    endDate: { type: Date },
+    status: { type: String, enum: ["pending", "active", "expired"] },
   },
   { timestamps: true }
 );

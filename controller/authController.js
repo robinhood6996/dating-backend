@@ -66,7 +66,20 @@ exports.registerUser = async (req, res) => {
 
 exports.getAllUser = async (req, res) => {
   try {
-    const allUsers = await User.find({});
+    const { search } = req.query;
+
+    let query = {};
+
+    if (search) {
+      query = {
+        $or: [
+          { email: { $regex: search, $options: "i" } }, // Case-insensitive search by email
+          { username: { $regex: search, $options: "i" } }, // Case-insensitive search by username
+        ],
+      };
+    }
+
+    const allUsers = await User.find(query);
     res.send(allUsers);
   } catch {
     res.status(500).json({ message: "Something went wrong" });
@@ -135,14 +148,20 @@ exports.deleteUser = async (req, res) => {
 
     // if (requestedUser.type === "admin") {
     if (userExist) {
-      await User.deleteOne({ username });
       if (userExist.type === "escort") {
-        await EscortProfile.deleteOne({ username });
+        const escort = await EscortProfile.findOne({ username });
+        if (escort) {
+          await escort.deleteOne();
+        }
       }
       if (userExist.type === "default") {
-        await defaultUser.deleteOne({ username });
+        const defaultUsr = await defaultUser.findOne({ username });
+        if (defaultUsr) {
+          await defaultUsr.deleteOne();
+        }
       }
-      res.json({ message: "Deleted user" });
+      await userExist.deleteOne();
+      res.status(200).json({ message: "Deleted user" });
     } else {
       res.status(404).json({ message: "User not found", statusCode: 404 });
     }

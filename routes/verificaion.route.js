@@ -12,7 +12,7 @@ const storage = multer.diskStorage({
     callback(null, Date.now() + "-" + file.originalname);
   },
 });
-const upload = multer({ storage: storage });
+let upload = multer({ storage: storage });
 
 router.post(
   "/",
@@ -28,5 +28,6 @@ router.put(
 );
 router.get("/", authenticate, verification.getVerificationItems);
 router.get("/:username", authenticate, verification.getSingleUserVerifications);
+router.delete("/delete", authenticate, verification.deleteVerification);
 
 module.exports = router;
