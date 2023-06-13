@@ -5,7 +5,10 @@ const { authenticate } = require("../middleware/tokenMiddleware");
 
 const upload = require("multer")();
 
-router.post("/", authenticate, upload.any(), adsController.addEscortAd);
+router.post("/", authenticate, upload.any([
+    { name: "bank", maxCount: 1 },
+]), adsController.addEscortAd);
+router.put("/hold", authenticate, upload.any(), adsController.holdAds);
 router.put("/:adId", authenticate, adsController.updateIsPaidStatus);
 router.get("/get-all", adsController.getAllEscortsAd);
 router.get("/my", authenticate, adsController.getMyAds);

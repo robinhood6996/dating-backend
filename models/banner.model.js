@@ -24,6 +24,9 @@ const bannerSchema = new mongoose.Schema(
     endDate: { type: Date },
     expired: { type: Boolean, default: false },
     active: { type: Boolean, default: false },
+    forceStartDates: {type: Date , default: null},
+    forceStopDates: {type: Date, default: null},
+    holdDays: {type: Number, default: null},
   },
   { timestamps: true }
 );

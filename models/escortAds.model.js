@@ -19,7 +19,11 @@ const escortAdSchema = new Schema(
     city: { type: String, lowercase: true, default: null },
     startDate: { type: Date },
     endDate: { type: Date },
-    status: { type: String, enum: ["pending", "active", "expired"] },
+    active: { type: Boolean, default:false},
+    expired: { type: Boolean, default: false},
+    forceStartDates: {type: Date , default: null},
+    forceStopDates: {type: Date, default: null},
+    holdDays: {type: Number, default: null},
   },
   { timestamps: true }
 );
