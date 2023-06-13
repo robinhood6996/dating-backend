@@ -48,7 +48,8 @@ app.use((req, res, next) => {
 // Function to be executed every hour
 function myController() {
   // Your controller logic goes here
-  console.log("Controller executed");
+  console.log("Controller cron job");
+  // let 
 }
 
 mongoose
@@ -87,7 +88,7 @@ mongoose
     app.use("/rating", Rating);
     app.use("/stripe", stripe);
     app.use("/escort-ad", escortAd);
-    // cron.schedule("* * * * *", myConstroller);
+    cron.schedule("*/1 * * * *", myController);
     exports.api = functions.https.onRequest(app);
   })
   .catch((error) => {
