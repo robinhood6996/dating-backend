@@ -313,6 +313,21 @@ cron.schedule("*/1 * * * *", async () => {
 
       await banner.save();
     }
+    const today = new Date();
+    const expiredBanners = await Banner.find({
+      active: true,
+      $or: [{ holdDays: null }, { holdDays: 0 }],
+      forceStartDates: null,
+      forceStopDates: null,
+      endDate: { $lt: today },
+    });
+
+    for (const banner of expiredBanners) {
+      // Update the banner to make it active and reset hold-related fields
+      banner.active = false;
+      banner.expired = true;
+      await banner.save();
+    }
 
     console.log("Cron job executed successfully");
   } catch (error) {
