@@ -1,6 +1,6 @@
 const Banner = require("../models/banner.model");
 const User = require("../models/user.model");
-const cron = require('node-cron');
+const cron = require("node-cron");
 function calculateFutureDate(date, duration) {
   const millisecondsInDay = 24 * 60 * 60 * 1000; // Number of milliseconds in a day
 
@@ -236,9 +236,9 @@ exports.getMyBanners = async (req, res) => {
 };
 exports.getPositionBanners = async (req, res) => {
   try {
-    let query = { isPaid: true, active: true, expired: false }
+    let query = { isPaid: true, active: true, expired: false };
     const { position } = req.query;
-    if(position){
+    if (position) {
       query.position = position;
     }
     const banners = await Banner.find(query);
@@ -249,7 +249,6 @@ exports.getPositionBanners = async (req, res) => {
   }
 };
 
-
 exports.holdBanner = async (req, res) => {
   const { bannerId, holdDays } = req.body;
   const { username } = req.user; // Assuming you have user authentication implemented and can retrieve the user ID
@@ -258,21 +257,26 @@ exports.holdBanner = async (req, res) => {
     // Check if the banner exists and belongs to the user
     const banner = await Banner.findOne({ _id: bannerId, username });
     if (banner.holdDays) {
-      return res.status(400).json({ message: 'Cannot edit hold banner' });
+      return res.status(400).json({ message: "Cannot edit hold banner" });
     }
     if (!banner) {
-      return res.status(404).json({ message: 'Banner not found' });
+      return res.status(404).json({ message: "Banner not found" });
     }
 
     if (banner.expired) {
-      return res.status(400).json({ message: 'Cannot edit expired banner' });
+      return res.status(400).json({ message: "Cannot edit expired banner" });
+    }
+    if (!banner.active) {
+      return res.status(400).json({ message: "Cannot edit pending banner" });
     }
 
     // Calculate the new start and end dates based on holdDays
     const currentDate = new Date();
     const forceStartDate = currentDate;
-    const forceStopDate = new Date(currentDate.getTime() + holdDays * 60 * 1000); // * 24 * 60
-    const endDate = new Date(banner.endDate.getTime() + holdDays * 60 * 1000);//24 * 60 *
+    const forceStopDate = new Date(
+      currentDate.getTime() + holdDays * 60 * 1000
+    ); // * 24 * 60
+    const endDate = new Date(banner.endDate.getTime() + holdDays * 60 * 1000); //24 * 60 *
 
     // Update the banner with the new dates and holdDays
     banner.forceStartDates = forceStartDate;
@@ -282,39 +286,51 @@ exports.holdBanner = async (req, res) => {
     banner.active = false; // Set active to false until the hold period is over
     await banner.save();
 
-    return res.status(200).json({ message: 'Banner successfully updated' });
+    return res.status(200).json({ message: "Banner successfully updated" });
   } catch (error) {
-    console.error('Error editing banner:', error);
-    return res.status(500).json({ message: 'Server error' });
+    console.error("Error editing banner:", error);
+    return res.status(500).json({ message: "Server error" });
   }
-}
-
-
+};
 
 // Schedule the cron job to run every hour
-cron.schedule('*/1 * * * *', async () => {
-  console.log('Banner crob triggered')
+cron.schedule("*/1 * * * *", async () => {
+  console.log("Banner crob triggered");
   try {
     // Find all held banners with forceStopDate less than today's date
     const heldBanners = await Banner.find({
       active: false,
       holdDays: { $ne: null },
-      forceStopDates: { $lte: new Date() }
+      forceStopDates: { $lte: new Date() },
     });
-    
+
     for (const banner of heldBanners) {
       // Update the banner to make it active and reset hold-related fields
       banner.active = true;
       banner.holdDays = 0;
       banner.forceStartDates = null;
       banner.forceStopDates = null;
-      
+
       await banner.save();
     }
-    
-    console.log('Cron job executed successfully');
+    const today = new Date();
+    const expiredBanners = await Banner.find({
+      active: true,
+      $or: [{ holdDays: null }, { holdDays: 0 }],
+      forceStartDates: null,
+      forceStopDates: null,
+      endDate: { $lt: today },
+    });
+
+    for (const banner of expiredBanners) {
+      // Update the banner to make it active and reset hold-related fields
+      banner.active = false;
+      banner.expired = true;
+      await banner.save();
+    }
+
+    console.log("Cron job executed successfully");
   } catch (error) {
-    console.error('Error executing cron job:', error);
+    console.error("Error executing cron job:", error);
   }
 });
-

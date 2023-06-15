@@ -581,83 +581,81 @@ exports.getEscorts = async (req, res) => {
     } = req.query;
 
     let query = { $or: [] };
-
     if (country) {
-      query.$or.push({ country });
+      query.country = country;
     }
     if (nationality) {
-      query.$or.push({ nationality });
+      query.nationality = nationality;
     }
     if (state) {
-      query.$or.push({ state });
+      query.state = state;
     }
     if (baseCity) {
-      query.$or.push({ baseCity: baseCity.toLowerCase() });
+      query.baseCity = baseCity.toLowerCase();
     }
     if (realPics) {
-      query.$or.push({ realPics });
+      query.realPics = realPics;
     }
     if (withVideo) {
-      query.$or.push({ withVideo });
+      query.withVideo = withVideo;
     }
     if (verified) {
-      query.$or.push({ verified: verified });
+      query.verified = verified;
     }
     if (pornStar) {
-      query.$or.push({ pornStar });
+      query.pornStar = pornStar;
     }
     if (tattoos) {
-      query.$or.push({ tattoos });
+      query.tattoos = tattoos;
     }
     if (piercings) {
-      query.$or.push({ piercings });
+      query.piercings = piercings;
     }
     if (available24) {
-      query.$or.push({ available24 });
+      query.available24 = available24;
     }
     if (services) {
       let servicesArray = services.split(",");
-      query.$or.push({ services: { $in: servicesArray } });
+      query.services = { $in: servicesArray };
     }
     if (weight) {
       let weights = weight.split(",").map((h) => h.trim().toLowerCase());
-      query.$or.push({ weight: { $in: weights } });
+      query.weight = { $in: weights };
     }
     if (height) {
       let heights = height.split(",").map((h) => h.trim().toLowerCase());
-      query.$or.push({ height: { $in: heights } });
+      query.height = { $in: heights };
     }
     if (hairColor) {
-      query.$or.push({ hairColor: hairColor.toLowerCase() });
+      query.hairColor = hairColor.toLowerCase();
     }
     if (eyeColor) {
-      query.$or.push({ hairColor: hairColor.toLowerCase() });
+      query.eyeColor = eyeColor.toLowerCase();
     }
     if (breastSize) {
-      query.$or.push({ breastSize: breastSize.toLowerCase() });
+      query.breastSize = breastSize.toLowerCase();
     }
     if (ethnicity) {
-      query.$or.push({ ethnicity: ethnicity.toLowerCase() });
+      query.ethnicity = ethnicity.toLowerCase();
     }
     if (gender) {
       let genders = gender.split(",").map((h) => h.trim().toLowerCase());
-      query.$or.push({ gender: { $in: genders } });
+      query.gender = { $in: genders };
     }
     if (inCall) {
       let inCalls = inCall.split(",").map((h) => h.trim().toLowerCase());
-      query.$or.push({ inCall: { $in: inCalls } });
+      query.inCall = { $in: inCalls };
     }
     if (outCall) {
       let outCalls = outCall.split(",").map((h) => h.trim().toLowerCase());
-      query.$or.push({ outCall: { $in: outCalls } });
+      query.outCall = { $in: outCalls };
     }
     if (orientation) {
       let orientations = orientation
         .split(",")
         .map((h) => h.trim().toLowerCase());
-      query.$or.push({ orientation: { $in: orientations } });
+      query.orientation = { $in: orientations };
     }
-
     let escort = await EscortProfile.find(query)
       .limit(limit || 0)
       .skip(offset || 0)
@@ -677,6 +675,132 @@ exports.getEscorts = async (req, res) => {
       .json({ message: "Something went wrong", statusCode: 500 });
   }
 };
+// exports.getEscorts = async (req, res) => {
+//   try {
+//     let {
+//       country,
+//       nationality,
+//       state,
+//       baseCity,
+//       realPics,
+//       verified,
+//       pornStar,
+//       withVideo,
+//       limit,
+//       offset,
+//       services,
+//       inCall,
+//       outCall,
+//       hairColor,
+//       eyeColor,
+//       breastSize,
+//       ethnicity,
+//       gender,
+//       height,
+//       orientation,
+//       weight,
+//       tattoos,
+//       piercings,
+//       available24,
+//     } = req.query;
+
+//     let query = { $or: [] };
+
+//     if (country) {
+//       query.$or.push({ country });
+//     }
+//     if (nationality) {
+//       query.$or.push({ nationality });
+//     }
+//     if (state) {
+//       query.$or.push({ state });
+//     }
+//     if (baseCity) {
+//       query.$or.push({ baseCity: baseCity.toLowerCase() });
+//     }
+//     if (realPics) {
+//       query.$or.push({ realPics });
+//     }
+//     if (withVideo) {
+//       query.$or.push({ withVideo });
+//     }
+//     if (verified) {
+//       query.$or.push({ verified: verified });
+//     }
+//     if (pornStar) {
+//       query.$or.push({ pornStar });
+//     }
+//     if (tattoos) {
+//       query.$or.push({ tattoos });
+//     }
+//     if (piercings) {
+//       query.$or.push({ piercings });
+//     }
+//     if (available24) {
+//       query.$or.push({ available24 });
+//     }
+//     if (services) {
+//       let servicesArray = services.split(",");
+//       query.$or.push({ services: { $in: servicesArray } });
+//     }
+//     if (weight) {
+//       let weights = weight.split(",").map((h) => h.trim().toLowerCase());
+//       query.$or.push({ weight: { $in: weights } });
+//     }
+//     if (height) {
+//       let heights = height.split(",").map((h) => h.trim().toLowerCase());
+//       query.$or.push({ height: { $in: heights } });
+//     }
+//     if (hairColor) {
+//       query.$or.push({ hairColor: hairColor.toLowerCase() });
+//     }
+//     if (eyeColor) {
+//       query.$or.push({ hairColor: hairColor.toLowerCase() });
+//     }
+//     if (breastSize) {
+//       query.$or.push({ breastSize: breastSize.toLowerCase() });
+//     }
+//     if (ethnicity) {
+//       query.$or.push({ ethnicity: ethnicity.toLowerCase() });
+//     }
+//     if (gender) {
+//       let genders = gender.split(",").map((h) => h.trim().toLowerCase());
+//       query.$or.push({ gender: { $in: genders } });
+//     }
+//     if (inCall) {
+//       let inCalls = inCall.split(",").map((h) => h.trim().toLowerCase());
+//       query.$or.push({ inCall: { $in: inCalls } });
+//     }
+//     if (outCall) {
+//       let outCalls = outCall.split(",").map((h) => h.trim().toLowerCase());
+//       query.$or.push({ outCall: { $in: outCalls } });
+//     }
+//     if (orientation) {
+//       let orientations = orientation
+//         .split(",")
+//         .map((h) => h.trim().toLowerCase());
+//       query.$or.push({ orientation: { $in: orientations } });
+//     }
+
+//     let escort = await EscortProfile.find(query)
+//       .limit(limit || 0)
+//       .skip(offset || 0)
+//       .exec();
+//     if (escort) {
+//       return res
+//         .status(200)
+//         .json({ data: escort, resultCount: escort.length, statusCode: 200 });
+//     } else {
+//       return res
+//         .status(404)
+//         .json({ message: "No escort found", statusCode: 404 });
+//     }
+//   } catch (error) {
+//     return res
+//       .status(500)
+//       .json({ message: "Something went wrong", statusCode: 500 });
+//   }
+// };
 
 //Upload photo
 exports.uploadFile = async (req, res) => {
