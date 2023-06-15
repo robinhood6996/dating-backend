@@ -141,8 +141,8 @@ exports.addBanner = async (req, res) => {
 
 exports.getAllBanners = async (req, res) => {
   try {
-    const { active, payment, position, limit, offset, search } = req.params;
-
+    const { active, payment, position, limit, offset, search } = req.query;
+    console.log(req.params)
     let params = {};
     if (active !== undefined) {
       params.active = active;
