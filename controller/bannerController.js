@@ -141,20 +141,23 @@ exports.addBanner = async (req, res) => {
 
 exports.getAllBanners = async (req, res) => {
   try {
-    const { paid, country, city } = req.params;
+    const { active, payment, position, limit, offset, search } = req.params;
 
     let params = {};
-    if (paid) {
-      params.paid = paid;
+    if (active !== undefined) {
+      params.active = active;
     }
-    if (country) {
-      params.country = country;
+    if (payment) {
+      params.paymentMedia = payment;
     }
-    if (city) {
-      params.city = city;
+    if (position) {
+      params.position = position;
+    }
+    if(search !== undefined){
+      params.search = search;
     }
 
-    const banners = await Banner.find(params);
+    const banners = await Banner.find(params).limit(limit).skip(offset);
     return res.json({ banners });
   } catch (err) {
     console.error(err);

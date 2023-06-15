@@ -75,6 +75,10 @@ mongoose
       const { filename } = req.params;
       res.sendFile(`${__dirname}/uploads/banner/${filename}`);
     });
+    app.get("/bank/:filename", (req, res) => {
+      const { filename } = req.params;
+      res.sendFile(`${__dirname}/uploads/bank/${filename}`);
+    });
     app.use("/", settingsRoutes);
     app.use("/auth", authRoutes);
     app.use("/default-user", defaultUser);
