@@ -12,7 +12,7 @@ exports.addRating = async (req, res) => {
     performance,
     details,
   } = req.body;
-  const { username: customerUsername, email: customerEmail } = req.user; // Assuming customer's username and email are available in req.user
+  const { username: +, email: customerEmail } = req.user; // Assuming customer's username and email are available in req.user
   const { username: escortUsername, email: escortEmail } = req.body; // Assuming escort's username and email are available in req.body
 
   try {
