@@ -317,7 +317,22 @@ cron.schedule("*/1 * * * *", async () => {
 
       await ad.save();
     }
+
+    const expiredAds = await EscortAd.find({
+      active: true,
+      $or: [{ holdDays: null }, { holdDays: 0 }],
+      forceStartDates: null,
+      forceStopDates: null,
+      endDate: { $lt: today },
+    });
+
+    for (const ad of expiredAds) {
+      // Update the banner to make it active and reset hold-related fields
+      ad.active = false;
+      ad.expired = true;
+      await ad.save();
+    }
   } catch (error) {
-    console.error("Error executing cron job:", error);
+    // console.error("Error executing cron job:", error);
   }
 });
