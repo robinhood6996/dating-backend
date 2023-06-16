@@ -153,12 +153,19 @@ exports.getGirlofTheMonth = async (req, res) => {
 };
 
 exports.getAllEscortsAd = async (req, res) => {
-  const { isPaid, expired, limit, offset } = req.query;
-
-  if (expired === undefined) {
+  const { isPaid, expired, limit, offset, payment, package } = req.query;
     const query = {};
     if (isPaid !== undefined) {
       query.isPaid = isPaid;
+    }
+    if (expired !== undefined) {
+      query.expired = expired;
+    }
+    if(payment){
+      query.paymentMedia = payment
+    }
+    if(package){
+      query.packageType = package
     }
 
     try {
@@ -170,26 +177,7 @@ exports.getAllEscortsAd = async (req, res) => {
       console.error("Error updating isPaid status:", error);
       res.status(500).json({ error: "Failed to update isPaid status" });
     }
-  } else {
-    const today = new Date();
-
-    const ads = await EscortAd.aggregate([
-      {
-        $addFields: {
-          expirationDate: {
-            $add: ["$createdAt", { $multiply: ["$duration", 1000] }], // Assuming duration is in seconds
-          },
-        },
-      },
-      {
-        $match: {
-          expirationDate: { $lt: today },
-        },
-      },
-    ]);
-
-    res.status(200).json({ ads });
-  }
+  
 };
 exports.getMyAds = async (req, res) => {
   const { username } = req.user;
@@ -296,6 +284,34 @@ exports.holdAds = async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 };
+
+//Delete ad
+exports.deleteAd = async(req, res) => {
+  const { adId } = req.params;
+  const { type } = req.user;
+  try{
+    if(type !== 'admin'){
+      return res
+      .status(403)
+      .json({ message: "You are not allowed" });
+    }
+    const escortAd = await EscortAd.findOne({ _id: adId});
+    if(!escortAd){
+      return res
+      .status(404)
+      .json({ message: "Ad not found" });
+    }else{
+     await escortAd.deleteOne();
+     return res
+     .status(200)
+     .json({ message: "Deleted the ad" });
+    }
+  }catch(error){
+    return res
+     .status(500)
+     .json({ message: "Internal server error", error});
+  }
+}
 
 // Schedule the cron job to run every hour
 cron.schedule("*/1 * * * *", async () => {

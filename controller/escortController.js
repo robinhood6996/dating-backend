@@ -1,3 +1,6 @@
+const Jimp = require("jimp");
+const watermark2 = require("jimp-watermark");
+const ffmpeg = require("fluent-ffmpeg");
 const { EscortProfile } = require("../models/escort.model");
 const User = require("../models/user.model");
 const searchQueries = require("../helpers/categories.json");
@@ -675,132 +678,6 @@ exports.getEscorts = async (req, res) => {
       .json({ message: "Something went wrong", statusCode: 500 });
   }
 };
-// exports.getEscorts = async (req, res) => {
-//   try {
-//     let {
-//       country,
-//       nationality,
-//       state,
-//       baseCity,
-//       realPics,
-//       verified,
-//       pornStar,
-//       withVideo,
-//       limit,
-//       offset,
-//       services,
-//       inCall,
-//       outCall,
-//       hairColor,
-//       eyeColor,
-//       breastSize,
-//       ethnicity,
-//       gender,
-//       height,
-//       orientation,
-//       weight,
-//       tattoos,
-//       piercings,
-//       available24,
-//     } = req.query;
-
-//     let query = { $or: [] };
-
-//     if (country) {
-//       query.$or.push({ country });
-//     }
-//     if (nationality) {
-//       query.$or.push({ nationality });
-//     }
-//     if (state) {
-//       query.$or.push({ state });
-//     }
-//     if (baseCity) {
-//       query.$or.push({ baseCity: baseCity.toLowerCase() });
-//     }
-//     if (realPics) {
-//       query.$or.push({ realPics });
-//     }
-//     if (withVideo) {
-//       query.$or.push({ withVideo });
-//     }
-//     if (verified) {
-//       query.$or.push({ verified: verified });
-//     }
-//     if (pornStar) {
-//       query.$or.push({ pornStar });
-//     }
-//     if (tattoos) {
-//       query.$or.push({ tattoos });
-//     }
-//     if (piercings) {
-//       query.$or.push({ piercings });
-//     }
-//     if (available24) {
-//       query.$or.push({ available24 });
-//     }
-//     if (services) {
-//       let servicesArray = services.split(",");
-//       query.$or.push({ services: { $in: servicesArray } });
-//     }
-//     if (weight) {
-//       let weights = weight.split(",").map((h) => h.trim().toLowerCase());
-//       query.$or.push({ weight: { $in: weights } });
-//     }
-//     if (height) {
-//       let heights = height.split(",").map((h) => h.trim().toLowerCase());
-//       query.$or.push({ height: { $in: heights } });
-//     }
-//     if (hairColor) {
-//       query.$or.push({ hairColor: hairColor.toLowerCase() });
-//     }
-//     if (eyeColor) {
-//       query.$or.push({ hairColor: hairColor.toLowerCase() });
-//     }
-//     if (breastSize) {
-//       query.$or.push({ breastSize: breastSize.toLowerCase() });
-//     }
-//     if (ethnicity) {
-//       query.$or.push({ ethnicity: ethnicity.toLowerCase() });
-//     }
-//     if (gender) {
-//       let genders = gender.split(",").map((h) => h.trim().toLowerCase());
-//       query.$or.push({ gender: { $in: genders } });
-//     }
-//     if (inCall) {
-//       let inCalls = inCall.split(",").map((h) => h.trim().toLowerCase());
-//       query.$or.push({ inCall: { $in: inCalls } });
-//     }
-//     if (outCall) {
-//       let outCalls = outCall.split(",").map((h) => h.trim().toLowerCase());
-//       query.$or.push({ outCall: { $in: outCalls } });
-//     }
-//     if (orientation) {
-//       let orientations = orientation
-//         .split(",")
-//         .map((h) => h.trim().toLowerCase());
-//       query.$or.push({ orientation: { $in: orientations } });
-//     }
-
-//     let escort = await EscortProfile.find(query)
-//       .limit(limit || 0)
-//       .skip(offset || 0)
-//       .exec();
-//     if (escort) {
-//       return res
-//         .status(200)
-//         .json({ data: escort, resultCount: escort.length, statusCode: 200 });
-//     } else {
-//       return res
-//         .status(404)
-//         .json({ message: "No escort found", statusCode: 404 });
-//     }
-//   } catch (error) {
-//     return res
-//       .status(500)
-//       .json({ message: "Something went wrong", statusCode: 500 });
-//   }
-// };
 
 //Upload photo
 exports.uploadFile = async (req, res) => {
@@ -816,6 +693,9 @@ exports.uploadFile = async (req, res) => {
       let escort = await EscortProfile.findOne({ email: user.email });
       let currentImages = [...escort.images];
       files.map((file) => {
+        watermark2.addWatermark(file.path, "./controller/watermark.png", {
+          dstPath: `./uploads/escort/${file.filename}`,
+        });
         currentImages.push(file);
       });
       escort.images = currentImages;
@@ -846,6 +726,25 @@ exports.uploadVideos = async (req, res) => {
       if (escort?.videos.length > 0) {
         let currentVideos = [...escort.videos];
         files.map((file) => {
+          // const outputFilePath = `./uploads/escort/videos/${file.filename}`;
+          // ffmpeg(file.path)
+          //   // .inputOptions("-itsoffset 0.5") // Delay the overlay by 0.5 seconds (adjust as needed)
+          //   .input("./watermark.png") // Path to the watermark image
+          //   .complexFilter([
+          //     "[0:v][1:v]overlay=W-w-10:H-h-10", // Overlay the watermark image
+          //     // "[0:a]anull[a]", // Remove the audio from the video
+          //   ])
+          //   .output(outputFilePath)
+          //   .on("end", (data) => {
+          //     console.log("video=>", data);
+          //     // Watermarking completed, do something with the modified video
+          //     res.json({ videoPath: outputFilePath });
+          //   })
+          //   .on("error", (error) => {
+          //     console.error(error);
+          //     res.status(500).json({ error: "Something went wrong" });
+          //   })
+          //   .run();
           currentVideos.push(file);
         });
         escort.videos = currentVideos;
@@ -859,7 +758,10 @@ exports.uploadVideos = async (req, res) => {
         statusCode: 200,
       });
     }
-    res.send();
+    return res.status(400).json({
+      message: "Video required",
+      statusCode: 400,
+    });
   } catch (error) {
     return res.status(500).json({ message: "Error", error, statusCode: 500 });
   }
@@ -903,9 +805,18 @@ exports.uploadProfileImage = async (req, res) => {
     let user = req.user;
     if (req.files) {
       let files = req.files[0];
-      let profileImage = files.filename;
       let escort = await EscortProfile.findOne({ email: user.email });
-
+      watermark2
+        .addWatermark(files.path, "./controller/watermark.png", {
+          dstPath: `./uploads/escort/${files.filename}`,
+        })
+        .then((data) => {
+          console.log(data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+      let profileImage = files.filename;
       escort.profileImage = profileImage;
       await escort.save();
       return res.status(200).json({
@@ -915,6 +826,7 @@ exports.uploadProfileImage = async (req, res) => {
       });
     }
   } catch (error) {
+    console.log("main", error);
     return res.status(500).json({ message: "Error", error, statusCode: 500 });
   }
 };
