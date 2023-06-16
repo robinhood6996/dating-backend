@@ -121,6 +121,7 @@ exports.updatePhysicalData = async (req, res) => {
     tattoos,
     piercings,
     languages,
+    breast,
   } = req.body; // Extract the updated physical data from the request body
 
   try {
@@ -144,30 +145,12 @@ exports.updatePhysicalData = async (req, res) => {
     if (brest) profile.brest = brest;
     if (brestSize) profile.brestSize = brestSize;
     if (pubicHair) profile.pubicHair = pubicHair;
-    if (smoke !== undefined) {
-      if (typeof smoke !== "boolean") {
-        throw new Error("Invalid data type for smoking");
-      }
-      profile.smoking = smoke;
-    }
-    if (drinking !== undefined) {
-      if (typeof drinking !== "boolean") {
-        throw new Error("Invalid data type for drinking");
-      }
-      profile.drinking = drinking;
-    }
-    if (tattoos !== undefined) {
-      if (typeof tattoos !== "boolean") {
-        throw new Error("Invalid data type for tattoos");
-      }
-      profile.tattoos = tattoos;
-    }
-    if (piercings !== undefined) {
-      if (typeof piercings !== "boolean") {
-        throw new Error("Invalid data type for piercings");
-      }
-      profile.piercings = piercings;
-    }
+    if (breast) profile.breast = breast;
+    if (smoke) profile.smoke = smoke;
+    if (drinking) profile.drinking = drinking;
+    if (tattoos) profile.tattoos = tattoos;
+    if (piercings) profile.piercings = piercings;
+
     if (languages !== undefined) {
       if (!Array.isArray(languages)) {
         throw new Error(
