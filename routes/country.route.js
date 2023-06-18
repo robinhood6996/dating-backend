@@ -4,6 +4,7 @@ const countryController = require("../controller/CountriesController");
 const upload = require("multer")();
 const { authenticate, adminAuth } = require("../middleware/tokenMiddleware");
 router.get("/", countryController.getAllCountries);
+router.get("/nationality", countryController.getNationality);
 router.put(
   "/:id",
   authenticate,

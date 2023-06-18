@@ -5,7 +5,8 @@ const freeAdSchema = new Schema(
   {
     title: { type: String, required: true },
     category: { type: String, required: true },
-    city: { type: String },
+    country: { type: String, required: true },
+    city: { type: String, required: true },
     description: { type: String, required: true },
     phone: { type: Number, required: true },
     email: { type: String },
@@ -13,6 +14,11 @@ const freeAdSchema = new Schema(
     duration: { type: Number },
     photos: { type: Array, required: true },
     ownerEmail: { type: String, required: true },
+    status: {
+      type: String,
+      required: true,
+      enum: ["pending", "active", "deactivate"],
+    },
   },
   { timestamps: true }
 );

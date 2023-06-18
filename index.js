@@ -48,7 +48,8 @@ app.use((req, res, next) => {
 // Function to be executed every hour
 function myController() {
   // Your controller logic goes here
-  console.log("Controller executed");
+  console.log("Controller cron job");
+  // let 
 }
 
 mongoose
@@ -74,6 +75,10 @@ mongoose
       const { filename } = req.params;
       res.sendFile(`${__dirname}/uploads/banner/${filename}`);
     });
+    app.get("/bank/:filename", (req, res) => {
+      const { filename } = req.params;
+      res.sendFile(`${__dirname}/uploads/bank/${filename}`);
+    });
     app.use("/", settingsRoutes);
     app.use("/auth", authRoutes);
     app.use("/default-user", defaultUser);
@@ -87,7 +92,7 @@ mongoose
     app.use("/rating", Rating);
     app.use("/stripe", stripe);
     app.use("/escort-ad", escortAd);
-    // cron.schedule("* * * * *", myConstroller);
+    cron.schedule("*/1 * * * *", myController);
     exports.api = functions.https.onRequest(app);
   })
   .catch((error) => {

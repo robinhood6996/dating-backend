@@ -69,6 +69,8 @@ router.put(
   escortController.updateContactData
 );
 router.get("/get-all", escortController.getAllEscort);
+router.get("/videos", escortController.getEscortVideos);
+router.get("/photo-reviews", escortController.getEscortPhotos);
 router.get("/get-inactive", escortController.getInactiveEscorts);
 router.get("/", authenticate, escortController.getEscort);
 router.get("/profile", authenticate, escortController.getEscortProfile);
@@ -116,6 +118,12 @@ router.put(
   authenticate,
   upload.any(),
   escortController.updateStatus
+);
+router.post(
+  "/rate-photo",
+  authenticate,
+  upload.any(),
+  escortController.ratePhotos
 );
 
 module.exports = router;
