@@ -12,11 +12,7 @@ router.delete(
   upload.any(),
   RatingController.deleteReviews
 );
+router.get("/user-ratings", RatingController.getRatingsByUsernames);
 router.get("/:ratingId", upload.any(), RatingController.getSingleRatings);
-router.get(
-  "/user-ratings",
-  upload.any(),
-  RatingController.getRatingsByUsernames
-);
 
 module.exports = router;

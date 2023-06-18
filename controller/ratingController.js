@@ -1,3 +1,4 @@
+const { EscortProfile } = require("../models/escort.model");
 const Rating = require("../models/rating.model"); // Assuming you have a Rating model defined
 
 exports.addRating = async (req, res) => {
@@ -12,10 +13,25 @@ exports.addRating = async (req, res) => {
     performance,
     details,
   } = req.body;
-  const { username: customerUsername, email: customerEmail } = req.user; // Assuming customer's username and email are available in req.user
+  const {
+    type,
+    username: customerUsername,
+    email: customerEmail,
+    name: customerName,
+  } = req.user; // Assuming customer's username and email are available in req.user
   const { username: escortUsername, email: escortEmail } = req.body; // Assuming escort's username and email are available in req.body
 
   try {
+    if (type !== "default") {
+      return res.status(403).json({ message: "You cant give review." });
+    }
+    let escort = await EscortProfile.findOne({ username: escortUsername });
+    if (!escort) {
+      return res.status(404).json({ message: "Escort not found" });
+    }
+    let name = escort?.name;
+    let profileImage = escort.profileImage;
+
     const newRating = new Rating({
       meetingCity,
       meetingPlace,
@@ -26,8 +42,17 @@ exports.addRating = async (req, res) => {
       chat,
       performance,
       details,
-      customerDetails: { username: customerUsername, email: customerEmail },
-      escortDetails: { username: escortUsername, email: escortEmail },
+      customerDetails: {
+        username: customerUsername,
+        email: customerEmail,
+        name: customerName,
+      },
+      escortDetails: {
+        username: escortUsername,
+        email: escortEmail,
+        name,
+        profileImage,
+      },
     });
 
     const savedRating = await newRating.save();
@@ -80,8 +105,8 @@ exports.getAllRatings = async (req, res) => {
 exports.getRatingsByUsernames = async (req, res) => {
   const { customerUsername, escortUsername } = req.query;
 
-  const filter = {};
-
+  console.log("filter");
+  let filter = {};
   if (customerUsername) {
     filter["customerDetails.username"] = customerUsername;
   }
