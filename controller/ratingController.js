@@ -149,3 +149,30 @@ exports.deleteReviews = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+exports.addReply = async (req, res) => {
+  const { ratingId, reply } = req.body;
+  const { email } = req.user; // Assuming you have user authentication implemented and can retrieve the escort ID
+
+  try {
+    // Check if the rating exists and belongs to the escort
+    const rating = await Rating.findOne({
+      _id: ratingId,
+      "escortDetails.email": email,
+    });
+
+    if (!rating) {
+      return res.status(404).json({ message: "Rating not found" });
+    }
+
+    // Update the rating with the reply
+    rating.reply = reply;
+
+    await rating.save();
+
+    return res.status(200).json({ message: "Reply added successfully" });
+  } catch (error) {
+    console.error("Error adding reply:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};

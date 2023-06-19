@@ -14,5 +14,11 @@ router.delete(
 );
 router.get("/user-ratings", RatingController.getRatingsByUsernames);
 router.get("/:ratingId", upload.any(), RatingController.getSingleRatings);
+router.post(
+  "/add-reply",
+  authenticate,
+  upload.any(),
+  RatingController.addReply
+);
 
 module.exports = router;

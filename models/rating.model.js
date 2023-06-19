@@ -22,6 +22,7 @@ const RatingSchema = new Schema(
     details: { type: String, required: true },
     customerDetails: { type: UserSchema, required: true },
     escortDetails: { type: UserSchema, required: true },
+    reply: { type: String, require: false, default: null },
   },
   { timestamps: true }
 );
