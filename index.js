@@ -8,6 +8,7 @@ const settingsRoutes = require("./routes/settings.route");
 const escortRoutes = require("./routes/escortRoutes");
 const countryRoutes = require("./routes/country.route");
 const cityRoutes = require("./routes/cities.route");
+const areaRoutes = require("./routes/area.route");
 const freeAdController = require("./routes/freeads.route");
 const bannerController = require("./routes/banner.route");
 const verification = require("./routes/verificaion.route");
@@ -49,7 +50,7 @@ app.use((req, res, next) => {
 function myController() {
   // Your controller logic goes here
   console.log("Controller cron job");
-  // let 
+  // let
 }
 
 mongoose
@@ -85,6 +86,7 @@ mongoose
     app.use("/escort", escortRoutes);
     app.use("/country", countryRoutes);
     app.use("/city", cityRoutes);
+    app.use("/area", areaRoutes);
     app.use("/freead", freeAdController);
     app.use("/banner", bannerController);
     app.use("/city-tour", cityTour);

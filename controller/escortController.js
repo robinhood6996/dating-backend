@@ -23,6 +23,7 @@ exports.updateBiographyData = async (req, res) => {
     state,
     category,
     baseCity,
+    area,
   } = req.body;
   try {
     // Find the escort profile by profileId
@@ -71,8 +72,10 @@ exports.updateBiographyData = async (req, res) => {
         profile.baseCity = baseCity;
       }
     }
-    if (state) profile.state = state;
     if (category) profile.category = category;
+    if (area) {
+      profile.area = area;
+    }
     // Save the updated profile
     await profile.save();
 
@@ -535,14 +538,23 @@ exports.getEscortProfile = async (req, res) => {
       .json({ message: "Something went wrong", statusCode: 500 });
   }
 };
+function formatWord(word) {
+  // Use a regular expression to insert a space before each uppercase letter (except the first one)
+  var formattedWord = word.replace(/([A-Z])/g, " $1");
 
+  // Capitalize the first letter
+  formattedWord =
+    formattedWord.charAt(0).toUpperCase() + formattedWord.slice(1);
+
+  return formattedWord;
+}
 //Get escorts data
 exports.getEscorts = async (req, res) => {
   try {
     let {
       country,
       nationality,
-      state,
+      area,
       baseCity,
       realPics,
       verified,
@@ -573,8 +585,9 @@ exports.getEscorts = async (req, res) => {
     if (nationality) {
       query.nationality = nationality;
     }
-    if (state) {
-      query.state = state;
+    if (area) {
+      query.area = area.toLowerCase();
+      console.log(query.area);
     }
     if (baseCity) {
       query.baseCity = baseCity.toLowerCase();
