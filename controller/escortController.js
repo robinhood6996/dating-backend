@@ -578,7 +578,7 @@ exports.getEscorts = async (req, res) => {
       available24,
     } = req.query;
 
-    let query = { $or: [] };
+    let query = { $or: [], isActive: true };
     if (country) {
       query.country = country;
     }

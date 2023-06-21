@@ -6,7 +6,7 @@ const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const { EscortProfile } = require("../models/escort.model");
 const { generateRandomNumber } = require("../helpers/utils");
-const { defaultUser } = require("../models/defaultUser.model");
+const defaultUser = require("../models/defaultUser.model");
 
 exports.registerUser = async (req, res) => {
   try {
@@ -60,6 +60,7 @@ exports.registerUser = async (req, res) => {
     }
     return res.status(201).json({ message: "Successfully registered" });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({ message: "Something went wrong", error });
   }
 };
@@ -78,8 +79,8 @@ exports.getAllUser = async (req, res) => {
         ],
       };
     }
-
-    const allUsers = await User.find(query);
+    console.log("query", query);
+    const allUsers = await User.find(query).sort({ createdAt: -1 });
     res.send(allUsers);
   } catch {
     res.status(500).json({ message: "Something went wrong" });

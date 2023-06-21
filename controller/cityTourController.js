@@ -1,3 +1,5 @@
+const citiesModel = require("../models/cities.model");
+const countriesModel = require("../models/countries.model");
 const { EscortProfile } = require("../models/escort.model");
 const CityTour = require("../models/tour.model");
 const User = require("../models/user.model");
@@ -15,10 +17,18 @@ exports.getAllCityTours = async (req, res) => {
 exports.createCityTour = async (req, res) => {
   try {
     const { email: userEmail, username } = req.user;
-    const { name, dateFrom, dateTo, email, phone, city } = req.body;
+    const { name, dateFrom, dateTo, email, phone, city, country } = req.body;
     let escort = await EscortProfile.findOne({ email: userEmail });
     // Check if all required fields are present in the request body
-    if (!name || !dateFrom || !dateTo || !email || !phone || !city) {
+    if (
+      !name ||
+      !dateFrom ||
+      !dateTo ||
+      !email ||
+      !phone ||
+      !city ||
+      !country
+    ) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -34,12 +44,22 @@ exports.createCityTour = async (req, res) => {
       email,
       phone,
       city,
+      country,
       username,
       status: "pending",
       profileImage: escort?.profileImage,
       escortEmail: userEmail,
     });
-
+    if (country) {
+      let theCountry = await countriesModel.findOne({ name: country });
+      theCountry.escortsOnTour = theCountry.escortsOnTour + 1;
+      await theCountry.save();
+    }
+    if (city) {
+      let theCity = await citiesModel.findOne({ name: city });
+      theCity.escortsOnTour = theCity.escortsOnTour + 1;
+      await theCity.save();
+    }
     await cityTour.save();
 
     return res.status(201).json({ cityTour, message: "City tour created" });
