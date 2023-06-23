@@ -17,7 +17,7 @@ const upload = multer({ storage: storage });
 router.post(
   "/create",
   authenticate,
-  upload.any("photos"),
+  upload.array("photos"),
   freeAdController.createAd
 );
 router.put(

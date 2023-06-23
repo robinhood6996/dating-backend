@@ -5,7 +5,8 @@ exports.createAd = async (req, res) => {
   try {
     const user = req.user;
     const files = req.files;
-    const { title, category, description, phone, email, duration } = req.body;
+    const { title, category, description, phone, email, duration, username } =
+      req.body;
     const escort = await EscortProfile.findOne({ email: user.email });
     // Check if request body exists
     if (!req.body) {
@@ -41,13 +42,13 @@ exports.createAd = async (req, res) => {
       city: req.body.city || "",
       description,
       phone,
-      email: email || "",
-      duration: req.body.duration || 15,
-      status: req.body.status || "pending",
+      email: email ?? "",
+      duration: duration ?? 15,
+      status: req.body.status ?? "pending",
       author: user.email,
       photos: files,
-      username: user.username,
-      ownerEmail: escort.email,
+      username: username ?? user.username,
+      ownerEmail: email ?? escort.email,
     });
 
     // Save new free ad document

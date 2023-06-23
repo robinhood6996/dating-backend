@@ -13,7 +13,7 @@ const freeAdSchema = new Schema(
     username: { type: String },
     duration: { type: Number },
     photos: { type: Array, required: true },
-    ownerEmail: { type: String, required: true },
+    ownerEmail: { type: String },
     status: {
       type: String,
       required: true,
