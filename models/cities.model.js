@@ -3,8 +3,8 @@ const Schema = mongoose.Schema;
 
 const CitiesSchema = new Schema(
   {
-    name: { type: String, required: true },
-    country: { type: String, required: true },
+    name: { type: String, required: true, lowercase: true },
+    country: { type: String, required: true, lowercase: true },
     areas: { type: Array, default: [] },
     description: { type: String },
     escortCount: { type: Number },

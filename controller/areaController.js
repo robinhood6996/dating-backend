@@ -119,15 +119,19 @@ exports.deleteCity = async (req, res) => {
 //Get All Cities
 exports.getAllCity = async (req, res) => {
   try {
-    const { search, limit = 10, offset = 0 } = req.query;
+    const { city, search, limit = 10, offset = 0 } = req.query;
 
     // Creating a search query based on the provided text
-    const searchQuery = search
-      ? { name: { $regex: search, $options: "i" } }
-      : {};
+    let query = {};
+    if (search) {
+      query.name = { $regex: search, $options: "i" };
+    }
+    if (city) {
+      query.city = city;
+    }
 
     // Fetching area names with limit and offset
-    const areas = await Areas.find(searchQuery)
+    const areas = await Areas.find(query)
       .sort({ createdAt: -1 })
       .limit(Number(limit))
       .skip(Number(offset));
