@@ -6,7 +6,15 @@ const User = require("../models/user.model");
 
 exports.getAllCityTours = async (req, res) => {
   try {
-    const cityTours = await CityTour.find();
+    let { country, city, limit, offset } = req.query;
+    let query = {};
+    if (country) {
+      query.country = country;
+    }
+    if (city) {
+      query.city = city;
+    }
+    const cityTours = await CityTour.find(query).limit(limit).skip(offset);
     res.json({ cityTours });
   } catch (error) {
     console.error(error);
@@ -45,7 +53,7 @@ exports.createCityTour = async (req, res) => {
       phone,
       city,
       country,
-      username,
+      userName: username,
       status: "pending",
       profileImage: escort?.profileImage,
       escortEmail: userEmail,

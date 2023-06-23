@@ -7,6 +7,7 @@ const upload = require("multer")();
 // router.get("/", countryController.getAllCountries);
 
 router.get("/", cityController.getAllCity);
+router.get("/get-one", cityController.getCity);
 router.get("/:country", cityController.getCityByCountry);
 router.post("/", upload.any(), cityController.addCity);
 router.put("/:cityId", authenticate, upload.any(), cityController.editCity);

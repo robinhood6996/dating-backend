@@ -43,7 +43,7 @@ exports.registerUser = async (req, res) => {
         age: user.age,
         phone: req.body.phone,
         gender: user.gender.toLowerCase(),
-        username,
+        userName: username,
       });
       await escort.save();
     }

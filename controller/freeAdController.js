@@ -43,7 +43,7 @@ exports.createAd = async (req, res) => {
       phone,
       email: email || "",
       duration: req.body.duration || 15,
-      status: req.body.status || "inactive",
+      status: req.body.status || "pending",
       author: user.email,
       photos: files,
       username: user.username,

@@ -1,12 +1,14 @@
 const Countries = require("../models/countries.model");
-const nationality = require('../helpers/countries.json');
+const nationality = require("../helpers/countries.json");
 exports.createCountry = async (req, res) => {
   try {
     if (req.body) {
-      let exist = await Countries.findOne({ name: req.body.name });
+      const { name, description } = req.body;
+      let exist = await Countries.findOne({ name: name });
       if (!exist) {
         let country = new Countries({
-          name: req.body.name.toLowerCase(),
+          name: name.toLowerCase(),
+          description: description,
           cities: [],
           escortCount: 0,
           cityCount: 0,
@@ -29,7 +31,7 @@ exports.createCountry = async (req, res) => {
 
 exports.editCountry = async (req, res) => {
   const { id } = req.params; // Assuming the ID is passed as a route parameter
-  const { name } = req.body; // Assuming the new name is provided in the request body
+  const { name, description } = req.body; // Assuming the new name is provided in the request body
 
   try {
     // Find the country by ID
@@ -41,6 +43,7 @@ exports.editCountry = async (req, res) => {
     }
     // Update the name of the country
     country.name = name;
+    country.description = description;
     // Save the updated country
     await country.save();
     // Return the updated country as the response
@@ -66,7 +69,7 @@ exports.getAllCountries = async (req, res) => {
 exports.getNationality = async (req, res) => {
   try {
     const data = nationality;
-    res.status(200).json({data});
+    res.status(200).json({ data });
   } catch (err) {
     res.status(500).json({ message: "Internal server error" });
   }
@@ -79,6 +82,17 @@ exports.deleteCountry = async (req, res) => {
       res.status(200).json({ message: "Country deleted" });
     });
   } catch (err) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+exports.getCountry = async (req, res) => {
+  try {
+    let { country } = req.query;
+    const countryData = await Countries.findOne({ name: country });
+    res.status(200).json(countryData);
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Internal server error" });
   }
 };

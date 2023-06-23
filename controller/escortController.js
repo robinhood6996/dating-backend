@@ -506,7 +506,7 @@ exports.getAllEscort = async (req, res) => {
 exports.getEscort = async (req, res) => {
   try {
     let { username } = req.query;
-    let escort = await EscortProfile.findOne({ username });
+    let escort = await EscortProfile.findOne({ userName: username });
     if (escort) {
       return res.status(200).json({ data: escort, statusCode: 200 });
     } else {
