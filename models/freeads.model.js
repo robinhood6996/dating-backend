@@ -28,7 +28,7 @@ freeAdSchema.methods = {
     return mongoose.model("FreeAd").find({ status: "active" });
   },
   findInactive: function () {
-    return mongoose.model("FreeAd").find({ status: "inactive" });
+    return mongoose.model("FreeAd").find({ status: "pending" });
   },
   findAll: function () {
     return mongoose.model("FreeAd").find({});
