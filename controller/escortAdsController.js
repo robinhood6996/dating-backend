@@ -154,30 +154,29 @@ exports.getGirlofTheMonth = async (req, res) => {
 
 exports.getAllEscortsAd = async (req, res) => {
   const { isPaid, expired, limit, offset, payment, package } = req.query;
-    const query = {};
-    if (isPaid !== undefined) {
-      query.isPaid = isPaid;
-    }
-    if (expired !== undefined) {
-      query.expired = expired;
-    }
-    if(payment){
-      query.paymentMedia = payment
-    }
-    if(package){
-      query.packageType = package
-    }
+  const query = {};
+  if (isPaid !== undefined) {
+    query.isPaid = isPaid;
+  }
+  if (expired !== undefined) {
+    query.expired = expired;
+  }
+  if (payment) {
+    query.paymentMedia = payment;
+  }
+  if (package) {
+    query.packageType = package;
+  }
 
-    try {
-      const ads = await EscortAd.find({ ...query })
-        .limit(limit)
-        .skip(offset);
-      res.status(200).json({ ads });
-    } catch (error) {
-      console.error("Error updating isPaid status:", error);
-      res.status(500).json({ error: "Failed to update isPaid status" });
-    }
-  
+  try {
+    const ads = await EscortAd.find({ ...query })
+      .limit(limit)
+      .skip(offset);
+    res.status(200).json({ ads });
+  } catch (error) {
+    console.error("Error updating isPaid status:", error);
+    res.status(500).json({ error: "Failed to update isPaid status" });
+  }
 };
 exports.getMyAds = async (req, res) => {
   const { username } = req.user;
@@ -200,6 +199,53 @@ exports.updateIsPaidStatus = async (req, res) => {
       const updatedAd = await EscortAd.findByIdAndUpdate(
         adId,
         { $set: { isPaid, paymentMedia: media } },
+        { new: true }
+      );
+
+      if (!updatedAd) {
+        return res.status(404).json({ error: "Escort ad not found" });
+      }
+
+      const { username, packageType, duration, paymentMedia } = updatedAd;
+
+      const updatedProfile = await EscortProfile.findOneAndUpdate(
+        { username },
+        {
+          $set: {
+            memberShip: packageType,
+            memberShipDetails: {
+              startDate: new Date(),
+              endDate: getFutureDate(duration),
+              paymentMedia,
+            },
+          },
+        },
+        { new: true }
+      );
+
+      if (!updatedProfile) {
+        return res.status(404).json({ error: "Escort profile not found" });
+      }
+
+      res.status(200).json({ message: "Payment status updated" });
+    } catch (error) {
+      console.error("Error updating isPaid status:", error);
+      res.status(500).json({ error: "Failed to update isPaid status" });
+    }
+  } else {
+    return res.status(403).json("You are not allowed 88");
+  }
+};
+exports.updateAdStatus = async (req, res) => {
+  const { type } = req.user;
+  const { adId } = req.params;
+  const { active, isPaid } = req.body;
+
+  if (type === "admin") {
+    try {
+      const updatedAd = await EscortAd.findByIdAndUpdate(
+        adId,
+        { $set: { active, isPaid } },
         { new: true }
       );
 
@@ -286,35 +332,27 @@ exports.holdAds = async (req, res) => {
 };
 
 //Delete ad
-exports.deleteAd = async(req, res) => {
+exports.deleteAd = async (req, res) => {
   const { adId } = req.params;
   const { type } = req.user;
-  try{
-    if(type !== 'admin'){
-      return res
-      .status(403)
-      .json({ message: "You are not allowed" });
+  try {
+    if (type !== "admin") {
+      return res.status(403).json({ message: "You are not allowed" });
     }
-    const escortAd = await EscortAd.findOne({ _id: adId});
-    if(!escortAd){
-      return res
-      .status(404)
-      .json({ message: "Ad not found" });
-    }else{
-     await escortAd.deleteOne();
-     return res
-     .status(200)
-     .json({ message: "Deleted the ad" });
+    const escortAd = await EscortAd.findOne({ _id: adId });
+    if (!escortAd) {
+      return res.status(404).json({ message: "Ad not found" });
+    } else {
+      await escortAd.deleteOne();
+      return res.status(200).json({ message: "Deleted the ad" });
     }
-  }catch(error){
-    return res
-     .status(500)
-     .json({ message: "Internal server error", error});
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error", error });
   }
-}
+};
 
 // Schedule the cron job to run every hour
-cron.schedule("*/1 * * * *", async () => {
+cron.schedule("0 */6 * * *", async () => {
   console.log("Ad cron triggered");
   try {
     // Find all held banners with forceStopDate less than today's date

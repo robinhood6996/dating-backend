@@ -94,7 +94,7 @@ mongoose
     app.use("/rating", Rating);
     app.use("/stripe", stripe);
     app.use("/escort-ad", escortAd);
-    cron.schedule("*/1 * * * *", myController);
+    cron.schedule("0 */6 * * *", myController);
     exports.api = functions.https.onRequest(app);
   })
   .catch((error) => {
