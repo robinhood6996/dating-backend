@@ -1,7 +1,7 @@
 require("dotenv").config();
 const User = require("../models/user.model");
 const BlacklistToken = require("../models/blacklistToken.model");
-// const bcrypt = require("bcrypt");
+const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const { EscortProfile } = require("../models/escort.model");
@@ -19,14 +19,14 @@ exports.registerUser = async (req, res) => {
     }
 
     // Hash the password
-    // const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
     // Create a new user document
     let nameSplit = req.body.email.split("@")[0];
     let username = nameSplit + generateRandomNumber();
     const user = new User({
       name: req.body.name,
       email: req.body.email,
-      password: req.body.password,
+      password: hashedPassword,
       gender: req.body.gender,
       age: req.body.age || null,
       phone: req.body.phone,
@@ -80,7 +80,10 @@ exports.getAllUser = async (req, res) => {
       };
     }
     console.log("query", query);
-    const allUsers = await User.find(query).sort({ createdAt: -1 });
+    // Exclude the password field from the query projection
+    const projection = { password: 0 };
+
+    const allUsers = await User.find(query, projection).sort({ createdAt: -1 });
     res.send(allUsers);
   } catch {
     res.status(500).json({ message: "Something went wrong" });
@@ -96,8 +99,8 @@ exports.login = async (req, res) => {
     });
     if (existingUser) {
       // Generate a JWT token
-      // const matched = await bcrypt.compare(password, existingUser.password);
-      const matched = password === existingUser.password;
+      const matched = await bcrypt.compare(password, existingUser.password);
+      // const matched = password === existingUser.password;
       if (matched) {
         const token = jwt.sign(
           { user: existingUser },
