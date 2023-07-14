@@ -172,7 +172,7 @@ exports.updatePhysicalData = async (req, res) => {
           );
         }
       });
-      let mergeSet = new Set([...profile.language, languages]);
+      let mergeSet = new Set([...profile.languages, ...languages]);
       profile.languages = [...mergeSet];
     }
     // Save the updated profile to the database

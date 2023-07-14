@@ -119,7 +119,7 @@ exports.deleteCity = async (req, res) => {
 //Get All Cities
 exports.getAllCity = async (req, res) => {
   try {
-    const { city, search, limit = 10, offset = 0 } = req.query;
+    const { city, search } = req.query;
 
     // Creating a search query based on the provided text
     let query = {};
@@ -133,8 +133,8 @@ exports.getAllCity = async (req, res) => {
     // Fetching area names with limit and offset
     const areas = await Areas.find(query)
       .sort({ createdAt: -1 })
-      .limit(Number(limit))
-      .skip(Number(offset));
+      //.limit(Number(limit))
+      //.skip(Number(offset));
 
     res.json(areas);
   } catch (error) {

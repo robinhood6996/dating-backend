@@ -19,14 +19,14 @@ exports.registerUser = async (req, res) => {
     }
 
     // Hash the password
-    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    //const hashedPassword = await bcrypt.hash(req.body.password, 10);
     // Create a new user document
     let nameSplit = req.body.email.split("@")[0];
     let username = nameSplit + generateRandomNumber();
     const user = new User({
       name: req.body.name,
       email: req.body.email,
-      password: hashedPassword,
+      password: req.body.password,
       gender: req.body.gender,
       age: req.body.age || null,
       phone: req.body.phone,
@@ -99,8 +99,8 @@ exports.login = async (req, res) => {
     });
     if (existingUser) {
       // Generate a JWT token
-      const matched = await bcrypt.compare(password, existingUser.password);
-      // const matched = password === existingUser.password;
+      //const matched = await bcrypt.compare(password, existingUser.password);
+      const matched = password === existingUser.password;
       if (matched) {
         const token = jwt.sign(
           { user: existingUser },
@@ -118,7 +118,7 @@ exports.login = async (req, res) => {
       } else {
         res
           .status(400)
-          .json({ message: "Invalid email or password", statusCode: 400 });
+          .json({ message: "Invalid email or password", statusCode: 400, existingUser });
       }
     } else {
       res.status(404).json({ message: "User not found" });
