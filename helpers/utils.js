@@ -27,4 +27,21 @@ function getFutureDate(numberOfDays) {
   return formattedDate;
 }
 
-module.exports = { generateRandomNumber, getFutureDate };
+function mergeArrays(oldArray, newArray) {
+  let oldData = [...oldArray];
+  newArray.forEach((newObj) => {
+    const index = oldData.findIndex(
+      (oldObj) => oldObj.langauge === newObj.langauge
+    );
+
+    if (index !== -1) {
+      oldData.splice(index, 1);
+    }
+
+    oldData.push(newObj);
+  });
+
+  return oldData;
+}
+
+module.exports = { generateRandomNumber, getFutureDate, mergeArrays };

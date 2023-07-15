@@ -8,6 +8,7 @@ const fs = require("fs");
 const Countries = require("../models/countries.model");
 const citiesModel = require("../models/cities.model");
 const userModel = require("../models/user.model");
+const { mergeArrays } = require("../helpers/utils");
 // Update Biography Data
 exports.updateBiographyData = async (req, res) => {
   const user = req.user;
@@ -28,7 +29,7 @@ exports.updateBiographyData = async (req, res) => {
   try {
     // Find the escort profile by profileId
     const profile = await EscortProfile.findOne({ email: user.email });
-    console.log(profile);
+
     if (name) profile.name = name;
     if (email) profile.email = email;
     if (slogan) profile.slogan = slogan;
@@ -117,7 +118,7 @@ exports.updatePhysicalData = async (req, res) => {
     shoeSize,
     bustWaistHips,
     brest,
-    brestSize,
+    breastSize,
     pubicHair,
     smoke,
     drinking,
@@ -125,6 +126,7 @@ exports.updatePhysicalData = async (req, res) => {
     piercings,
     languages,
     breast,
+    resetLanguage,
   } = req.body; // Extract the updated physical data from the request body
 
   try {
@@ -146,7 +148,7 @@ exports.updatePhysicalData = async (req, res) => {
     if (shoeSize) profile.shoeSize = shoeSize;
     if (bustWaistHips) profile.bustWaistHips = bustWaistHips;
     if (brest) profile.brest = brest;
-    if (brestSize) profile.brestSize = brestSize;
+    if (breastSize) profile.brestSize = breastSize;
     if (pubicHair) profile.pubicHair = pubicHair;
     if (breast) profile.breast = breast;
     if (smoke) profile.smoke = smoke;
@@ -172,8 +174,16 @@ exports.updatePhysicalData = async (req, res) => {
           );
         }
       });
-      let mergeSet = new Set([...profile.languages, ...languages]);
-      profile.languages = [...mergeSet];
+      let currentLanguages = [...profile.languages];
+
+      // let mergeSet = new Set([...profile.languages, ...languages]);
+      // profile.languages = [...mergeSet];
+
+      let languagesNew = mergeArrays(currentLanguages, languages);
+      profile.languages = languagesNew;
+    }
+    if (resetLanguage) {
+      profile.languages = [];
     }
     // Save the updated profile to the database
     await profile.save();
@@ -185,6 +195,7 @@ exports.updatePhysicalData = async (req, res) => {
     });
   } catch (error) {
     // Send an error response if something goes wrong
+    console.log("error=>", error);
     res.status(500).json({
       message: "Something went wrong",
       error: error.message,
@@ -587,7 +598,6 @@ exports.getEscorts = async (req, res) => {
     }
     if (area) {
       query.area = area.toLowerCase();
-      console.log(query.area);
     }
     if (baseCity) {
       query.baseCity = baseCity.toLowerCase();
@@ -806,12 +816,8 @@ exports.uploadProfileImage = async (req, res) => {
         .addWatermark(files.path, "./controller/watermark.png", {
           dstPath: `./uploads/escort/${files.filename}`,
         })
-        .then((data) => {
-          console.log(data);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+        .then((data) => {})
+        .catch((err) => {});
       let profileImage = files.filename;
       escort.profileImage = profileImage;
       await escort.save();
