@@ -108,13 +108,25 @@ exports.deleteCity = async (req, res) => {
 //Get All Cities
 exports.getAllCity = async (req, res) => {
   try {
-    const cities = await Cities.find({}).sort({ createdAt: -1 });
-    // if (req.query) {
-    //   if (req?.query?.limit) {
-    //     const limit = parseInt(req.query.limit);
-    //     query = query.limit(limit);
-    //   }
-    // }
+    const { search, limit, offset, country } = req.query;
+
+    // Create a query object with optional search condition and filtering by country name
+    const query = {};
+    if (search) {
+      query.name = { $regex: search, $options: "i" };
+    }
+    if (country) {
+      query.country = { $regex: country, $options: "i" };
+    }
+    // Apply limit and offset options to the query
+    const citiesQuery = Cities.find(query)
+      .limit(parseInt(limit))
+      .skip(parseInt(offset))
+      .sort({ createdAt: -1 });
+
+    // Execute the query and retrieve the cities
+    const cities = await citiesQuery.exec();
+
     res.status(200).json({ cities, counts: cities.length });
   } catch (err) {
     console.error(err);
