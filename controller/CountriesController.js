@@ -57,8 +57,14 @@ exports.editCountry = async (req, res) => {
 //Get all countries
 exports.getAllCountries = async (req, res) => {
   try {
-    const query = await Countries.find({});
-    const countries = query;
+    const { search, limit, offset } = req.query;
+
+    // Create a query object with optional search condition
+    const query = search ? { name: { $regex: search, $options: "i" } } : {};
+    const countriesQuery = Countries.find(query)
+      .limit(parseInt(limit))
+      .skip(parseInt(offset));
+    const countries = await countriesQuery.exec();
     res.status(200).json({ countries, counts: countries.length });
   } catch (err) {
     console.error(err);
