@@ -25,7 +25,7 @@ exports.addRating = async (req, res) => {
     if (type !== "default") {
       return res.status(403).json({ message: "You cant give review." });
     }
-    let escort = await EscortProfile.findOne({ username: escortUsername });
+    let escort = await EscortProfile.findOne({ userName: escortUsername });
     if (!escort) {
       return res.status(404).json({ message: "Escort not found" });
     }
