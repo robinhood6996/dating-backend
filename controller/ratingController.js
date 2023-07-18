@@ -64,8 +64,17 @@ exports.addRating = async (req, res) => {
 };
 
 exports.getAllRatings = async (req, res) => {
-  const { city, appearanceRate, serviceRate, attitude, chat, performance } =
-    req.query;
+  const {
+    city,
+    appearanceRate,
+    serviceRate,
+    attitude,
+    chat,
+    performance,
+    limit,
+    offset,
+    search,
+  } = req.query;
 
   const filter = {};
 
@@ -92,10 +101,18 @@ exports.getAllRatings = async (req, res) => {
   if (performance) {
     filter.performance = performance;
   }
-
+  if (search) {
+    filter.$or = [
+      { "customerDetails.name": { $regex: search, $options: "i" } },
+      { "escortDetails.name": { $regex: search, $options: "i" } },
+    ];
+  }
   try {
-    const ratings = await Rating.find(filter);
-    res.status(200).json({ data: ratings });
+    const ratings = await Rating.find(filter)
+      .sort({ createdAt: -1 })
+      .limit(parseInt(limit))
+      .skip(parseInt(offset));
+    res.status(200).json({ data: ratings, count: ratings.length });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
