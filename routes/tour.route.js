@@ -6,6 +6,7 @@ const upload = require("multer")();
 router.post("/", authenticate, upload.any(), cityTour.createCityTour);
 router.get("/", cityTour.getAllCityTours);
 router.get("/my", authenticate, cityTour.getUserCityTour);
+router.get("/escort/:userName", authenticate, cityTour.getEscortTours);
 router.delete("/", authenticate, cityTour.deleteCityTour);
 
 module.exports = router;
