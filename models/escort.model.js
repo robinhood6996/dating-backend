@@ -105,6 +105,7 @@ const EscortProfileSchema = new Schema(
     verified: { type: Boolean, default: false },
     pornStar: { type: Boolean, default: false },
     withVideo: { type: Boolean, default: false },
+    fakePhoto: { type: Boolean, default: false },
     //others
     memberShip: { type: [], default: [] },
     memberShipDetails: { type: MembershipSchema, default: {} },
