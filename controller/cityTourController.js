@@ -116,3 +116,13 @@ exports.getUserCityTour = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+exports.getEscortTours = async (req, res) => {
+  const { userName } = req.params;
+  try {
+    const cityTours = await CityTour.find({ userName: userName });
+    res.json({ cityTours });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
