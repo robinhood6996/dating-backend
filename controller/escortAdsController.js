@@ -381,6 +381,7 @@ cron.schedule("0 */6 * * *", async () => {
     });
 
     for (const ad of expiredAds) {
+      console.log("ad", ad);
       // Update the banner to make it active and reset hold-related fields
       ad.active = false;
       ad.expired = true;
