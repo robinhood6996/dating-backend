@@ -7,6 +7,7 @@ const QuerySchema = new Schema(
     email: { type: String, required: true },
     message: { type: String, required: true },
     status: { type: Number, default: 0 },
+    type: { type: Number, default: 0 },
   },
   { timestamps: true }
 );
