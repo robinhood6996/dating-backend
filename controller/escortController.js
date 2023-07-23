@@ -1105,11 +1105,19 @@ exports.deleteEscort = async (req, res) => {
 
 exports.getInactiveEscorts = async (req, res) => {
   try {
-    let { limit, offset, gender, category } = req.query;
+    let { limit, offset, gender, category, search } = req.query;
     let genderN = gender?.toLowerCase();
     let query = { isActive: false };
     if (gender) query.gender = genderN;
     if (category) query.category = category;
+    if (search) {
+      const searchRegex = new RegExp(search, "i");
+      query.$or = [
+        { userName: searchRegex },
+        { email: searchRegex },
+        { name: searchRegex },
+      ];
+    }
     // Fetch all escort profiles from the database
     const escorts = await EscortProfile.find({ ...query })
       .limit(limit || 0)
