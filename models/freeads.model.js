@@ -5,7 +5,7 @@ const freeAdSchema = new Schema(
   {
     title: { type: String, required: true },
     category: { type: String, required: true },
-    country: { type: String, required: true },
+    country: { type: String },
     city: { type: String, required: true },
     description: { type: String, required: true },
     phone: { type: Number, required: true },
@@ -13,7 +13,7 @@ const freeAdSchema = new Schema(
     username: { type: String },
     duration: { type: Number },
     photos: { type: Array, required: true },
-    ownerEmail: { type: String, required: true },
+    ownerEmail: { type: String },
     status: {
       type: String,
       required: true,
@@ -28,7 +28,7 @@ freeAdSchema.methods = {
     return mongoose.model("FreeAd").find({ status: "active" });
   },
   findInactive: function () {
-    return mongoose.model("FreeAd").find({ status: "inactive" });
+    return mongoose.model("FreeAd").find({ status: "pending" });
   },
   findAll: function () {
     return mongoose.model("FreeAd").find({});

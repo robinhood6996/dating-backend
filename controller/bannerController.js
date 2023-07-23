@@ -141,20 +141,23 @@ exports.addBanner = async (req, res) => {
 
 exports.getAllBanners = async (req, res) => {
   try {
-    const { paid, country, city } = req.params;
-
+    const { active, payment, position, limit, offset, search } = req.query;
+    console.log(req.params);
     let params = {};
-    if (paid) {
-      params.paid = paid;
+    if (active !== undefined) {
+      params.active = active;
     }
-    if (country) {
-      params.country = country;
+    if (payment) {
+      params.paymentMedia = payment;
     }
-    if (city) {
-      params.city = city;
+    if (position) {
+      params.position = position;
+    }
+    if (search !== undefined) {
+      params.search = search;
     }
 
-    const banners = await Banner.find(params);
+    const banners = await Banner.find(params).limit(limit).skip(offset);
     return res.json({ banners });
   } catch (err) {
     console.error(err);
@@ -294,7 +297,7 @@ exports.holdBanner = async (req, res) => {
 };
 
 // Schedule the cron job to run every hour
-cron.schedule("*/1 * * * *", async () => {
+cron.schedule("0 */6 * * *", async () => {
   console.log("Banner crob triggered");
   try {
     // Find all held banners with forceStopDate less than today's date
@@ -334,3 +337,29 @@ cron.schedule("*/1 * * * *", async () => {
     console.error("Error executing cron job:", error);
   }
 });
+
+exports.updateAdStatus = async (req, res) => {
+  const { type } = req.user;
+  const { bannerId } = req.params;
+  const { active, isPaid } = req.body;
+
+  if (type === "admin") {
+    try {
+      const updatedAd = await Banner.findByIdAndUpdate(
+        bannerId,
+        { $set: { active, isPaid } },
+        { new: true }
+      );
+
+      if (!updatedAd) {
+        return res.status(404).json({ error: "Escort ad not found" });
+      }
+      res.status(200).json({ message: "Payment status updated" });
+    } catch (error) {
+      console.error("Error updating isPaid status:", error);
+      res.status(500).json({ error: "Failed to update isPaid status" });
+    }
+  } else {
+    return res.status(403).json("You are not allowed 88");
+  }
+};

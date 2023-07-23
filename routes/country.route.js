@@ -20,5 +20,6 @@ router.post(
   countryController.createCountry
 );
 router.delete("/:id", authenticate, adminAuth, countryController.deleteCountry);
+router.get("/get-one", countryController.getCountry);
 
 module.exports = router;

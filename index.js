@@ -8,6 +8,7 @@ const settingsRoutes = require("./routes/settings.route");
 const escortRoutes = require("./routes/escortRoutes");
 const countryRoutes = require("./routes/country.route");
 const cityRoutes = require("./routes/cities.route");
+const areaRoutes = require("./routes/area.route");
 const freeAdController = require("./routes/freeads.route");
 const bannerController = require("./routes/banner.route");
 const verification = require("./routes/verificaion.route");
@@ -17,6 +18,7 @@ const stripe = require("./routes/stripe");
 const defaultUser = require("./routes/defaultUser.route");
 const Rating = require("./routes/rating.route");
 const escortAd = require("./routes/escortAds.route");
+const query = require("./routes/queryRoute");
 const cron = require("node-cron");
 
 const app = express();
@@ -24,6 +26,7 @@ app.use(cors());
 const allowedOrigins = [
   "https://incontrisc.netlify.app",
   "http://localhost:3011",
+  "http://admin.incontriesc.com",
 ];
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -49,12 +52,13 @@ app.use((req, res, next) => {
 function myController() {
   // Your controller logic goes here
   console.log("Controller cron job");
-  // let 
+  // let
 }
 
 mongoose
   .connect(
-    "mongodb+srv://datingadmin:D88CQRZrzRSvTGD@cluster0.oulrk.mongodb.net/?retryWrites=true&w=majority",
+    //"mongodb+srv://datingadmin:D88CQRZrzRSvTGD@cluster0.oulrk.mongodb.net/?retryWrites=true&w=majority",
+    "mongodb+srv://incontriesc:ZuE0Dw0mt3vV8VZ7@cluster0.c7z4yok.mongodb.net/?retryWrites=true&w=majority",
     {
       useNewUrlParser: true,
       useUnifiedTopology: true,
@@ -75,12 +79,17 @@ mongoose
       const { filename } = req.params;
       res.sendFile(`${__dirname}/uploads/banner/${filename}`);
     });
+    app.get("/bank/:filename", (req, res) => {
+      const { filename } = req.params;
+      res.sendFile(`${__dirname}/uploads/bank/${filename}`);
+    });
     app.use("/", settingsRoutes);
     app.use("/auth", authRoutes);
     app.use("/default-user", defaultUser);
     app.use("/escort", escortRoutes);
     app.use("/country", countryRoutes);
     app.use("/city", cityRoutes);
+    app.use("/area", areaRoutes);
     app.use("/freead", freeAdController);
     app.use("/banner", bannerController);
     app.use("/city-tour", cityTour);
@@ -88,7 +97,8 @@ mongoose
     app.use("/rating", Rating);
     app.use("/stripe", stripe);
     app.use("/escort-ad", escortAd);
-    cron.schedule("*/1 * * * *", myController);
+    app.use("/query", query);
+    cron.schedule("0 */6 * * *", myController);
     exports.api = functions.https.onRequest(app);
   })
   .catch((error) => {

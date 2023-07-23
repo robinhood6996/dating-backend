@@ -6,10 +6,11 @@ const cityTourSchema = new mongoose.Schema({
   dateTo: { type: Date, required: true },
   email: { type: String, required: true },
   phone: { type: String, required: true },
+  country: { type: String, required: true },
   city: { type: String, required: true },
   status: { type: String, default: "pending" },
   profileImage: { type: String },
-  username: { type: String },
+  userName: { type: String },
   escort: { type: String },
   escortEmail: { type: String, required: true },
 });

@@ -18,13 +18,15 @@ const EscortProfileSchema = new Schema(
     ethnicity: { type: String, lowercase: true },
     nationality: { type: String, lowercase: true },
     country: { type: String, lowercase: true },
-    state: { type: String, lowercase: true },
+    area: { type: String, lowercase: true },
     baseCity: { type: String, lowercase: true },
     userName: { type: String },
     profileImage: { type: String, default: "" },
 
     // Physical
+
     hairColor: { type: String, lowercase: true },
+    breast: { type: String, lowercase: true },
     eyeColor: { type: String, lowercase: true },
     hairLength: { type: String, lowercase: true },
     height: { type: String, lowercase: true },
@@ -35,10 +37,10 @@ const EscortProfileSchema = new Schema(
     brest: { type: String, lowercase: true },
     brestSize: { type: String, lowercase: true },
     pubicHair: { type: String, lowercase: true },
-    smoking: { type: String },
+    smoke: { type: String },
     drinking: { type: String },
-    tattoos: { type: Boolean },
-    piercings: { type: Boolean },
+    tattoos: { type: String },
+    piercings: { type: String },
     // Languages
     languages: { type: Array, default: [] },
 
@@ -103,13 +105,14 @@ const EscortProfileSchema = new Schema(
     verified: { type: Boolean, default: false },
     pornStar: { type: Boolean, default: false },
     withVideo: { type: Boolean, default: false },
+    fakePhoto: { type: Boolean, default: false },
     //others
     memberShip: { type: [], default: [] },
     memberShipDetails: { type: MembershipSchema, default: {} },
     isActive: { type: Boolean, default: false },
-    photosRate: {type: Number, default: 0},
-    ratedClients: {type: Array, default: []},
-    avgRate: {type: Number, default: 0}
+    photosRate: { type: Number, default: 0 },
+    ratedClients: { type: Array, default: [] },
+    avgRate: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

@@ -26,8 +26,8 @@ router.post(
 router.get("/", Banner.getAllBanners);
 router.get("/all", Banner.getPositionBanners);
 router.get("/my", authenticate, Banner.getMyBanners);
-// router.put("/:bannerId", upload.any(), Banner.editBanner);
 router.put("/hold", authenticate, upload.any(), Banner.holdBanner);
 router.delete("/delete", authenticate, Banner.deleteBanner);
+router.put("/:bannerId", authenticate, upload.any(), Banner.updateAdStatus);
 
 module.exports = router;

@@ -25,6 +25,8 @@ router.get("/get-all", adsController.getAllEscortsAd);
 router.get("/my", authenticate, adsController.getMyAds);
 router.get("/featured", adsController.getFeaturedEscorts);
 router.get("/girl-of-the-month", adsController.getGirlofTheMonth);
+router.put("/status/:adId", authenticate, adsController.updateAdStatus);
 router.put("/:adId", authenticate, adsController.updateIsPaidStatus);
+router.delete("/:adId", authenticate, adsController.deleteAd);
 
 module.exports = router;

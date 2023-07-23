@@ -1,12 +1,12 @@
 require("dotenv").config();
 const User = require("../models/user.model");
 const BlacklistToken = require("../models/blacklistToken.model");
-// const bcrypt = require("bcrypt");
+const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const { EscortProfile } = require("../models/escort.model");
 const { generateRandomNumber } = require("../helpers/utils");
-const { defaultUser } = require("../models/defaultUser.model");
+const defaultUser = require("../models/defaultUser.model");
 
 exports.registerUser = async (req, res) => {
   try {
@@ -19,7 +19,7 @@ exports.registerUser = async (req, res) => {
     }
 
     // Hash the password
-    // const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    //const hashedPassword = await bcrypt.hash(req.body.password, 10);
     // Create a new user document
     let nameSplit = req.body.email.split("@")[0];
     let username = nameSplit + generateRandomNumber();
@@ -43,7 +43,7 @@ exports.registerUser = async (req, res) => {
         age: user.age,
         phone: req.body.phone,
         gender: user.gender.toLowerCase(),
-        username,
+        userName: username,
       });
       await escort.save();
     }
@@ -60,6 +60,7 @@ exports.registerUser = async (req, res) => {
     }
     return res.status(201).json({ message: "Successfully registered" });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({ message: "Something went wrong", error });
   }
 };
@@ -75,11 +76,15 @@ exports.getAllUser = async (req, res) => {
         $or: [
           { email: { $regex: search, $options: "i" } }, // Case-insensitive search by email
           { username: { $regex: search, $options: "i" } }, // Case-insensitive search by username
+          { name: { $regex: search, $options: "i" } }, // Case-insensitive search by username
         ],
       };
     }
+    console.log("query", query);
+    // Exclude the password field from the query projection
+    const projection = { password: 0 };
 
-    const allUsers = await User.find(query);
+    const allUsers = await User.find(query, projection).sort({ createdAt: -1 });
     res.send(allUsers);
   } catch {
     res.status(500).json({ message: "Something went wrong" });
@@ -95,7 +100,7 @@ exports.login = async (req, res) => {
     });
     if (existingUser) {
       // Generate a JWT token
-      // const matched = await bcrypt.compare(password, existingUser.password);
+      //const matched = await bcrypt.compare(password, existingUser.password);
       const matched = password === existingUser.password;
       if (matched) {
         const token = jwt.sign(
@@ -114,7 +119,11 @@ exports.login = async (req, res) => {
       } else {
         res
           .status(400)
-          .json({ message: "Invalid email or password", statusCode: 400 });
+          .json({
+            message: "Invalid email or password",
+            statusCode: 400,
+            existingUser,
+          });
       }
     } else {
       res.status(404).json({ message: "User not found" });

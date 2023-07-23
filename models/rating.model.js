@@ -2,8 +2,10 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const UserSchema = new Schema({
+  name: { type: String, required: true },
   username: { type: String, required: true },
   email: { type: String, required: true },
+  profileImage: { type: String, default: null },
 });
 
 const RatingSchema = new Schema(
@@ -20,6 +22,7 @@ const RatingSchema = new Schema(
     details: { type: String, required: true },
     customerDetails: { type: UserSchema, required: true },
     escortDetails: { type: UserSchema, required: true },
+    reply: { type: String, require: false, default: null },
   },
   { timestamps: true }
 );

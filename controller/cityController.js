@@ -3,7 +3,7 @@ const Countries = require("../models/countries.model");
 
 exports.addCity = async (req, res) => {
   try {
-    const { name, country } = req.body;
+    const { name, country, description } = req.body;
 
     if (!country) {
       return res.status(400).json({ message: "Country name is required." });
@@ -25,6 +25,7 @@ exports.addCity = async (req, res) => {
     const city = new Cities({
       name,
       country,
+      description,
       escortCount: 0,
       escortsOnTour: 0,
     });
@@ -56,6 +57,7 @@ exports.editCity = async (req, res) => {
   try {
     const cityId = req.params.cityId;
     const newCityName = req.body.name;
+    const description = req.body.description;
 
     if (!cityId || !newCityName) {
       return res
@@ -74,7 +76,7 @@ exports.editCity = async (req, res) => {
     }
     const updatedCity = await Cities.findOneAndUpdate(
       { _id: cityId },
-      { $set: { name: newCityName } },
+      { $set: { name: newCityName, description } },
       { new: true }
     );
 
@@ -106,13 +108,25 @@ exports.deleteCity = async (req, res) => {
 //Get All Cities
 exports.getAllCity = async (req, res) => {
   try {
-    const cities = await Cities.find({});
-    // if (req.query) {
-    //   if (req?.query?.limit) {
-    //     const limit = parseInt(req.query.limit);
-    //     query = query.limit(limit);
-    //   }
-    // }
+    const { search, limit, offset, country } = req.query;
+
+    // Create a query object with optional search condition and filtering by country name
+    const query = {};
+    if (search) {
+      query.name = { $regex: search, $options: "i" };
+    }
+    if (country) {
+      query.country = { $regex: country, $options: "i" };
+    }
+    // Apply limit and offset options to the query
+    const citiesQuery = Cities.find(query)
+      .limit(parseInt(limit))
+      .skip(parseInt(offset))
+      .sort({ createdAt: -1 });
+
+    // Execute the query and retrieve the cities
+    const cities = await citiesQuery.exec();
+
     res.status(200).json({ cities, counts: cities.length });
   } catch (err) {
     console.error(err);
@@ -136,6 +150,17 @@ exports.getCityByCountry = async (req, res) => {
     //     query = query.limit(limit);
     //   }
     // }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+exports.getCity = async (req, res) => {
+  try {
+    let { city } = req.query;
+    const cityData = await Cities.findOne({ name: city });
+    res.status(200).json(cityData);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Internal server error" });

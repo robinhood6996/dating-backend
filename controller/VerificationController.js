@@ -1,6 +1,6 @@
 const { EscortProfile } = require("../models/escort.model");
 const { verification } = require("../models/verification.model");
-
+const fs = require("fs");
 exports.verificationRequest = async (req, res) => {
   try {
     let user = req.user;
@@ -11,7 +11,7 @@ exports.verificationRequest = async (req, res) => {
       if (!escort) {
         return res.status(403).json({ message: "Not allowed" });
       }
-      if (files.length < 2) {
+      if (files.length < 3) {
         return res.status(400).json({ message: "Photos are required" });
       }
       const verify = new verification({
@@ -109,12 +109,24 @@ exports.getSingleUserVerifications = async (req, res) => {
 };
 exports.deleteVerification = async (req, res) => {
   const { id } = req.query;
-  console.log("verification", id);
+  const { type, email } = req.user;
   try {
     const verificationItems = await verification.findOne({ _id: id });
     console.log("verification", verificationItems);
-    await verificationItems.deleteOne();
-    res.status(200).json({ message: "Deleted Successfully" });
+    if (type === "admin" || verificationItems.userEmail === email) {
+      const directoryPath = __dirname + "/../uploads/escort/";
+      verificationItems?.photos?.forEach((photo) => {
+        let file = photo?.filename;
+        if (file) {
+          fs.unlinkSync(directoryPath + file, (err) => {});
+        }
+      });
+
+      await verificationItems.deleteOne();
+      res.status(200).json({ message: "Deleted Successfully" });
+    } else {
+      res.status(403).json({ message: "Forbidden" });
+    }
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
