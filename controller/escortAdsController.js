@@ -153,8 +153,10 @@ exports.getGirlofTheMonth = async (req, res) => {
 };
 
 exports.getAllEscortsAd = async (req, res) => {
-  const { isPaid, expired, limit, offset, payment, package } = req.query;
+  const { isPaid, expired, limit, offset, payment, package, search } =
+    req.query;
   const query = {};
+
   if (isPaid !== undefined) {
     query.isPaid = isPaid;
   }
@@ -168,16 +170,37 @@ exports.getAllEscortsAd = async (req, res) => {
     query.packageType = package;
   }
 
+  // Apply search functionality if the "search" query parameter is provided
+  if (search) {
+    const searchRegex = new RegExp(search, "i"); // Case-insensitive search regex
+    query.$or = [
+      { title: searchRegex },
+      { category: searchRegex },
+      // Add more fields as needed for searching
+    ];
+  }
+
   try {
-    const ads = await EscortAd.find({ ...query })
-      .limit(limit)
-      .skip(offset);
-    res.status(200).json({ ads });
+    const totalAdsCount = await EscortAd.countDocuments(query);
+
+    const ads = await EscortAd.find(query)
+      .limit(parseInt(limit) || 10) // Default limit is 10 if not provided or not a valid number
+      .skip(parseInt(offset) || 0) // Default offset is 0 if not provided or not a valid number
+      .exec();
+
+    res.status(200).json({
+      ads,
+      resultCount: ads.length,
+      totalAdsCount,
+      currentPage: Math.floor(offset / (parseInt(limit) || 10)) + 1,
+      totalPages: Math.ceil(totalAdsCount / (parseInt(limit) || 10)),
+    });
   } catch (error) {
-    console.error("Error updating isPaid status:", error);
-    res.status(500).json({ error: "Failed to update isPaid status" });
+    console.error("Error fetching escort ads:", error);
+    res.status(500).json({ error: "Failed to fetch escort ads" });
   }
 };
+
 exports.getMyAds = async (req, res) => {
   const { username } = req.user;
 
