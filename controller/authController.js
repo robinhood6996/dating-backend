@@ -76,6 +76,7 @@ exports.getAllUser = async (req, res) => {
         $or: [
           { email: { $regex: search, $options: "i" } }, // Case-insensitive search by email
           { username: { $regex: search, $options: "i" } }, // Case-insensitive search by username
+          { name: { $regex: search, $options: "i" } }, // Case-insensitive search by username
         ],
       };
     }
@@ -118,7 +119,11 @@ exports.login = async (req, res) => {
       } else {
         res
           .status(400)
-          .json({ message: "Invalid email or password", statusCode: 400, existingUser });
+          .json({
+            message: "Invalid email or password",
+            statusCode: 400,
+            existingUser,
+          });
       }
     } else {
       res.status(404).json({ message: "User not found" });
