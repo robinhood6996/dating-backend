@@ -6,13 +6,23 @@ const User = require("../models/user.model");
 
 exports.getAllCityTours = async (req, res) => {
   try {
-    let { country, city, limit, offset } = req.query;
+    let { country, city, limit, offset, search } = req.query;
     let query = {};
     if (country) {
       query.country = country;
     }
     if (city) {
       query.city = city;
+    }
+    if (search) {
+      const searchRegex = new RegExp(search, "i"); // Case-insensitive search regex
+      query.$or = [
+        { name: searchRegex },
+        { userName: searchRegex },
+        { escortEmail: searchRegex },
+        { country: searchRegex },
+        { city: searchRegex },
+      ];
     }
     const cityTours = await CityTour.find(query).limit(limit).skip(offset);
     res.json({ cityTours });
