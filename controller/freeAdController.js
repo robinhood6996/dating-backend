@@ -95,23 +95,97 @@ exports.editFreeAd = async (req, res) => {
 //Find active Freeads
 exports.activeAds = async (req, res) => {
   try {
-    let NewAd = new FreeAd();
-    let data = await NewAd.findActive();
-    res.status(200).json({ data, count: data.length });
+    let { limit, offset, search } = req.query;
+    limit = parseInt(limit) || 10; // Default limit is 10 if not provided or not a valid number
+    offset = parseInt(offset) || 0; // Default offset is 0 if not provided or not a valid number
+
+    // Construct the search query with the "status" set to "active" and optional search text
+    const query = {
+      status: "active",
+    };
+
+    if (search) {
+      const searchRegex = new RegExp(search, "i"); // Case-insensitive search regex
+      query.$or = [
+        { title: searchRegex },
+        { category: searchRegex },
+        { city: searchRegex },
+        { description: searchRegex },
+      ];
+    }
+
+    // Fetch active FreeAds from the database
+    const activeFreeAds = await FreeAd.find(query)
+      .limit(limit)
+      .skip(offset)
+      .exec();
+
+    // Count the total number of active FreeAds for pagination purposes
+    const totalActiveFreeAds = await FreeAd.countDocuments(query);
+
+    // Send the retrieved data as a response
+    res.status(200).json({
+      message: "Active FreeAds retrieved successfully",
+      resultCount: activeFreeAds.length,
+      total: totalActiveFreeAds,
+      data: activeFreeAds,
+      statusCode: 200,
+    });
   } catch (error) {
-    console.log("error", error);
-    res.status(500).json({ message: "Internal server error" });
+    // Send an error response if something goes wrong
+    res.status(500).json({
+      message: "Something went wrong",
+      error: error.message,
+      statusCode: 500,
+    });
   }
 };
 //Find active Freeads
 exports.inactiveAds = async (req, res) => {
   try {
-    let NewAd = new FreeAd();
-    let data = await NewAd.findInactive();
-    res.status(200).json({ data, count: data.length });
+    let { limit, offset, search } = req.query;
+    limit = parseInt(limit) || 10; // Default limit is 10 if not provided or not a valid number
+    offset = parseInt(offset) || 0; // Default offset is 0 if not provided or not a valid number
+
+    // Construct the search query with the "status" set to "active" and optional search text
+    const query = {
+      status: "inactive",
+    };
+
+    if (search) {
+      const searchRegex = new RegExp(search, "i"); // Case-insensitive search regex
+      query.$or = [
+        { title: searchRegex },
+        { category: searchRegex },
+        { city: searchRegex },
+        { description: searchRegex },
+      ];
+    }
+
+    // Fetch active FreeAds from the database
+    const activeFreeAds = await FreeAd.find(query)
+      .limit(limit)
+      .skip(offset)
+      .exec();
+
+    // Count the total number of active FreeAds for pagination purposes
+    const totalActiveFreeAds = await FreeAd.countDocuments(query);
+
+    // Send the retrieved data as a response
+    res.status(200).json({
+      message: "Active FreeAds retrieved successfully",
+      resultCount: activeFreeAds.length,
+      total: totalActiveFreeAds,
+      data: activeFreeAds,
+      statusCode: 200,
+    });
   } catch (error) {
-    console.log("error", error);
-    res.status(500).json({ message: "Internal server error" });
+    // Send an error response if something goes wrong
+    res.status(500).json({
+      message: "Something went wrong",
+      error: error.message,
+      statusCode: 500,
+    });
   }
 };
 
