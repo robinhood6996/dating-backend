@@ -153,12 +153,24 @@ exports.getAllBanners = async (req, res) => {
     if (position) {
       params.position = position;
     }
-    if (search !== undefined) {
-      params.search = search;
+    if (search) {
+      const searchRegex = new RegExp(search, "i"); // Case-insensitive search regex
+      query.$or = [
+        { email: searchRegex },
+        { username: searchRegex },
+        { name: searchRegex },
+        // Add more fields as needed for searching
+      ];
     }
-
-    const banners = await Banner.find(params).limit(limit).skip(offset);
-    return res.json({ banners });
+    const totalBanners = await Banner.countDocuments(query);
+    const banners = await Banner.find(params)
+      .limit(parseInt(limit))
+      .skip(parseInt(offset));
+    return res.json({
+      data: banners,
+      resultCount: banners.length,
+      totalCount: totalBanners,
+    });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: "Internal server error" });
