@@ -118,16 +118,19 @@ exports.getAllCity = async (req, res) => {
     if (country) {
       query.country = { $regex: country, $options: "i" };
     }
+    const totalCities = await Cities.countDocuments(query);
     // Apply limit and offset options to the query
-    const citiesQuery = Cities.find(query)
+    const cities = await Cities.find(query)
       .limit(parseInt(limit))
       .skip(parseInt(offset))
       .sort({ createdAt: -1 });
 
     // Execute the query and retrieve the cities
-    const cities = await citiesQuery.exec();
+    // const cities = await citiesQuery.exec();
 
-    res.status(200).json({ cities, counts: cities.length });
+    res
+      .status(200)
+      .json({ cities, resultCount: cities.length, totalCount: totalCities });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Internal server error" });

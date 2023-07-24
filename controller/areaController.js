@@ -132,7 +132,7 @@ exports.getAllCity = async (req, res) => {
     if (city) {
       query.city = { $regex: city, $options: "i" };
     }
-
+    const totalAreas = await Areas.countDocuments(query);
     // Fetching area names with limit and offset
     const areasQuery = Areas.find(query)
       .sort({ createdAt: -1 })
@@ -142,7 +142,9 @@ exports.getAllCity = async (req, res) => {
     // Execute the query and retrieve the cities
     const areas = await areasQuery.exec();
 
-    res.status(200).json({ areas, counts: areas.length });
+    res
+      .status(200)
+      .json({ areas, resultCount: areas.length, totalCount: totalAreas });
   } catch (error) {
     console.error(error);
     res
