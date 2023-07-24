@@ -60,12 +60,21 @@ exports.getAllCountries = async (req, res) => {
     const { search, limit, offset } = req.query;
 
     // Create a query object with optional search condition
-    const query = search ? { name: { $regex: search, $options: "i" } } : {};
+    const query = {};
+    if (search) {
+      const searchRegex = new RegExp(search, "i"); // Case-insensitive search regex
+      query.$or = [{ name: searchRegex }];
+    }
+    const totalCountries = await CityTour.countDocuments(query);
     const countriesQuery = Countries.find(query)
       .limit(parseInt(limit))
       .skip(parseInt(offset));
     const countries = await countriesQuery.exec();
-    res.status(200).json({ countries, counts: countries.length });
+    res.status(200).json({
+      countries,
+      resultCount: countries.length,
+      totalCount: totalCountries,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Internal server error" });
