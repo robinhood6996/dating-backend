@@ -127,7 +127,7 @@ exports.activeAds = async (req, res) => {
     res.status(200).json({
       message: "Active FreeAds retrieved successfully",
       resultCount: activeFreeAds.length,
-      total: totalActiveFreeAds,
+      totalCount: totalActiveFreeAds,
       data: activeFreeAds,
       statusCode: 200,
     });
@@ -175,7 +175,7 @@ exports.inactiveAds = async (req, res) => {
     res.status(200).json({
       message: "Active FreeAds retrieved successfully",
       resultCount: activeFreeAds.length,
-      total: totalActiveFreeAds,
+      totalCount: totalActiveFreeAds,
       data: activeFreeAds,
       statusCode: 200,
     });
@@ -203,12 +203,15 @@ exports.getAll = async (req, res) => {
     if (city) {
       query.city = city;
     }
-
+    // Count the total number of active FreeAds for pagination purposes
+    const totalActiveFreeAds = await FreeAd.countDocuments(query);
     let data = await FreeAd.find(query)
       .limit(limit || 0)
       .skip(offset || 0)
       .exec();
-    return res.status(200).json({ data, count: data.length });
+    return res
+      .status(200)
+      .json({ data, count: data.length, totalCount: totalActiveFreeAds });
   } catch (error) {
     console.log("error", error);
     res.status(500).json({ message: "Internal server error" });
@@ -262,11 +265,15 @@ exports.getMyAds = async (req, res) => {
   try {
     const { limit, offset } = req.query;
     let query = { ownerEmail: email };
+    // Count the total number of active FreeAds for pagination purposes
+    const totalActiveFreeAds = await FreeAd.countDocuments(query);
     let data = await FreeAd.find(query)
       .limit(limit || 0)
       .skip(offset || 0)
       .exec();
-    return res.status(200).json({ data, count: data.length });
+    return res
+      .status(200)
+      .json({ data, count: data.length, totalCount: totalActiveFreeAds });
   } catch (error) {
     console.log("error", error);
     res.status(500).json({ message: "Internal server error" });

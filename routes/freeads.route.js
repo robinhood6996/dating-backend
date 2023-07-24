@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const freeAdController = require("../controller/freeAdController");
-const { authenticate } = require("../middleware/tokenMiddleware");
+const { authenticate, adminAuth } = require("../middleware/tokenMiddleware");
 const multer = require("multer");
 
 const storage = multer.diskStorage({
@@ -26,8 +26,8 @@ router.put(
   upload.any(),
   freeAdController.editFreeAd
 );
-router.get("/active", authenticate, freeAdController.activeAds);
-router.get("/inactive", authenticate, freeAdController.inactiveAds);
+router.get("/active", adminAuth, freeAdController.activeAds);
+router.get("/inactive", adminAuth, freeAdController.inactiveAds);
 router.get("/", freeAdController.getAll);
 router.get("/my", authenticate, freeAdController.getMyAds);
 router.get("/:adId", freeAdController.getSingleAd);
