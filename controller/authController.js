@@ -21,6 +21,7 @@ exports.registerUser = async (req, res) => {
     // Hash the password
     //const hashedPassword = await bcrypt.hash(req.body.password, 10);
     // Create a new user document
+    console.log("req.body.email", req.body);
     let nameSplit = req.body.email.split("@")[0];
     let username = nameSplit + generateRandomNumber();
     const user = new User({
