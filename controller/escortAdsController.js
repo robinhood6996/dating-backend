@@ -190,7 +190,7 @@ exports.getAllEscortsAd = async (req, res) => {
     res.status(200).json({
       ads,
       resultCount: ads.length,
-      totalAdsCount,
+      totalCount: totalAdsCount,
       currentPage: Math.floor(offset / (parseInt(limit) || 10)) + 1,
       totalPages: Math.ceil(totalAdsCount / (parseInt(limit) || 10)),
     });

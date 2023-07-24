@@ -65,7 +65,7 @@ exports.getAllCountries = async (req, res) => {
       const searchRegex = new RegExp(search, "i"); // Case-insensitive search regex
       query.$or = [{ name: searchRegex }];
     }
-    const totalCountries = await CityTour.countDocuments(query);
+    const totalCountries = await Countries.countDocuments(query);
     const countriesQuery = Countries.find(query)
       .limit(parseInt(limit))
       .skip(parseInt(offset));
