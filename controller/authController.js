@@ -67,26 +67,37 @@ exports.registerUser = async (req, res) => {
 
 exports.getAllUser = async (req, res) => {
   try {
-    const { search } = req.query;
+    const { search, limit, offset } = req.query;
 
     let query = {};
 
     if (search) {
-      query = {
-        $or: [
-          { email: { $regex: search, $options: "i" } }, // Case-insensitive search by email
-          { username: { $regex: search, $options: "i" } }, // Case-insensitive search by username
-          { name: { $regex: search, $options: "i" } }, // Case-insensitive search by username
-        ],
-      };
+      const searchRegex = new RegExp(search, "i");
+      query.$or = [
+        { email: searchRegex },
+        { username: searchRegex },
+        { name: searchRegex },
+        // Add more fields as needed for searching
+      ];
     }
-    console.log("query", query);
+
     // Exclude the password field from the query projection
     const projection = { password: 0 };
+    const totalUsers = await User.countDocuments(query);
 
-    const allUsers = await User.find(query, projection).sort({ createdAt: -1 });
-    res.send(allUsers);
-  } catch {
+    const allUsers = await User.find(query, projection)
+      .sort({ createdAt: -1 })
+      .limit(parseInt(limit))
+      .skip(parseInt(offset));
+    res.status(200).json({
+      data: allUsers,
+      currentPage: Math.floor(offset / (parseInt(limit) || 10)) + 1,
+      totalPages: Math.ceil(totalUsers / (parseInt(limit) || 10)),
+      totalCount: totalUsers,
+      resultCount: allUsers.length,
+    });
+  } catch (error) {
+    console.log("user", error);
     res.status(500).json({ message: "Something went wrong" });
   }
 };
@@ -117,13 +128,11 @@ exports.login = async (req, res) => {
         };
         res.status(200).json({ user, token });
       } else {
-        res
-          .status(400)
-          .json({
-            message: "Invalid email or password",
-            statusCode: 400,
-            existingUser,
-          });
+        res.status(400).json({
+          message: "Invalid email or password",
+          statusCode: 400,
+          existingUser,
+        });
       }
     } else {
       res.status(404).json({ message: "User not found" });
