@@ -1,6 +1,7 @@
 const { EscortProfile } = require("../models/escort.model");
 const { verification } = require("../models/verification.model");
 const fs = require("fs");
+
 exports.verificationRequest = async (req, res) => {
   try {
     let user = req.user;
@@ -11,9 +12,11 @@ exports.verificationRequest = async (req, res) => {
       if (!escort) {
         return res.status(403).json({ message: "Not allowed" });
       }
+
       if (files.length < 3) {
         return res.status(400).json({ message: "Photos are required" });
       }
+
       const verify = new verification({
         name: escort.name,
         userEmail: user.email,
@@ -34,6 +37,7 @@ exports.verificationRequest = async (req, res) => {
     return res.status(500).json({ message: "Error", error, statusCode: 500 });
   }
 };
+
 exports.verificationApprove = async (req, res) => {
   try {
     let user = req.user;
@@ -77,15 +81,36 @@ exports.verificationApprove = async (req, res) => {
 };
 
 exports.getVerificationItems = async (req, res) => {
-  const { status } = req.query;
+  const { status, limit, offset, search } = req.query;
   const { type } = req.user;
+
   try {
     let query = {};
     if (status) {
       query.status = status;
     }
 
-    const verificationItems = await verification.find(query);
+    // Apply search functionality if the "search" query parameter is provided
+    if (search) {
+      const searchRegex = new RegExp(search, "i"); // Case-insensitive search regex
+      query.$or = [
+        { name: searchRegex },
+        { username: searchRegex },
+        { userEmail: searchRegex },
+        // Add more fields as needed for searching
+      ];
+    }
+
+    // Handle pagination using "limit" and "offset" query parameters
+    let limitValue = parseInt(limit) || 10; // Default limit is 10 if not provided or not a valid number
+    let offsetValue = parseInt(offset) || 0; // Default offset is 0 if not provided or not a valid number
+
+    const verificationItems = await verification
+      .find(query)
+      .limit(limitValue)
+      .skip(offsetValue)
+      .exec();
+
     if (type === "admin") {
       res.status(200).json(verificationItems);
     } else {
@@ -96,6 +121,7 @@ exports.getVerificationItems = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
 exports.getSingleUserVerifications = async (req, res) => {
   const { username } = req.params;
 
