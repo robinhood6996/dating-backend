@@ -174,8 +174,7 @@ exports.getAllEscortsAd = async (req, res) => {
   if (search) {
     const searchRegex = new RegExp(search, "i"); // Case-insensitive search regex
     query.$or = [
-      { title: searchRegex },
-      { category: searchRegex },
+      { name: searchRegex },
       // Add more fields as needed for searching
     ];
   }
