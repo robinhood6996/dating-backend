@@ -24,8 +24,14 @@ exports.getAllCityTours = async (req, res) => {
         { city: searchRegex },
       ];
     }
+    // Count the total number of active FreeAds for pagination purposes
+    const totalCityTours = await CityTour.countDocuments(query);
     const cityTours = await CityTour.find(query).limit(limit).skip(offset);
-    res.json({ cityTours });
+    res.status(200).json({
+      data: cityTours,
+      resultCount: cityTours.length,
+      totalCount: totalCityTours,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });

@@ -104,7 +104,7 @@ exports.getVerificationItems = async (req, res) => {
     // Handle pagination using "limit" and "offset" query parameters
     let limitValue = parseInt(limit) || 10; // Default limit is 10 if not provided or not a valid number
     let offsetValue = parseInt(offset) || 0; // Default offset is 0 if not provided or not a valid number
-
+    const totalVerifications = await verification.countDocuments(query);
     const verificationItems = await verification
       .find(query)
       .limit(limitValue)
@@ -112,7 +112,11 @@ exports.getVerificationItems = async (req, res) => {
       .exec();
 
     if (type === "admin") {
-      res.status(200).json(verificationItems);
+      res.status(200).json({
+        data: verificationItems,
+        resultCount: verificationItems.length,
+        totalCount: totalVerifications,
+      });
     } else {
       res.status(403).json({ message: "You are not allowed" });
     }
