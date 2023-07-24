@@ -499,6 +499,8 @@ exports.getAllEscort = async (req, res) => {
         { name: searchRegex },
       ];
     }
+    const totalEscortCount = await EscortProfile.countDocuments(query);
+
     // Fetch all escort profiles from the database
     const escorts = await EscortProfile.find({ ...query })
       .limit(limit || 0)
@@ -508,6 +510,10 @@ exports.getAllEscort = async (req, res) => {
     res.status(200).json({
       message: "All escort profiles retrieved successfully",
       resultCount: escorts.length,
+      currentPage: offset
+        ? Math.floor(offset / (parseInt(limit) || 10)) + 1
+        : 1,
+      totalPages: Math.ceil(totalEscortCount / (parseInt(limit) || 10)),
       data: escorts,
       statusCode: 200,
     });
@@ -673,14 +679,19 @@ exports.getEscorts = async (req, res) => {
         .map((h) => h.trim().toLowerCase());
       query.orientation = { $in: orientations };
     }
+    // Count the total number of active FreeAds for pagination purposes
+    const escortsTotal = await EscortProfile.countDocuments(query);
     let escort = await EscortProfile.find(query)
       .limit(limit || 0)
       .skip(offset || 0)
       .exec();
     if (escort) {
-      return res
-        .status(200)
-        .json({ data: escort, resultCount: escort.length, statusCode: 200 });
+      return res.status(200).json({
+        data: escort,
+        resultCount: escort.length,
+        totalCount: escortsTotal,
+        statusCode: 200,
+      });
     } else {
       return res
         .status(404)
