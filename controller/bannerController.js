@@ -155,14 +155,14 @@ exports.getAllBanners = async (req, res) => {
     }
     if (search) {
       const searchRegex = new RegExp(search, "i"); // Case-insensitive search regex
-      query.$or = [
+      params.$or = [
         { email: searchRegex },
         { username: searchRegex },
         { name: searchRegex },
         // Add more fields as needed for searching
       ];
     }
-    const totalBanners = await Banner.countDocuments(query);
+    const totalBanners = await Banner.countDocuments(params);
     const banners = await Banner.find(params)
       .limit(parseInt(limit))
       .skip(parseInt(offset));

@@ -108,7 +108,7 @@ exports.getAllRatings = async (req, res) => {
     ];
   }
   try {
-    const totalRatings = await ratings.countDocuments(filter);
+    const totalRatings = await Rating.countDocuments(filter);
     const ratings = await Rating.find(filter)
       .sort({ createdAt: -1 })
       .limit(parseInt(limit))
