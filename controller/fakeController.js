@@ -1,4 +1,4 @@
-const FakePhoto = require("./path/to/fakePhotoModel"); // Replace with the correct path to your model file
+const FakePhoto = require("../models/fakePhoto.model"); // Replace with the correct path to your model file
 
 // Controller function to add a new fakePhoto entry
 exports.addFakePhoto = async (req, res) => {
