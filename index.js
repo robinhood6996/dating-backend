@@ -19,6 +19,7 @@ const defaultUser = require("./routes/defaultUser.route");
 const Rating = require("./routes/rating.route");
 const escortAd = require("./routes/escortAds.route");
 const query = require("./routes/queryRoute");
+const fakePhotoRoutes = require("./routes/fake.route");
 const cron = require("node-cron");
 
 const app = express();
@@ -98,6 +99,7 @@ mongoose
     app.use("/stripe", stripe);
     app.use("/escort-ad", escortAd);
     app.use("/query", query);
+    app.use("/report", fakePhotoRoutes);
     cron.schedule("0 */6 * * *", myController);
     exports.api = functions.https.onRequest(app);
   })

@@ -2,24 +2,18 @@ const FakePhoto = require("./path/to/fakePhotoModel"); // Replace with the corre
 
 // Controller function to add a new fakePhoto entry
 exports.addFakePhoto = async (req, res) => {
-  const {
-    name,
-    email,
-    username,
-    reporterName,
-    reporterEmail,
-    reporterUsername,
-  } = req.body;
-
+  const { name, email, username, comment } = req.body;
+  const user = req.user;
   try {
     // Create a new fakePhoto document
     const newFakePhoto = new FakePhoto({
       name: name.toLowerCase(),
       email: email.toLowerCase(),
-      username: username.toLowerCase(),
-      reporterName: reporterName.toLowerCase(),
-      reporterEmail: reporterEmail.toLowerCase(),
-      reporterUsername: reporterUsername.toLowerCase(),
+      username: username,
+      reporterName: user.name,
+      reporterEmail: user.email,
+      reporterUsername: user.username,
+      comment,
     });
 
     // Save the new fakePhoto entry to the database
