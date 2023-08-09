@@ -10,6 +10,7 @@ const FakePhotoSchema = new Schema(
     reporterEmail: { type: String, required: true, lowercase: true },
     reporterUsername: { type: String, required: true, lowercase: true },
     comment: { type: String, required: false },
+    suspicious: { type: Boolean, required: false, default: false },
   },
   { timestamps: true }
 );
