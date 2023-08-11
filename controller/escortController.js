@@ -21,10 +21,11 @@ exports.updateBiographyData = async (req, res) => {
     ethnicity,
     nationality,
     country,
-    state,
     category,
     baseCity,
     area,
+    latitude,
+    longitude,
   } = req.body;
   try {
     // Find the escort profile by profileId
@@ -76,6 +77,23 @@ exports.updateBiographyData = async (req, res) => {
     if (category) profile.category = category;
     if (area) {
       profile.area = area;
+    }
+    if (latitude && longitude) {
+      let coordinates = {
+        latitude,
+        longitude,
+      };
+      let locationDetails = {
+        coordinates,
+        name: profile.name,
+        age: profile.age,
+        country: profile.country,
+        baseCity: profile.baseCity,
+        area: profile.area,
+        userName: profile.userName,
+        profileImage: profile.profileImage ?? "",
+      };
+      profile.locationDetails = { ...locationDetails };
     }
     // Save the updated profile
     await profile.save();
@@ -829,8 +847,10 @@ exports.uploadProfileImage = async (req, res) => {
   try {
     let user = req.user;
     if (req.files) {
+      const directoryPath = __dirname + "/../uploads/escort/";
       let files = req.files[0];
       let escort = await EscortProfile.findOne({ email: user.email });
+      let oldProfileImage = escort.profileImage;
       watermark2
         .addWatermark(files.path, "./controller/watermark.png", {
           dstPath: `./uploads/escort/${files.filename}`,
@@ -839,7 +859,16 @@ exports.uploadProfileImage = async (req, res) => {
         .catch((err) => {});
       let profileImage = files.filename;
       escort.profileImage = profileImage;
-      await escort.save();
+      await escort.save().then((res) => {
+        fs.unlinkSync(directoryPath + oldProfileImage, (err) => {
+          if (err) {
+            res.status(500).send({
+              message: "Could not delete the old profile image. " + err,
+            });
+          }
+        });
+        console.log("Deleted old photo");
+      });
       return res.status(200).json({
         message: "Profile Photo Uploaded",
         escort,

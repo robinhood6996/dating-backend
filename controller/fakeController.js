@@ -112,30 +112,38 @@ exports.updateFakePhotoSuspicion = async (req, res) => {
     const fakePhoto = await FakePhoto.findOne({ _id: id });
     let escort = await EscortProfile.findOne({ userName: fakePhoto.username });
     let profileImage = escort?.profileImage;
-    if (suspicious === true) {
-      watermark2.addWatermark(
-        `./uploads/escort/${profileImage}`,
-        "./controller/suspicious.png",
-        {
-          dstPath: `./uploads/escort/${profileImage}`,
-        }
+    if (!escort?.fakePhoto) {
+      if (suspicious === true) {
+        watermark2.addWatermark(
+          `./uploads/escort/${profileImage}`,
+          "./controller/suspicious.png",
+          {
+            dstPath: `./uploads/escort/${profileImage}`,
+          }
+        );
+        escort.fakePhoto = true;
+        await escort.save();
+      }
+      const updatedFakePhoto = await FakePhoto.findByIdAndUpdate(
+        id,
+        { $set: { suspicious } },
+        { new: true }
       );
-    }
-    console.log("profileImage", profileImage);
-    const updatedFakePhoto = await FakePhoto.findByIdAndUpdate(
-      id,
-      { $set: { suspicious } },
-      { new: true }
-    );
 
-    if (!updatedFakePhoto) {
-      return res.status(404).json({ message: "FakePhoto not found" });
-    }
+      if (!updatedFakePhoto) {
+        return res.status(404).json({ message: "FakePhoto not found" });
+      }
 
-    res.status(200).json({
-      message: "Suspicion status updated",
-      fakePhoto: updatedFakePhoto,
-    });
+      return res.status(201).json({
+        message: "Suspicion status updated",
+        fakePhoto: updatedFakePhoto,
+      });
+    } else {
+      return res.status(200).json({
+        message: "This escort already marked as Fake photo",
+        fakePhoto: updatedFakePhoto,
+      });
+    }
   } catch (error) {
     console.error("Error updating suspicion status:", error);
     res.status(500).json({ error: "Failed to update suspicion status" });

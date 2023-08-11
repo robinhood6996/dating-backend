@@ -1,3 +1,4 @@
+const { object } = require("firebase-functions/v1/storage");
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
@@ -5,6 +6,20 @@ const Schema = mongoose.Schema;
 const MembershipSchema = {
   startDate: { type: Date },
   endDate: { type: Date },
+};
+//Mermbership details schema
+const LocationSchema = {
+  coordinates: {
+    latitude: { type: String, default: null },
+    longitude: { type: String, default: null },
+  },
+  name: { type: String, default: null },
+  age: { type: Number, default: null },
+  country: { type: String, lowercase: true, default: null },
+  area: { type: String, lowercase: true, default: null },
+  baseCity: { type: String, lowercase: true, default: null },
+  userName: { type: String, default: null },
+  profileImage: { type: String, default: null },
 };
 // Schema
 const EscortProfileSchema = new Schema(
@@ -113,6 +128,7 @@ const EscortProfileSchema = new Schema(
     photosRate: { type: Number, default: 0 },
     ratedClients: { type: Array, default: [] },
     avgRate: { type: Number, default: 0 },
+    locationDetails: { type: LocationSchema, default: {} },
   },
   { timestamps: true }
 );
