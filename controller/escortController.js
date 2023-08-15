@@ -545,6 +545,19 @@ exports.getAllEscort = async (req, res) => {
   }
 };
 
+exports.getGeoEscorts = async (req, res) => {
+  try {
+    const escorts = await EscortProfile.find({
+      "locationDetails.coordinates.latitude": { $exists: true },
+      "locationDetails.coordinates.longitude": { $exists: true },
+    });
+
+    res.json(escorts);
+  } catch (error) {
+    res.status(500).json({ error: "Error fetching escorts" });
+  }
+};
+
 //Get escort data
 exports.getEscort = async (req, res) => {
   try {
