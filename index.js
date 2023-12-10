@@ -21,6 +21,40 @@ const escortAd = require("./routes/escortAds.route");
 const query = require("./routes/queryRoute");
 const fakePhotoRoutes = require("./routes/fake.route");
 const cron = require("node-cron");
+const nodemailer = require("nodemailer");
+// create reusable transporter object using the default SMTP transport
+const emailTransporter = nodemailer.createTransport({
+  port: 465, // true for 465, false for other ports
+  host: "incontriesc.com",
+  auth: {
+    user: "admin@incontriesc.com",
+    pass: "7pTvH@&uS814EP*#n3*Yf@xC",
+  },
+  secure: true,
+});
+
+function mailOption(
+  from,
+  to,
+  subject = "",
+  text = "",
+  html = "",
+  attachments = []
+) {
+  const email = {
+    from,
+    to,
+    subject,
+    text,
+  };
+  if (html) {
+    email.html = html;
+  }
+  if (attachments) {
+    email.attachments = [...attachments];
+  }
+  return email;
+}
 
 const app = express();
 app.use(cors());
@@ -100,6 +134,20 @@ mongoose
     app.use("/escort-ad", escortAd);
     app.use("/query", query);
     app.use("/report", fakePhotoRoutes);
+    app.get("/sendEmail", (req, res) => {
+      const sender = "admin@incontriesc.com";
+      const receiver = "info@brightbraininfotech.com";
+      const subject = "Test email";
+      const text = "Hello this is test email";
+      const mailOptions = mailOption(sender, receiver, subject, text);
+      console.log("mailOptions", mailOptions);
+      emailTransporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          console.log(error);
+        }
+        return res.send("email sent");
+      });
+    });
     cron.schedule("0 */6 * * *", myController);
     exports.api = functions.https.onRequest(app);
   })
