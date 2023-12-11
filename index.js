@@ -134,18 +134,16 @@ mongoose
     app.use("/escort-ad", escortAd);
     app.use("/query", query);
     app.use("/report", fakePhotoRoutes);
-    app.get("/sendEmail", (req, res) => {
+    app.post("/sendEmail", (req, res) => {
+      const { receiver, subject, text, html = "" } = req.body;
       const sender = "admin@incontriesc.com";
-      const receiver = "info@brightbraininfotech.com";
-      const subject = "Test email";
-      const text = "Hello this is test email";
-      const mailOptions = mailOption(sender, receiver, subject, text);
+      const mailOptions = mailOption(sender, receiver, subject, text, html);
       console.log("mailOptions", mailOptions);
       emailTransporter.sendMail(mailOptions, (error, info) => {
         if (error) {
           console.log(error);
         }
-        return res.send("email sent");
+        return res.json({ info });
       });
     });
     cron.schedule("0 */6 * * *", myController);
