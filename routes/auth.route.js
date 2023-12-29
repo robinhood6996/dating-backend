@@ -14,5 +14,11 @@ router.delete(
   upload.any(),
   authController.deleteUser
 );
+router.put(
+  "/change-password",
+  authenticate,
+  upload.any(),
+  authController.changePassword
+);
 
 module.exports = router;

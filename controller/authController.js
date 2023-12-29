@@ -18,7 +18,7 @@ exports.registerUser = async (req, res) => {
         .json({ message: "User with this email already exists" });
     }
     // Hash the password
-    //const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
     // Create a new user document
     console.log("req.body.email", req.body);
     let nameSplit = req.body.email.split("@")[0];
@@ -27,6 +27,7 @@ exports.registerUser = async (req, res) => {
       name: req.body.name,
       email: req.body.email,
       password: req.body.password,
+      // password: hashedPassword,
       gender: req.body.gender,
       age: req.body.age || null,
       phone: req.body.phone,
@@ -111,7 +112,7 @@ exports.login = async (req, res) => {
     });
     if (existingUser) {
       // Generate a JWT token
-      //const matched = await bcrypt.compare(password, existingUser.password);
+      // const matched = await bcrypt.compare(password, existingUser.password);
       const matched = password === existingUser.password;
       if (matched) {
         const token = jwt.sign(
@@ -192,5 +193,48 @@ exports.deleteUser = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Something went wrong", statusCode: 500 });
+  }
+};
+
+//Change Password
+exports.changePassword = async (req, res) => {
+  let requestedUser = req.user;
+
+  const { currentPassword, newPassword } = req.body;
+
+  try {
+    // Find the user by ID
+    const user = await User.findById(requestedUser._id);
+    // return res.json(user);
+    // Check if the user exists
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Verify the current password
+    // const isPasswordValid = await bcrypt.compare(
+    //   currentPassword,
+    //   user.password
+    // );
+
+    const isPasswordValid = currentPassword === user.password;
+
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: "Current password is incorrect" });
+    }
+
+    // Hash the new password
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update the user's password
+    user.password = newPassword;
+
+    // Save the updated user document
+    await user.save();
+
+    return res.status(200).json({ message: "Password changed successfully" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Something went wrong", error });
   }
 };
