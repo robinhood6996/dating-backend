@@ -206,7 +206,6 @@ exports.editBanner = async (req, res) => {
 
     res.json({ banner: updatedBanner });
   } catch (err) {
-    console.error(err);
     if (err instanceof mongoose.Error.ValidationError) {
       const errorMessages = Object.values(err.errors).map(
         (error) => error.message
@@ -224,7 +223,6 @@ exports.deleteBanner = async (req, res) => {
     if (!banner) {
       return res.status(404).json({ message: "Banner not found" });
     }
-    console.log("banner", banner);
     // Check if user type is admin
     // if (req.user.type !== "admin") {
     //   return res.status(403).json({ message: "Not authorized" });

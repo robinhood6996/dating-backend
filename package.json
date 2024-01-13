@@ -30,6 +30,7 @@
     "node-cron": "^3.0.2",
     "nodemailer": "^6.9.7",
     "nodemon": "^2.0.20",
+    "resend": "^2.1.0",
     "stripe": "^12.5.0"
   },
   "engines": {

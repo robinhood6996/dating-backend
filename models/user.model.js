@@ -8,8 +8,8 @@ const userSchema = new Schema(
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     gender: { type: String, enum: ["male", "female", "other"] },
-    age: { type: Number, required: true },
-    phone: { type: String, required: true },
+    age: { type: Number, required: false },
+    phone: { type: String, required: false },
     type: {
       type: String,
       required: true,

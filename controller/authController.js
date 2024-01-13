@@ -199,7 +199,7 @@ exports.deleteUser = async (req, res) => {
 //Change Password
 exports.changePassword = async (req, res) => {
   let requestedUser = req.user;
-
+  console.log("requestedUser", requestedUser);
   const { currentPassword, newPassword } = req.body;
 
   try {
@@ -220,11 +220,11 @@ exports.changePassword = async (req, res) => {
     const isPasswordValid = currentPassword === user.password;
 
     if (!isPasswordValid) {
-      return res.status(401).json({ message: "Current password is incorrect" });
+      return res.status(403).json({ message: "Current password is incorrect" });
     }
 
     // Hash the new password
-    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+    // const hashedNewPassword = await bcrypt.hash(newPassword, 10);
 
     // Update the user's password
     user.password = newPassword;
