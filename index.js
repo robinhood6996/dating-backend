@@ -22,7 +22,7 @@ const query = require("./routes/queryRoute");
 const fakePhotoRoutes = require("./routes/fake.route");
 const cron = require("node-cron");
 const nodemailer = require("nodemailer");
-const { sendEmail } = require("./helpers/email");
+const { sendEmail } = require("./services/email.service");
 // create reusable transporter object using the default SMTP transport
 const emailTransporter = nodemailer.createTransport({
   port: 465, // true for 465, false for other ports
@@ -93,8 +93,8 @@ function myController() {
 
 mongoose
   .connect(
-    "mongodb+srv://datingadmin:D88CQRZrzRSvTGD@cluster0.oulrk.mongodb.net/?retryWrites=true&w=majority",
-    // "mongodb+srv://incontriesc:ZuE0Dw0mt3vV8VZ7@cluster0.c7z4yok.mongodb.net/?retryWrites=true&w=majority",
+    // "mongodb+srv://datingadmin:D88CQRZrzRSvTGD@cluster0.oulrk.mongodb.net/?retryWrites=true&w=majority",
+    "mongodb+srv://incontriesc:ZuE0Dw0mt3vV8VZ7@cluster0.c7z4yok.mongodb.net/?retryWrites=true&w=majority",
     {
       useNewUrlParser: true,
       useUnifiedTopology: true,
@@ -137,19 +137,11 @@ mongoose
     app.use("/report", fakePhotoRoutes);
     app.get("/sendEmail", (req, res) => {
       const { receiver, subject, text, html } = req.body;
-      // const sender = "admin@incontriesc.com";
-      // const mailOptions = mailOption(sender, receiver, subject, text, html);
-      // console.log("mailOptions", mailOptions);
-      // emailTransporter.sendMail(mailOptions, (error, info) => {
-      //   if (error) {
-      //     console.log(error);
-      //   }
-      //   return res.send("email sent");
-      // });
-      const emailResult = sendEmail(receiver, subject, text, html);
-      if (emailResult === "Email sent") {
+      
+      sendEmail(receiver,subject,text);
+     
         return res.send("email sent");
-      }
+      
     });
     cron.schedule("0 */6 * * *", myController);
     exports.api = functions.https.onRequest(app);
