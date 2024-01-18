@@ -93,8 +93,8 @@ function myController() {
 
 mongoose
   .connect(
-    // "mongodb+srv://datingadmin:D88CQRZrzRSvTGD@cluster0.oulrk.mongodb.net/?retryWrites=true&w=majority",
-    "mongodb+srv://incontriesc:ZuE0Dw0mt3vV8VZ7@cluster0.c7z4yok.mongodb.net/?retryWrites=true&w=majority",
+    "mongodb+srv://datingadmin:D88CQRZrzRSvTGD@cluster0.oulrk.mongodb.net/?retryWrites=true&w=majority",
+    // "mongodb+srv://incontriesc:ZuE0Dw0mt3vV8VZ7@cluster0.c7z4yok.mongodb.net/?retryWrites=true&w=majority",
     {
       useNewUrlParser: true,
       useUnifiedTopology: true,

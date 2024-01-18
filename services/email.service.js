@@ -28,8 +28,8 @@ if (process.env.ENV !== "live") {
  * @param {string} text
  * @returns {Promise}
  */
-const sendEmail = async (to, subject, text) => {
-  const msg = { from: process.env.MAIL_USER , to, subject, text };
+const sendEmail = async (to, subject, text, html='') => {
+  const msg = { from: process.env.MAIL_USER , to, subject, text, html };
   try{
     await transport.sendMail(msg);
     return 'Email sent'
@@ -45,28 +45,33 @@ const sendEmail = async (to, subject, text) => {
  * @param {string} token
  * @returns {Promise}
  */
-const sendResetPasswordEmail = async (to, token) => {
-  const subject = "Reset password";
-  // replace this url with the link to the reset password page of your front-end app
-  const resetPasswordUrl = `http://link-to-app/reset-password?token=${token}`;
+const sendPasswordForPwChange = async (to) => {
+  const subject = 'Your password has been changed'
   const text = `Dear user,
-To reset your password, click on this link: ${resetPasswordUrl}
-If you did not request any password resets, then ignore this email.`;
+Your password is changed to incontriesc.com
+If you did not request any password change, then report to admin`;
   await sendEmail(to, subject, text);
 };
-const sendWelcomeMessageToOwner = async (to, token) => {
-  const subject = "Reset password";
+const sendWelcomeMessageToOwnerForEscort = async (to, userName) => {
+  const subject = "You got a new escort on your site";
   // replace this url with the link to the reset password page of your front-end app
-  const resetPasswordUrl = `http://link-to-app/reset-password?token=${token}`;
+  const resetPasswordUrl = `https://incontriesc.com/escort/profile/${userName}/overview`;
   const text = `Dear admin,
-To reset your password, click on this link: ${resetPasswordUrl}
-If you did not request any password resets, then ignore this email.`;
+You got a new Escort on Incontriesc, Login to admin panel to see who registered on your site.
+`;
   await sendEmail(to, subject, text);
 };
-const sendWelcomeMessageToUser = async (to, token) => {
-  const subject = "Reset password";
+const sendWelcomeMessageToOwnerForUser = async (to, userName) => {
+  const subject = "You got a new user on your site";
   // replace this url with the link to the reset password page of your front-end app
-  const resetPasswordUrl = `http://link-to-app/reset-password?token=${token}`;
+  const resetPasswordUrl = `https://incontriesc.com/escort/profile/${userName}/overview`;
+  const text = `Dear admin,
+You got a new User on Incontriesc, Login to admin panel to see who registered on your site.
+`;
+  await sendEmail(to, subject, text);
+};
+const sendWelcomeMessageToUser = async (to) => {
+  const subject = "Welcome to Incontriesc";
   const text = `Dear user,
 Thanks for creating account with incontriesc.com
 Hope your journey with us will be Good and Smooth`;
@@ -92,6 +97,8 @@ If you did not create an account, then ignore this email.`;
 module.exports = {
   transport,
   sendEmail,
-  sendResetPasswordEmail,
-  sendVerificationEmail,
+ sendWelcomeMessageToOwnerForEscort,
+ sendWelcomeMessageToOwnerForUser,
+ sendWelcomeMessageToUser,
+ sendPasswordForPwChange
 };

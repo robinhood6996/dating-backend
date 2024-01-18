@@ -7,6 +7,7 @@ const jwt = require("jsonwebtoken");
 const { EscortProfile } = require("../models/escort.model");
 const { generateRandomNumber } = require("../helpers/utils");
 const defaultUser = require("../models/defaultUser.model");
+const { sendWelcomeMessageToOwnerForEscort, sendWelcomeMessageToOwnerForUser, sendWelcomeMessageToUser } = require("../services/email.service");
 
 exports.registerUser = async (req, res) => {
   try {
@@ -47,6 +48,8 @@ exports.registerUser = async (req, res) => {
         userName: username,
       });
       await escort.save();
+      sendWelcomeMessageToOwnerForEscort(process.env.ADMIN_EMAIL, username);
+      
     }
     if (user.type === "default") {
       let user = new defaultUser({
@@ -58,7 +61,9 @@ exports.registerUser = async (req, res) => {
         username,
       });
       await user.save();
+      sendWelcomeMessageToOwnerForUser(process.env.ADMIN_EMAIL, username)
     }
+    sendWelcomeMessageToUser(user.email)
     return res.status(201).json({ message: "Successfully registered" });
   } catch (error) {
     console.log(error);
@@ -231,7 +236,7 @@ exports.changePassword = async (req, res) => {
 
     // Save the updated user document
     await user.save();
-
+  sendPasswordForPwChange(requestedUser.email)
     return res.status(200).json({ message: "Password changed successfully" });
   } catch (error) {
     console.error(error);
