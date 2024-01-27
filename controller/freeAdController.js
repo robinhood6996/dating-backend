@@ -7,7 +7,12 @@ exports.createAd = async (req, res) => {
     const files = req.files;
     const { title, category, description, phone, email, duration, username } =
       req.body;
-    const escort = await EscortProfile.findOne({ email: user.email });
+    let escort = null;
+    if(user.type === 'admin'){
+     escort = await EscortProfile.findOne({ userName: username });
+    } else{
+      escort = await EscortProfile.findOne({ email: user.email });
+    }
     // Check if request body exists
     if (!req.body) {
       return res.status(400).json({ message: "Request body is required" });
@@ -48,7 +53,7 @@ exports.createAd = async (req, res) => {
       author: user.email,
       photos: files,
       username: username ?? user.username,
-      ownerEmail: email ?? escort.email,
+      ownerEmail: escort.email ?? email,
     });
 
     // Save new free ad document
@@ -116,6 +121,7 @@ exports.activeAds = async (req, res) => {
 
     // Fetch active FreeAds from the database
     const activeFreeAds = await FreeAd.find(query)
+      .sort({ createdAt: -1 })
       .limit(limit)
       .skip(offset)
       .exec();
@@ -149,7 +155,7 @@ exports.inactiveAds = async (req, res) => {
 
     // Construct the search query with the "status" set to "active" and optional search text
     const query = {
-      status: "inactive",
+      status: "pending",
     };
 
     if (search) {
@@ -164,6 +170,7 @@ exports.inactiveAds = async (req, res) => {
 
     // Fetch active FreeAds from the database
     const activeFreeAds = await FreeAd.find(query)
+      .sort({ createdAt: -1 })
       .limit(limit)
       .skip(offset)
       .exec();
@@ -206,6 +213,7 @@ exports.getAll = async (req, res) => {
     // Count the total number of active FreeAds for pagination purposes
     const totalActiveFreeAds = await FreeAd.countDocuments(query);
     let data = await FreeAd.find(query)
+      .sort({ createdAt: -1 })
       .limit(limit || 0)
       .skip(offset || 0)
       .exec();
@@ -264,10 +272,12 @@ exports.getMyAds = async (req, res) => {
   const { email } = req.user;
   try {
     const { limit, offset } = req.query;
+    console.log('email',email)
     let query = { ownerEmail: email };
     // Count the total number of active FreeAds for pagination purposes
     const totalActiveFreeAds = await FreeAd.countDocuments(query);
     let data = await FreeAd.find(query)
+      .sort({ createdAt: -1 })
       .limit(limit || 0)
       .skip(offset || 0)
       .exec();

@@ -1139,9 +1139,10 @@ exports.deleteEscort = async (req, res) => {
     let { username } = req.query;
     let userProfile = await userModel.findOne({ email });
     if (userProfile.type === "admin") {
-      let escort = await EscortProfile.findOne({ username });
+      let escort = await EscortProfile.findOne({ userName: username });
+      console.log('escort', escort)
       if (escort) {
-        await EscortProfile.deleteOne({ username });
+        await EscortProfile.deleteOne({ userName: username });
       }
       await userModel.deleteOne({ username });
 
