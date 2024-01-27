@@ -32,5 +32,6 @@ router.get("/", freeAdController.getAll);
 router.get("/my", authenticate, freeAdController.getMyAds);
 router.get("/:adId", freeAdController.getSingleAd);
 router.delete("/:adId", authenticate, freeAdController.deleteAd);
+router.delete("/delete-image/:adId", authenticate, freeAdController.deleteAdImage);
 
 module.exports = router;

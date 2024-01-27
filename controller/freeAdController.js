@@ -45,6 +45,7 @@ exports.createAd = async (req, res) => {
       title,
       category,
       city: req.body.city || "",
+      country: req.body.country || "",
       description,
       phone,
       email: email ?? "",
@@ -70,7 +71,7 @@ exports.editFreeAd = async (req, res) => {
   try {
     const freeAdId = req.params.id;
     const update = req.body;
-
+    const files = req.files;
     if (!freeAdId) {
       return res.status(400).json({ message: "FreeAd id is required" });
     }
@@ -81,7 +82,11 @@ exports.editFreeAd = async (req, res) => {
     if (!existingFreeAd) {
       return res.status(400).json({ message: "FreeAd not found" });
     }
-
+    console.log('files', files)
+     // Update photos array only if new files are provided
+    if (files && files.length > 0) {
+      existingFreeAd.photos = existingFreeAd.photos.concat(files);
+    }
     // Update the FreeAd document with the new data
     Object.keys(update).forEach((key) => {
       existingFreeAd[key] = update[key];
@@ -289,3 +294,55 @@ exports.getMyAds = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+exports.deleteAdImage = async(req, res) => {
+    try {
+    let {adId} = req.params;
+    const { filename } = req.query;
+    const directoryPath = __dirname + "/../uploads/escort/";
+    if (filename) {
+      let ad = await FreeAd.findOne({ _id: adId });
+      console.log('filename', adId, filename, ad)
+      if (ad) {
+        let existFile = ad?.photos?.find(
+          (img) => img.filename === filename
+        );
+        if (existFile) {
+          fs.unlinkSync(directoryPath + filename, (err) => {
+            if (err) {
+              res.status(500).send({
+                message: "Could not delete the file. " + err,
+              });
+            }
+          });
+          let filtered = ad.photos.filter(
+            (img) => img.filename !== filename
+          );
+          ad.photos = filtered;
+          await ad.save();
+          return res.status(200).json({
+            message: "Deleted image",
+            statusCode: 200,
+          });
+        }
+        return res.status(403).json({
+          message: "You are not allowed for this action",
+          statusCode: 403,
+        });
+      } else {
+        return res.status(401).json({
+          message: "Escort not found",
+          escort,
+          statusCode: 401,
+        });
+      }
+    }
+    return res.status(400).json({
+      message: "image parameter expected with filename",
+      statusCode: 400,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Error", error, statusCode: 500 });
+  }
+}
