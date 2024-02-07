@@ -234,7 +234,8 @@ exports.getSingleAd = async (req, res) => {
   try {
     const { adId } = req.params;
     let NewAd = await FreeAd.findById(adId);
-    res.status(200).json({ NewAd, statusCode: 200 });
+    let user = await EscortProfile.findOne({userName: NewAd?.username})
+    res.status(200).json({ NewAd: {...NewAd?._doc, escort: {...user?._doc}}, statusCode: 200 });
   } catch (error) {
     console.log("error", error);
     res.status(500).json({ message: "Internal server error", statusCode: 500 });

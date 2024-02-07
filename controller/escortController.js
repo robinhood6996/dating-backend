@@ -563,8 +563,11 @@ exports.getEscort = async (req, res) => {
   try {
     let { username } = req.query;
     let escort = await EscortProfile.findOne({ userName: username });
+    const user = req?.user;
+      escort.viewed = escort?.viewed + 1;
+      await escort.save();
     if (escort) {
-      return res.status(200).json({ data: escort, statusCode: 200 });
+      return res.status(200).json({ data: escort, statusCode: 200, user });
     } else {
       return res
         .status(404)

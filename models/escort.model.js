@@ -128,6 +128,7 @@ const EscortProfileSchema = new Schema(
     photosRate: { type: Number, default: 0 },
     ratedClients: { type: Array, default: [] },
     avgRate: { type: Number, default: 0 },
+    viewed: { type: Number, default: 0 },
     locationDetails: { type: LocationSchema, default: {} },
   },
   { timestamps: true }
