@@ -7,6 +7,8 @@ const upload = require("multer")();
 router.post("/register", upload.any(), authController.registerUser);
 router.get("/user", authController.getAllUser);
 router.post("/login", upload.any(), authController.login);
+router.post("/forgot-password", upload.any(), authController.forgotPassword);
+router.post("/reset-password", upload.any(), authController.resetPassword);
 router.get("/logout", authController.logout);
 router.delete(
   "/delete-user",

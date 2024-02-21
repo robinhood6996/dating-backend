@@ -7,7 +7,7 @@ const jwt = require("jsonwebtoken");
 const { EscortProfile } = require("../models/escort.model");
 const { generateRandomNumber } = require("../helpers/utils");
 const defaultUser = require("../models/defaultUser.model");
-const { sendWelcomeMessageToOwnerForEscort, sendWelcomeMessageToOwnerForUser, sendWelcomeMessageToUser } = require("../services/email.service");
+const { sendWelcomeMessageToOwnerForEscort, sendWelcomeMessageToOwnerForUser, sendWelcomeMessageToUser, sendPasswordResetEmail } = require("../services/email.service");
 
 exports.registerUser = async (req, res) => {
   try {
@@ -241,5 +241,55 @@ exports.changePassword = async (req, res) => {
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Something went wrong", error });
+  }
+};
+
+exports.forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    // Find the user with the provided email address
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Generate a JWT token with user's email for password reset
+    const token = jwt.sign({ email }, process.env.ACCESS_SECRET_TOKEN, { expiresIn: '1h' });
+
+    // Send password reset link/token to the user's email
+    const resetLink = `${req.protocol}://${req.get('host')}/reset-password?token=${token}`;
+    await sendPasswordResetEmail(email, resetLink); // Assuming you have a function to send email
+
+    res.json({ message: 'Password reset link sent to your email' });
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+exports.resetPassword = async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+
+    // Verify and decode the token
+    const decoded = jwt.verify(token, process.env.ACCESS_SECRET_TOKEN);
+
+    // Find the user with the decoded email
+    const user = await User.findOne({ email: decoded.email });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Update user's password
+    user.password = newPassword; // Assuming you have a proper hashing mechanism for passwords
+    await user.save();
+
+    res.json({ message: 'Password reset successful' });
+  } catch (error) {
+    console.error('Password reset error:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
